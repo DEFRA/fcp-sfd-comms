@@ -16,10 +16,10 @@ jest.mock('hapi-pino', () => ({
   },
   name: 'mock-hapi-pino'
 }))
-jest.mock('node:tls', () => ({
-  ...jest.requireActual('node:tls'),
-  createSecureContext: (...args) => mockTlsCreateSecureContext(...args)
-}))
+
+const { config } = await import('../../../../../../src/config/index.js')
+const { secureContext } = await import('../../../../../../src/api/common/helpers/secure-context/index.js')
+const { requestLogger } = await import('../../../../../../src/api/common/helpers/logging/request-logger.js')
 
 describe('#secureContext', () => {
   let server
@@ -50,6 +50,9 @@ describe('#secureContext', () => {
   describe('When secure context is enabled', () => {
     const PROCESS_ENV = process.env
 
+    const createSecureContextSpy = jest.spyOn(tls, 'createSecureContext')
+      .mockImplementation(mockTlsCreateSecureContext)
+
     beforeAll(() => {
       process.env = { ...PROCESS_ENV }
       process.env.TRUSTSTORE_ONE = 'mock-trust-store-cert-one'
@@ -68,6 +71,7 @@ describe('#secureContext', () => {
 
     afterAll(() => {
       process.env = PROCESS_ENV
+      createSecureContextSpy.mockRestore()
     })
 
     test('Original tls.createSecureContext should have been called', () => {
