@@ -11,8 +11,7 @@ on:
       - synchronize
       - ready_for_review
 
- workflow_dispatch:
-
+   workflow_dispatch:
 
 jobs:
   pr-validator:
@@ -36,7 +35,7 @@ jobs:
           docker build --no-cache --tag fcp-sfd-data .
           exit $?
 
-- name: Run Tests
+      - name: Run Tests
         run: |
           mkdir -p coverage
           chmod -R a+rw ./coverage
