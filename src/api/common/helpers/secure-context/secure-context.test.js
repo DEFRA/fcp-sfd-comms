@@ -1,12 +1,10 @@
-import hapi from '@hapi/hapi'
+import { jest, describe, test, expect, beforeEach, beforeAll, afterEach, afterAll } from '@jest/globals'
 
-import { secureContext } from '~/src/api/common/helpers/secure-context/index.js'
-import { requestLogger } from '~/src/api/common/helpers/logging/request-logger.js'
-import { config } from '~/src/config/index.js'
+import hapi from '@hapi/hapi'
+import tls from 'node:tls'
 
 const mockAddCACert = jest.fn()
-const mockTlsCreateSecureContext = jest
-  .fn()
+const mockTlsCreateSecureContext = jest.fn()
   .mockReturnValue({ context: { addCACert: mockAddCACert } })
 
 jest.mock('hapi-pino', () => ({
