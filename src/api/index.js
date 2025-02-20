@@ -18,7 +18,6 @@ const createServer = async () => {
         options: {
           abortEarly: false
         },
-        failAction
       },
       files: {
         relativeTo: path.resolve(config.get('root'), '.public')
@@ -38,20 +37,11 @@ const createServer = async () => {
       stripTrailingSlash: true
     }
   })
-
-  // Hapi Plugins:
-  // requestLogger  - automatically logs incoming requests
-  // requestTracing - trace header logging and propagation
-  // secureContext  - loads CA certificates from environment config
-  // pulse          - provides shutdown handlers
-  // mongoDb        - sets up mongo connection pool and attaches to `server` and `request` objects
-  // router         - routes used in the app
   await server.register([
     requestLogger,
     requestTracing,
     secureContext,
     pulse,
-    mongoDb,
     router
   ])
 
