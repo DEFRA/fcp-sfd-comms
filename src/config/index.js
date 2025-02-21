@@ -4,9 +4,11 @@ import { fileURLToPath } from 'node:url'
 import environments from '../api/common/constants/environments.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
+
 const isProduction = process.env.NODE_ENV === environments.PRODUCTION
 const isDev = process.env.NODE_ENV === environments.DEVELOPMENT
 const isTest = process.env.NODE_ENV === environments.TEST
+
 const config = convict({
   serviceVersion: {
     doc: 'The service version, this variable is injected into your docker container in CDP environments',

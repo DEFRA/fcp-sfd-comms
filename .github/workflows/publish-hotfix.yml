@@ -27,11 +27,13 @@ jobs:
           node-version: 22
           cache: npm
 
+      - run: npm ci
+
       - name: Run Tests
         run: |
           mkdir -p coverage
           chmod -R a+rw ./coverage
-          docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm "fcp-sfd-data"
+          docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm "fcp-sfd-comms"
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main
@@ -40,5 +42,5 @@ jobs:
 
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4
-        env:
+        env: 
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

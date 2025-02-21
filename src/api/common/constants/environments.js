@@ -1,5 +1,5 @@
 export default {
-    DEVELOPMENT: 'development',
-    TEST: 'test',
-    PRODUCTION: 'production'
+  DEVELOPMENT: 'development',
+  TEST: 'test',
+  PRODUCTION: 'production'
 }

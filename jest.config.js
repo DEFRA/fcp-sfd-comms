@@ -3,7 +3,6 @@ export default {
   resetModules: true,
   clearMocks: true,
   silent: false,
-  preset: '@shelf/jest-mongodb',
   watchPathIgnorePatterns: ['globalConfig'],
   testMatch: ['**/test/**/*.test.js'],
   reporters: ['default', ['github-actions', { silent: false }], 'summary'],

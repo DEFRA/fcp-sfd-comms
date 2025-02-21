@@ -1,9 +1,9 @@
 services:
-  fcp-sfd-data:
+  fcp-sfd-comms:
     build:
       target: development
-    image: fcp-sfd-data-development
-    container_name: fcp-sfd-data-test
+    image: fcp-sfd-comms-development
+    container_name: fcp-sfd-comms-test
     command: npm run test
     env_file:
       - path: .env

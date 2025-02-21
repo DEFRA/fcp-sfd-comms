@@ -32,14 +32,15 @@ jobs:
       - name: Build Docker Image
         run: |
           set +e
-          docker build --no-cache --tag fcp-sfd-data .
+          docker build --no-cache --tag fcp-sfd-comms .
           exit $?
 
       - name: Run Tests
         run: |
           mkdir -p coverage
           chmod -R a+rw ./coverage
-          docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm "fcp-sfd-data"
+          docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm "fcp-sfd-comms"
+
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4
         env: 

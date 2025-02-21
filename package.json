@@ -1,6 +1,6 @@
 {
   "name": "fcp-sfd-comms",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "CComms Service for Single Front Door",
   "main": "src/index.js",
   "type": "module",
@@ -17,8 +17,6 @@
   },
   "author": "Defra DDTS",
   "contributors": [
-    "Rana Salem <rana.salem@defra.gov.uk>",
-    "Shaun Fitzsimons <shaun.fitzsimmons@defra.gov.uk>",
     "Fay Toward <fay.toward@defra.gov.uk>"
   ],
   "license": "OGL-UK-3.0",
@@ -44,6 +42,7 @@
     "undici": "6.21.1"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "4.3.2",
     "@types/convict": "6.1.6",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.13",

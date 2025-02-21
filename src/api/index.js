@@ -11,13 +11,14 @@ import { setupProxy } from './common/helpers/proxy/setup-proxy.js'
 
 const createServer = async () => {
   setupProxy()
+
   const server = hapi.server({
     port: config.get('port'),
     routes: {
       validate: {
         options: {
           abortEarly: false
-        },
+        }
       },
       files: {
         relativeTo: path.resolve(config.get('root'), '.public')
