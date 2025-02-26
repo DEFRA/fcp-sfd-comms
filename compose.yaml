@@ -5,7 +5,7 @@ services:
     image: fcp-sfd-comms-development
     container_name: fcp-sfd-comms-development
     ports:
-      - '3001:3001'
+      - '3556:3556'
     links:
       - 'localstack:localstack'
       - 'mongodb:mongodb'
