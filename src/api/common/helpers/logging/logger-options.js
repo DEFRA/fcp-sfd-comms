@@ -1,11 +1,11 @@
 import { ecsFormat } from '@elastic/ecs-pino-format'
 import { getTraceId } from '@defra/hapi-tracing'
 
-import { config } from '../../../../config/index.js'
+import { serverConfig } from '../../../../config/index.js'
 
-const logConfig = config.get('log')
-const serviceName = config.get('serviceName')
-const serviceVersion = config.get('serviceVersion')
+const logConfig = serverConfig.get('log')
+const serviceName = serverConfig.get('serviceName')
+const serviceVersion = serverConfig.get('serviceVersion')
 
 const formatters = {
   ecs: {

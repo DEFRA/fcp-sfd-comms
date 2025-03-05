@@ -1,7 +1,7 @@
 import path from 'path'
 import hapi from '@hapi/hapi'
 
-import { config } from '../config/index.js'
+import { serverConfig } from '../config/index.js'
 import { router } from './router.js'
 import { requestLogger } from './common/helpers/logging/request-logger.js'
 import { secureContext } from './common/helpers/secure-context/index.js'
@@ -13,7 +13,7 @@ const createServer = async () => {
   setupProxy()
 
   const server = hapi.server({
-    port: config.get('port'),
+    port: serverConfig.get('port'),
     routes: {
       validate: {
         options: {
@@ -21,7 +21,7 @@ const createServer = async () => {
         }
       },
       files: {
-        relativeTo: path.resolve(config.get('root'), '.public')
+        relativeTo: path.resolve(serverConfig.get('root'), '.public')
       },
       security: {
         hsts: {
