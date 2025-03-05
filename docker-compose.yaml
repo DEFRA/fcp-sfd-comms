@@ -26,12 +26,10 @@ services:
       NODE_ENV: development
       MONGO_URI: mongodb://mongodb:27017/
       MONGO_DATABASE: fcp-sfd-comms
-      # AWS configuration
       AWS_REGION: eu-west-2
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
       AWS_ENDPOINT_URL: http://localstack:4566
-      # SQS/SNS configuration - only needed by the application
       SNS_TOPIC_ARN: arn:aws:sns:eu-west-2:000000000000:fcp-sfd-comms-topic
       DATA_TOPIC_ARN: arn:aws:sns:eu-west-2:000000000000:fcp-sfd-data-topic
       SQS_QUEUE_URL: http://localstack:4566/000000000000/fcp-sfd-comms-queue
@@ -51,7 +49,6 @@ services:
     env_file:
       - .env
     environment:
-      # Only the essential LocalStack configuration
       DEBUG: ${DEBUG:-1}
       LS_LOG: WARN
       SERVICES: s3,sqs,sns,firehose
