@@ -14,20 +14,25 @@ on:
   workflow_dispatch:
 
 jobs:
+
   pr-validator:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-      - run: |
-          npm ci
+          fetch-depth: 0
+
+      - name: Check Package Version Increment
+        run: |
+          main_version=$(git describe origin/main --tags)
+          pr_version=$(jq -r '.version' package.json)
+          if [ "$pr_version" \> "$main_version" ]; then
+            exit 0
+          fi
+          echo "Package version ($pr_version) is has not been incremented over main branch ($main_version)"
+          exit 1
 
       - name: Build Docker Image
         run: |
