@@ -31,7 +31,7 @@ jobs:
           if [ "$pr_version" \> "$main_version" ]; then
             exit 0
           fi
-          echo "Package version ($pr_version) is has not been incremented more over main branch ($main_version)"
+          echo "Package version ($pr_version) is has not been incremented over main branch ($main_version)"
           exit 1
 
       - name: Build Docker Image
