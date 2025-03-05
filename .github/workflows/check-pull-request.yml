@@ -26,7 +26,7 @@ jobs:
         run: |
           main=$(git describe main --tags | sed 's/\.//g')
           version=$(jq -r '.version' package.json | sed 's/\.//g')
-          if [ "$main" -gt "$version" ]; then
+          if [[ "$main" -gt "$version" ]]; then
             echo "Package version is not incremented"
             exit 1
           fi
