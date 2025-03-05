@@ -22,13 +22,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: true
 
       - name: Check Package Version Increment
         run: |
           main_version=$(git describe main --tags | sed 's/\.//g')
           pr_version=$(git describe HEAD --tags | sed 's/\.//g')
-          if [ "$pr_version" -le "$main_version" ]; then
+          if [[ "$pr_version" -le "$main_version" ]]; then
             echo "PR version ($pr) is not greater than main version ($main)"
             exit 1
           fi
