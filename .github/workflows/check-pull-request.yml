@@ -24,10 +24,12 @@ jobs:
 
       - name: Check Package Version Increment
         run: |
-          main=$(git describe main --tags | sed 's/\.//g')
-          version=$(jq -r '.version' package.json | sed 's/\.//g')
-          if [[ "$main" -gt "$version" ]]; then
-            echo "Package version is not incremented"
+          main=$(git describe main --tags)
+          pr=$(git describe HEAD --tags)
+          main_version=$(echo $main | sed 's/\.//g')
+          pr_version=$(echo $pr | sed 's/\.//g')
+          if [ "$pr_version" -le "$main_version" ]; then
+            echo "PR version ($pr) is not greater than main version ($main)"
             exit 1
           fi
 
