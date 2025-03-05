@@ -23,10 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          fetch-tags: true
-
-      - name: Fetch main branch
-        run: git fetch origin main
 
       - name: Check Package Version Increment
         run: |
@@ -35,7 +31,7 @@ jobs:
           if [ "$pr_version" \> "$main_version" ]; then
             exit 0
           fi
-          echo "Version in package.json is not greater than the main branch version"
+          echo "Package version ($pr_version) is has not been incremented more over main branch ($main_version)"
           exit 1
 
       - name: Build Docker Image
