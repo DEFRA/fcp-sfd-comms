@@ -21,13 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: |
-          npm ci
+      - name: Get package version
+        id: get_version
+        run: jq -r '.version' package.json
 
       - name: Build Docker Image
         run: |

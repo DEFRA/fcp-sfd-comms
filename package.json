@@ -1,6 +1,6 @@
 {
   "name": "fcp-sfd-comms",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "CComms Service for Single Front Door",
   "main": "src/index.js",
   "type": "module",
