@@ -29,10 +29,11 @@ jobs:
         run: |
           main_version=$(git describe main --tags | sed 's/\.//g')
           pr_version=$(jq -r '.version' package.json | sed 's/\.//g')
-          if [[ "$pr_version" -le "$main_version" ]]; then
-            echo "PR version ($pr) is not greater than main version ($main)"
-            exit 1
+          if [[ "$pr_version" -gt "$main_version" ]]; then
+            exit 0
           fi
+          echo "Version in package.json is not greater than the main branch version"
+          exit 1
 
       - name: Build Docker Image
         run: |
