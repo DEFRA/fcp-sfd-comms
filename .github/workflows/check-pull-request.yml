@@ -19,10 +19,10 @@ jobs:
     name: Run Pull Request Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Check package version increment
+      - name: Check Package Version Increment
         run: |
           main=$(git describe main --tags | sed 's/\.//g')
           version=$(jq -r '.version' package.json | sed 's/\.//g')
