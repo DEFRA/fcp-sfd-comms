@@ -26,8 +26,8 @@ jobs:
 
       - name: Check Package Version Increment
         run: |
-          main_version=$(git describe origin/main --tags | sed 's/\.//g')
-          pr_version=$(jq -r '.version' package.json | sed 's/\.//g')
+          main_version=$(git describe origin/main --tags)
+          pr_version=$(jq -r '.version' package.json)
           if [ "$pr_version" \> "$main_version" ]; then
             exit 0
           fi
