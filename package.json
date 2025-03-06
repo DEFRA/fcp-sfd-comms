@@ -17,7 +17,9 @@
   },
   "author": "Defra DDTS",
   "contributors": [
-    "Fay Toward <fay.toward@defra.gov.uk>"
+    "Fay Toward <fay.toward@defra.gov.uk>",
+    "Rana Salem <rana.salem@defra.gov.uk>",
+    "Shaun Fitzsimons <shaun.fitzsimmons@defra.gov.uk>"
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
