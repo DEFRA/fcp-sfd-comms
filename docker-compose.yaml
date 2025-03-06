@@ -3,7 +3,7 @@ services:
     build:
       target: development
     image: fcp-sfd-comms-development
-    container_name: fcp-sfd-comms-development
+    container_name: fcp-sfd-comms-test
     ports:
       - '3001:3001'
     links:
