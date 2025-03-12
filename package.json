@@ -9,7 +9,7 @@
   },
   "scripts": {
     "pretest": "npm run test:lint",
-    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand --silent=false",
+    "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand --forceExit",
     "test:watch": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand",
     "test:lint": "standard",
     "start:watch": "nodemon --watch src --exec 'node --experimental-vm-modules src/index.js'",
@@ -24,7 +24,7 @@
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
-    "@aws-sdk/client-sqs": "3.758.0",
+    "@aws-sdk/client-sqs": "^3.758.0",
     "@defra/hapi-tracing": "1.0.0",
     "@elastic/ecs-pino-format": "1.5.0",
     "@hapi/boom": "10.0.1",

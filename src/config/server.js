@@ -18,8 +18,12 @@ export const serverConfig = {
   },
   env: {
     doc: 'The application environment.',
-    format: ['production', 'development', 'test'],
-    default: 'development',
+    format: [
+      environments.DEVELOPMENT,
+      environments.PRODUCTION,
+      environments.TEST
+    ],
+    default: environments.DEVELOPMENT,
     env: 'NODE_ENV'
   },
   port: {

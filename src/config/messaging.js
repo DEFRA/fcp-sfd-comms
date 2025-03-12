@@ -30,18 +30,18 @@ export const messagingConfig = {
       default: 5,
       env: 'SQS_CONSUMER_HEARTBEAT_INTERVAL'
     },
-    commsIngestion: {
+    commsRequest: {
       queueUrl: {
         doc: 'URL for the comms ingest queue',
         format: String,
         default: null,
-        env: 'COMMS_INGEST_QUEUE_URL'
+        env: 'COMMS_REQUEST_QUEUE_URL'
       },
       deadLetterUrl: {
         doc: 'URL for the comms ingest dead letter queue',
         format: String,
         default: null,
-        env: 'COMMS_INGEST_DEAD_LETTER_QUEUE_URL'
+        env: 'COMMS_REQUEST_DEAD_LETTER_QUEUE_URL'
       }
     }
   }
