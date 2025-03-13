@@ -21,23 +21,23 @@ const startCommsListener = (sqsClient) => {
   })
 
   commsRequestConsumer.on('started', () => {
-    logger.info('Data ingestion consumer started')
+    logger.info('Comms request consumer started')
   })
 
   commsRequestConsumer.on('stopped', () => {
-    logger.info('Data ingestion consumer stopped')
+    logger.info('Comms request consumer stopped')
   })
 
   commsRequestConsumer.on('error', (err) => {
-    logger.error(`Error during data ingestion message handling: ${err.message}`)
+    logger.error(`Error during comms request message handling: ${err.message}`)
   })
 
   commsRequestConsumer.on('processing_error', (err) => {
-    logger.error(`Error during data ingestion message processing: ${err.message}`)
+    logger.error(`Error during comms request message processing: ${err.message}`)
   })
 
   commsRequestConsumer.on('timeout_error', (err) => {
-    logger.error(`Timeout error during data ingestion message handling: ${err.message}`)
+    logger.error(`Timeout error during comms request message handling: ${err.message}`)
   })
 
   commsRequestConsumer.start()

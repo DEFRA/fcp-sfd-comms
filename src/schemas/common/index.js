@@ -1,9 +1,9 @@
 import sbi from './sbi.js'
 import crn from './crn.js'
-import commsAddress from './commsAddress.js'
+import recipient from './recipient.js'
 
 export {
   sbi,
   crn,
-  commsAddress
+  recipient
 }

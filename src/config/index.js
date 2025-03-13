@@ -1,4 +1,5 @@
 import convict from 'convict'
+
 import { serverConfig } from './server.js'
 import { awsConfig } from './aws.js'
 import { messagingConfig } from './messaging.js'

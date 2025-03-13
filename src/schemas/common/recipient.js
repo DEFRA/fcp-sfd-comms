@@ -1,5 +1,8 @@
 import Joi from 'joi'
+
 import environments from '../../constants/environments.js'
+
+import { config } from '../../config/index.js'
 
 const nonProductionEnvironments = [
   environments.DEVELOPMENT,
@@ -7,15 +10,16 @@ const nonProductionEnvironments = [
 ]
 
 const createComponent = () => {
-  if (nonProductionEnvironments.includes(process.env.NODE_ENV)) {
+  if (nonProductionEnvironments.includes(config.get('env'))) {
     return Joi.alternatives().try(
       Joi.string().email(),
       Joi.string().valid('temp-fail@simulator.notify', 'perm-fail@simulator.notify')
     )
   }
+
   return Joi.string().email()
 }
 
-const commsAddress = createComponent()
+const recipient = createComponent()
 
-export default commsAddress
+export default recipient

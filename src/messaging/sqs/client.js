@@ -9,7 +9,7 @@ const sqsConfig = {
   region: config.get('aws.region')
 }
 
-if (config.get('env') === environments.PRODUCTION) {
+if (config.get('env') !== environments.PRODUCTION) {
   sqsConfig.credentials = {
     accessKeyId: config.get('aws.accessKeyId'),
     secretAccessKey: config.get('aws.secretAccessKey')
