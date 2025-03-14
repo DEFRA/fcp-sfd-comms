@@ -7,7 +7,6 @@ export default {
   testMatch: ['**/test/**/*.test.js'],
   reporters: ['default', ['github-actions', { silent: false }], 'summary'],
   setupFiles: ['<rootDir>/.jest/setup.js'],
-  setupFilesAfterEnv: ['<rootDir>/.jest/setup-after-env.js'],
   collectCoverageFrom: ['src/**/*.js'],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
