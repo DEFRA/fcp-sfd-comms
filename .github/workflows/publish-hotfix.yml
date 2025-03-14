@@ -29,11 +29,11 @@ jobs:
 
       - run: npm ci
 
-      # - name: Run Tests
-      #   run: |
-      #     mkdir -p coverage
-      #     chmod -R a+rw ./coverage
-      #     docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
+      - name: Run Tests
+        run: |
+          mkdir -p coverage
+          chmod -R a+rw ./coverage
+          docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
 
       - name: Publish Hot Fix
         uses: DEFRA/cdp-build-action/build-hotfix@main

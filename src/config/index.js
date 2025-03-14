@@ -12,8 +12,6 @@ const config = convict({
   ...mongoConfig
 })
 
-const validate = () => {
-  config.validate({ allowed: 'strict' })
-}
+config.validate({ allowed: 'strict' })
 
-export { config, validate }
+export { config }
