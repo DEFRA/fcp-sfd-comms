@@ -1,5 +1,5 @@
-import { sqsClient } from '../sqs/client.js'
-import { startCommsListener, stopCommsListener } from './comms-request/consumer.js'
+// import { sqsClient } from '../sqs/client.js'
+// import { startCommsListener, stopCommsListener } from './comms-request/consumer.js'
 
 import { createLogger } from '../../logging/logger.js'
 
