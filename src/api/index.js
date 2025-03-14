@@ -38,6 +38,7 @@ const createServer = async () => {
       stripTrailingSlash: true
     }
   })
+
   await server.register([
     requestLogger,
     requestTracing,

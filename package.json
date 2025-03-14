@@ -1,7 +1,7 @@
 {
   "name": "fcp-sfd-comms",
   "version": "0.4.0",
-  "description": "Comms Service for Single Front Door",
+  "description": "CComms Service for Single Front Door",
   "main": "src/index.js",
   "type": "module",
   "engines": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "pretest": "npm run test:lint",
-    "docker:test": "docker compose down -v && docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm \"fcp-sfd-comms\"",
+    "docker:test": "docker compose down -v && docker compose -f compose.yaml -f compose.test.yaml run --rm \"fcp-sfd-comms\"",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand --forceExit",
     "test:watch": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand",
     "test:lint": "standard",

@@ -6,6 +6,7 @@ const parseSqsMessage = (message) => {
 
     return body
   } catch (err) {
+    console.log(err)
     throw new UnprocessableMessageError('Invalid message', {
       cause: err
     })
