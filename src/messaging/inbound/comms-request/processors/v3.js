@@ -25,7 +25,7 @@ const processV3CommsRequest = async (message) => {
 
   await addNotificationRequest(validated)
 
-  logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)
+  return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)
 }
 
 export { processV3CommsRequest }
