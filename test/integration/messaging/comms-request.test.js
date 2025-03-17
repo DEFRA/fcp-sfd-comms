@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test, jest } from '@
 import v3 from '../../mocks/comms-request/v3.js'
 
 import { getQueueSize, resetQueue, sendMessage } from '../../helpers/sqs.js'
+import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
 
 jest.setTimeout(60000)
 
@@ -19,15 +20,17 @@ jest.unstable_mockModule('../../../src/logging/logger.js', () => ({
 const { startMessaging, stopMessaging } = await import('../../../src/messaging/inbound/inbound.js')
 
 describe('comms request consumer integration', () => {
-  beforeAll(async () => {
-    await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request')
-    await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter')
-
+  beforeAll(() => {
     startMessaging()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks()
+
+    await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request')
+    await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter')
+
+    await clearCollection('notificationRequests')
   })
 
   test('should process valid comms message placed on sqs', async () => {
@@ -42,6 +45,12 @@ describe('comms request consumer integration', () => {
 
     expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
 
+    const notification = await getAllEntities('notificationRequests', {
+      'message.id': '79389915-7275-457a-b8ca-8bf206b2e67b'
+    })
+
+    expect(notification).toHaveLength(1)
+
     const size = await getQueueSize(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
@@ -49,9 +58,10 @@ describe('comms request consumer integration', () => {
     expect(size.available).toBe(0)
   })
 
-  test('should send invalid comms message to dead-letter queue', async () => {
+  test('should not process invalid comms message', async () => {
     const message = {
       ...v3,
+      id: 'invalid',
       data: {
         ...v3.data,
         commsAddresses: undefined
@@ -66,6 +76,12 @@ describe('comms request consumer integration', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 3000)
     })
+
+    const notification = await getAllEntities('notificationRequests', {
+      'message.id': 'invalid'
+    })
+
+    expect(notification).toHaveLength(0)
 
     expect(mockLoggerError).toHaveBeenCalledWith(expect.stringContaining('Invalid comms V3 payload:'))
     expect(mockLoggerError).toHaveBeenCalledWith('Error processing message: Invalid message')

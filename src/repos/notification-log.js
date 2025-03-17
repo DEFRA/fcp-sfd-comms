@@ -1,4 +1,4 @@
-import dbClient from '../db/mongo-client.js'
+import dbClient from '../db/db-client.js'
 
 const collection = 'notificationRequests'
 
