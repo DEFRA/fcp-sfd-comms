@@ -24,16 +24,14 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Get package version
-        id: get_version
-        run: jq -r '.version' package.json
-
-      - name: Run Tests
+      - name: Create Test Coverage Reports
         run: |
           npm ci
+      - name: Run Tests
+        run: |
           mkdir -p coverage
           chmod -R a+rw ./coverage
-          docker compose -f docker-compose.yaml -f docker-compose.test.yaml run --rm "fcp-sfd-comms"
+          docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
 
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v4
@@ -44,4 +42,3 @@ jobs:
         uses: DEFRA/cdp-build-action/build@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: ${{ steps.get_version.outputs.stdout }}
