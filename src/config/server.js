@@ -35,7 +35,7 @@ export const serverConfig = {
   serviceName: {
     doc: 'Api Service Name',
     format: String,
-    default: 'fcp-sfd-data'
+    default: 'fcp-sfd-comms'
   },
   root: {
     doc: 'Project root',
@@ -83,6 +83,18 @@ export const serverConfig = {
         ? ['req.headers.authorization', 'req.headers.cookie', 'res.headers']
         : ['req', 'res', 'responseTime']
     }
+  },
+  mongoUri: {
+    doc: 'URI for mongodb',
+    format: String,
+    default: 'mongodb://127.0.0.1:27017/',
+    env: 'MONGO_URI'
+  },
+  mongoDatabase: {
+    doc: 'database for mongodb',
+    format: String,
+    default: 'fcp-sfd-comms',
+    env: 'MONGO_DATABASE'
   },
   httpProxy: {
     doc: 'HTTP Proxy',
