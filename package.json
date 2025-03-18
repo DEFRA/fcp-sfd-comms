@@ -9,7 +9,7 @@
   },
   "scripts": {
     "pretest": "npm run test:lint",
-    "docker:test": "docker compose down -v && docker compose -f compose.yaml -f compose.test.yaml run --rm \"fcp-sfd-comms\"",
+    "docker:test": "docker compose down -v && docker compose -f compose.yaml -f compose.test.yaml run  --build --rm \"fcp-sfd-comms\"",
     "test": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand --forceExit",
     "test:watch": "NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest --coverage --verbose --runInBand",
     "test:lint": "standard",
