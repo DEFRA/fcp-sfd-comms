@@ -83,15 +83,13 @@ describe('comms request consumer integration', () => {
 
     expect(notification).toHaveLength(0)
 
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringContaining('Invalid comms V3 payload:'))
-    expect(mockLoggerError).toHaveBeenCalledWith('Error processing message: Invalid message')
-    expect(mockLoggerInfo).toHaveBeenCalledWith('Moving unprocessable message to dead letter queue')
+    expect(mockLoggerError).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
 
     const size = await getQueueSize(
-      'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter'
+      'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
 
-    expect(size.available).toBe(1)
+    expect(size.available).toBe(0)
   })
 
   afterAll(() => {

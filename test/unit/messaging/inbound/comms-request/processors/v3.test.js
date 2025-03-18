@@ -2,8 +2,6 @@ import { jest, describe, test, expect, beforeEach } from '@jest/globals'
 
 import v3CommsRequest from '../../../../../mocks/comms-request/v3.js'
 
-import { UnprocessableMessageError } from '../../../../../../src/errors/message-errors.js'
-
 const mockLoggerInfo = jest.fn()
 const mockLoggerWarn = jest.fn()
 const mockLoggerError = jest.fn()
@@ -39,8 +37,8 @@ describe('comms request v3 processor', () => {
     expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
   })
 
-  test('should throw UNPROCESSABLE_MESSAGE error for invalid message', async () => {
-    await expect(processV3CommsRequest({})).rejects.toThrow(UnprocessableMessageError)
+  test('should log error if message is invalid', async () => {
+    await processV3CommsRequest({})
 
     expect(mockLoggerError).toHaveBeenCalledWith(
       'Invalid comms V3 payload: "id" is required,"source" is required,"specversion" is required,"type" is required,"datacontenttype" is required,"time" is required,"data" is required'

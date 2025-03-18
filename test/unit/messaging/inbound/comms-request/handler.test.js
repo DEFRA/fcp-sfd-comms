@@ -2,8 +2,6 @@ import { jest, describe, test, expect, beforeEach } from '@jest/globals'
 
 import sqsMessage from '../../../../mocks/aws/sqs-message'
 
-import { UnprocessableMessageError } from '../../../../../src/errors/message-errors.js'
-
 const mockLoggerInfo = jest.fn()
 const mockLoggerError = jest.fn()
 
@@ -37,38 +35,20 @@ describe('comms request handler', () => {
       sqsMessage
     ]
 
-    const completed = await handleCommRequestMessages({}, messages)
+    const completed = await handleCommRequestMessages(messages)
 
     expect(completed).toHaveLength(1)
     expect(completed).toContain(sqsMessage)
   })
 
-  test('should dead letter messages that throw unprocessable message', async () => {
-    const messages = [
-      sqsMessage
-    ]
-
-    mockProcessor.mockRejectedValue(new UnprocessableMessageError('Invalid message'))
-
-    const completed = await handleCommRequestMessages({}, messages)
-
-    expect(mockLoggerInfo).toHaveBeenCalledWith('Moving unprocessable message to dead letter queue')
-    expect(mockSendMessage).toHaveBeenCalledWith(
-      {},
-      'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter',
-      sqsMessage.Body
-    )
-    expect(completed).toHaveLength(1)
-  })
-
-  test('should dead letter messages that throw error', async () => {
+  test('should complete messages that throw error', async () => {
     const messages = [
       sqsMessage
     ]
 
     mockProcessor.mockRejectedValue(new Error('Error connecting to database'))
 
-    const completed = await handleCommRequestMessages({}, messages)
+    const completed = await handleCommRequestMessages(messages)
 
     expect(completed).toHaveLength(1)
   })

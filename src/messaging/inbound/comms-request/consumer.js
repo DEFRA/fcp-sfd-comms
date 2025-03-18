@@ -16,7 +16,7 @@ const startCommsListener = (sqsClient) => {
     heartbeatInterval: config.get('messaging.heartbeatInterval'),
     waitTimeSeconds: config.get('messaging.waitTimeSeconds'),
     pollingWaitTime: config.get('messaging.pollingWaitTime'),
-    handleMessageBatch: async (messages) => handleCommRequestMessages(sqsClient, messages),
+    handleMessageBatch: async (messages) => handleCommRequestMessages(messages),
     sqs: sqsClient
   })
 
