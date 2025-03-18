@@ -1,23 +1,26 @@
-# fcp-fd-comms
-
+# fcp-sfd-comms
 Communications service for the Single Front Door.
 
 This service is part of the [Single Front Door (SFD) service](https://github.com/DEFRA/fcp-sfd-core).
 
 ## Prerequisites
-
 - Docker
 - Docker Compose
+- Node.js (v22 LTS)
 
-Optional:
-- Kubernetes
-- Helm
+## Setup
+| Name                      | Default Value                                          | Required                  | Description                                                                 |
+|---------------------------|--------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------|
+| AWS_REGION                | eu-west-2                                              | No                        | AWS region to access resources in                                           |
+| AWS_DEFAULT_REGION        | eu-west-2                                              | No                        | Default AWS region to access resources in                                   |
+| AWS_ACCESS_KEY_ID         | test                                                   | No                        | AWS Access Key Id                                                           |
+| AWS_SECRET_ACCESS_KEY     | test                                                   | No                        | AWS Secret Access Key                                                       |
+
+### Configuration
 
 ## Running the application
 
-The application is designed to run in containerised environments, using Docker Compose in development and Kubernetes in production.
-
-- A Helm chart is provided for production deployments to Kubernetes.
+We recommend using the [fcp-sfd-core](https://github.com/DEFRA/fcp-sfd-core) repository for local development. You can howerver run this service independently by following the instructions below.
 
 ### Build container image
 
@@ -31,7 +34,6 @@ By default, the start script will build (or rebuild) images so there will
 rarely be a need to build images manually. However, this can be achieved
 through the Docker Compose
 [build](https://docs.docker.com/compose/reference/build/) command:
-
 ```
 # Build container images
 docker-compose build
@@ -42,7 +44,7 @@ docker-compose build
 Use Docker Compose to run service locally.
 
 ```
-docker-compose up
+docker-compose up --build
 ```
 
 ## Test structure
@@ -50,27 +52,21 @@ docker-compose up
 The tests have been structured into subfolders of `./test` as per the
 [Microservice test approach and repository structure](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1845396477/Microservice+test+approach+and+repository+structure)
 
-### Running tests
+## Running tests
 
-A convenience script is provided to run automated tests in a containerised
+A convenience npm script is provided to run automated tests in a containerised
 environment. This will rebuild images before running tests via docker-compose,
-using a combination of `docker-compose.yaml` and `docker-compose.test.yaml`.
-The command given to `docker-compose run` may be customised by passing
-arguments to the test script.
+using a combination of `compose.yaml` and `compose.test.yaml`.
 
-Examples:
-
+To run the tests:
 ```
-# Run all tests
-scripts/test
-
-# Run tests with file watch
-scripts/test -w
+npm run docker:test
 ```
 
-## CI pipeline
-
-This service uses the [FFC CI pipeline](https://github.com/DEFRA/ffc-jenkins-pipeline-library)
+You can also run the tests directly using docker compose:
+```
+docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
+```
 
 ## Licence
 
