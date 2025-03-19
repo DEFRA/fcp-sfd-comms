@@ -7,6 +7,8 @@ import { getCommsProcessor } from './processors/processor.js'
 import { sendMessage } from '../../sqs/send-message.js'
 import { parseSqsMessage } from '../../sqs/parse-message.js'
 
+import { sendNotification } from './send-notification.js'
+
 const logger = createLogger()
 
 const handleMessage = async (sqsClient, message) => {
@@ -34,6 +36,7 @@ const handleCommRequestMessages = async (sqsClient, messages) => {
   for (const message of messages) {
     try {
       await handleMessage(sqsClient, message)
+      await sendNotification(message)
     } catch (err) {
       logger.error(`Error handling message error: ${err}`)
     }
