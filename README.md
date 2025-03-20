@@ -15,7 +15,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 | AWS_DEFAULT_REGION        | eu-west-2                                              | No                        | Default AWS region to access resources in.                                  |
 | AWS_ACCESS_KEY_ID         | test                                                   | No                        | AWS Access Key ID.                                                          |
 | AWS_SECRET_ACCESS_KEY     | test                                                   | No                        | AWS Secret Access Key.                                                      |
-| NOTIFY_API_KEY            | n/a                                                    | Yes                       | Notify API key to perform API requests to GOV.UK Notify. Generate a test one for local development on the Notify portal, keys used in CDP environments are saved as secrets on CDP. |
+| NOTIFY_API_KEY            | n/a - sensitive                                        | Yes                       | Notify API key to perform API requests to GOV.UK Notify. Generate a test one for local development on the Notify portal, keys used in CDP environments are saved as secrets on CDP. |
 | MOCK_SERVER_ENDPOINT      |                                                        | No                        | Endpoint for a mock Notify server.                                          |
 | USE_MOCK_SERVER           | false                                                  | Yes                       | Boolean to determine whether to use mock Notify server.                     |
 
