@@ -4,13 +4,11 @@ import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 const mockSendEmail = jest.fn()
 const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => { })
 
-jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => {
-  return {
-    default: {
-      NotifyClient: { sendEmail: mockSendEmail }
-    }
+jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => ({
+  default: {
+    sendEmail: mockSendEmail
   }
-})
+}))
 
 const { trySendViaNotify } = await import('../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js')
 
