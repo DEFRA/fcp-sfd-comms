@@ -1,50 +1,26 @@
-# fcp-fd-comms
+# fcp-sfd-comms
+Communications service for the Single Front Door.
 
-Template to support rapid delivery of microservices for FCP Platform. It contains the configuration needed to deploy a simple Hapi Node server to the Azure Kubernetes Platform.
-
-## Usage
-
-Create a new repository from this template and run `./rename.js` specifying the new name of the project and the description to use e.g.
-```
-./rename.js ffc-demo-web "Web frontend for demo workstream"
-```
-
-The script will update the following:
-
-* `package.json`: update `name`, `description`, `homepage`
-* `docker-compose.yaml`: update the service name, `image` and `container_name`
-* `docker-compose.test.yaml`: update the service name, `image` and `container_name`
-* `docker-compose.override.yaml`: update the service name, `image` and `container_name`
-* Rename `helm/ffc-template-node`
-* `helm/ffc-template-node/Chart.yaml`: update `description` and `name`
-* `helm/ffc-template-node/values.yaml`: update  `name`, `namespace`, `workstream`, `image`, `containerConfigMap.name`
-* `helm/ffc-template-node/templates/_container.yaml`: update the template name
-* `helm/ffc-template-node/templates/cluster-ip-service.yaml`: update the template name and list parameter of include
-* `helm/ffc-template-node/templates/config-map.yaml`: update the template name and list parameter of include
-* `helm/ffc-template-node/templates/deployment.yaml`: update the template name, list parameter of deployment and container includes
-
-### Notes on automated rename
-
-* The Helm chart deployment values in `helm/ffc-template-node/values.yaml` may need updating depending on the resource needs of your microservice
-* The rename is a one-way operation i.e. currently it doesn't allow the name being changed from to be specified
-* There is some validation on the input to try and ensure the rename is successful, however, it is unlikely to stand up to malicious entry
-* Once the rename has been performed the script can be removed from the repo
-* Should the rename go awry the changes can be reverted via `git clean -df && git checkout -- .`
+This service is part of the [Single Front Door (SFD) service](https://github.com/DEFRA/fcp-sfd-core).
 
 ## Prerequisites
-
 - Docker
 - Docker Compose
+- Node.js (v22 LTS)
 
-Optional:
-- Kubernetes
-- Helm
+## Setup
+| Name                      | Default Value                                          | Required                  | Description                                                                 |
+|---------------------------|--------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------|
+| AWS_REGION                | eu-west-2                                              | No                        | AWS region to access resources in                                           |
+| AWS_DEFAULT_REGION        | eu-west-2                                              | No                        | Default AWS region to access resources in                                   |
+| AWS_ACCESS_KEY_ID         | test                                                   | No                        | AWS Access Key Id                                                           |
+| AWS_SECRET_ACCESS_KEY     | test                                                   | No                        | AWS Secret Access Key                                                       |
+
+### Configuration
 
 ## Running the application
 
-The application is designed to run in containerised environments, using Docker Compose in development and Kubernetes in production.
-
-- A Helm chart is provided for production deployments to Kubernetes.
+We recommend using the [fcp-sfd-core](https://github.com/DEFRA/fcp-sfd-core) repository for local development. You can howerver run this service independently by following the instructions below.
 
 ### Build container image
 
@@ -58,7 +34,6 @@ By default, the start script will build (or rebuild) images so there will
 rarely be a need to build images manually. However, this can be achieved
 through the Docker Compose
 [build](https://docs.docker.com/compose/reference/build/) command:
-
 ```
 # Build container images
 docker-compose build
@@ -69,7 +44,7 @@ docker-compose build
 Use Docker Compose to run service locally.
 
 ```
-docker-compose up
+docker-compose up --build
 ```
 
 ## Test structure
@@ -77,27 +52,21 @@ docker-compose up
 The tests have been structured into subfolders of `./test` as per the
 [Microservice test approach and repository structure](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1845396477/Microservice+test+approach+and+repository+structure)
 
-### Running tests
+## Running tests
 
-A convenience script is provided to run automated tests in a containerised
+A convenience npm script is provided to run automated tests in a containerised
 environment. This will rebuild images before running tests via docker-compose,
-using a combination of `docker-compose.yaml` and `docker-compose.test.yaml`.
-The command given to `docker-compose run` may be customised by passing
-arguments to the test script.
+using a combination of `compose.yaml` and `compose.test.yaml`.
 
-Examples:
-
+To run the tests:
 ```
-# Run all tests
-scripts/test
-
-# Run tests with file watch
-scripts/test -w
+npm run docker:test
 ```
 
-## CI pipeline
-
-This service uses the [FFC CI pipeline](https://github.com/DEFRA/ffc-jenkins-pipeline-library)
+You can also run the tests directly using docker compose:
+```
+docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
+```
 
 ## Licence
 
