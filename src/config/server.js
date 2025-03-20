@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import environments from '../api/common/constants/environments.js'
+import environments from '../constants/environments.js'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
