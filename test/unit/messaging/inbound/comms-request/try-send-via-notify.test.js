@@ -1,17 +1,18 @@
 import { jest, describe, test, expect, beforeEach } from '@jest/globals'
-import { trySendViaNotify } from '../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js'
 import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 
 const mockSendEmail = jest.fn()
-const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => { })
 
-jest.mock('../../../../../src/notify/notify-client.js', () => {
+jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => {
   return {
-    NotifyClient: jest.fn().mockImplementation(() => ({
-      sendEmail: mockSendEmail
-    }))
+    default: {
+      NotifyClient: { sendEmail: mockSendEmail }
+    }
   }
 })
+
+const { trySendViaNotify } = await import('../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js')
 
 describe('trySendViaNotify', () => {
   beforeEach(() => {
@@ -24,7 +25,7 @@ describe('trySendViaNotify', () => {
 
     const emailAddress = mockCommsRequest.data.commsAddresses
 
-    const [response, error] = await trySendViaNotify(mockCommsRequest, emailAddress)
+    const [response, error] = await trySendViaNotify(mockCommsRequest.data, emailAddress)
 
     expect(mockSendEmail).toHaveBeenCalledWith(
       mockCommsRequest.data.notifyTemplateId,
@@ -34,6 +35,7 @@ describe('trySendViaNotify', () => {
         reference: mockCommsRequest.data.reference
       }
     )
+
     expect(response).toEqual(mockResponse)
     expect(error).toBeNull()
   })
@@ -44,7 +46,7 @@ describe('trySendViaNotify', () => {
 
     const emailAddress = mockCommsRequest.data.commsAddresses
 
-    const [response, error] = await trySendViaNotify(mockCommsRequest, emailAddress)
+    const [response, error] = await trySendViaNotify(mockCommsRequest.data, emailAddress)
 
     expect(mockSendEmail).toHaveBeenCalledWith(
       mockCommsRequest.data.notifyTemplateId,
