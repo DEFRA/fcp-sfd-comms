@@ -1,4 +1,4 @@
-import notifyClient from '../../../clients/notify.js'
+import notifyClient from '../../../notify/notify-client.js'
 
 const trySendViaNotify = async (message, emailAddress) => {
   try {
@@ -18,14 +18,4 @@ const trySendViaNotify = async (message, emailAddress) => {
   }
 }
 
-const sendNotification = async (message) => {
-  const emailAddresses = Array.isArray(message.data.commsAddresses)
-    ? message.data.commsAddresses
-    : [message.data.commsAddresses]
-
-  for (const emailAddress of emailAddresses) {
-    await trySendViaNotify(message, emailAddress)
-  }
-}
-
-export { sendNotification }
+export { trySendViaNotify }
