@@ -16,10 +16,15 @@ jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
 
 const mockAddNotificationRequest = jest.fn()
 const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
+const mockTrySendViaNotify = jest.fn()
 
 jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () => ({
   addNotificationRequest: mockAddNotificationRequest,
   checkNotificationIdempotency: mockCheckNotificationIdempotency
+}))
+
+jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js', () => ({
+  trySendViaNotify: mockTrySendViaNotify
 }))
 
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')
@@ -59,5 +64,40 @@ describe('comms request v3 processor', () => {
     await processV3CommsRequest(v3CommsRequest)
 
     expect(mockLoggerWarn).toHaveBeenCalledWith('Comms V3 request already processed, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+  })
+
+  test('should call trySendViaNotify for each email address', async () => {
+    mockCheckNotificationIdempotency.mockResolvedValue(false)
+
+    const testMessage = {
+      ...v3CommsRequest,
+      data: {
+        ...v3CommsRequest.data,
+        commsAddresses: ['test1@example.com', 'test2@example.com']
+      }
+    }
+
+    await processV3CommsRequest(testMessage)
+
+    expect(mockTrySendViaNotify).toHaveBeenCalledTimes(2)
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'test1@example.com')
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'test2@example.com')
+  })
+
+  test('should handle single email address correctly', async () => {
+    mockCheckNotificationIdempotency.mockResolvedValue(false)
+
+    const testMessage = {
+      ...v3CommsRequest,
+      data: {
+        ...v3CommsRequest.data,
+        commsAddresses: 'single@example.com'
+      }
+    }
+
+    await processV3CommsRequest(testMessage)
+
+    expect(mockTrySendViaNotify).toHaveBeenCalledTimes(1)
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'single@example.com')
   })
 })
