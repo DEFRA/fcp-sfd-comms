@@ -1,4 +1,4 @@
-import { notifyClient } from '../../../clients/notify.js'
+import notifyClient from '../../../clients/notify.js'
 
 const trySendViaNotify = async (message, emailAddress) => {
   try {

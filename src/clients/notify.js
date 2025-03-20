@@ -1,14 +1,14 @@
 import { NotifyClient } from 'notifications-node-client'
-import { notifyConfig } from '../config/index.js'
+import { config } from '../config/index.js'
 
 const createNotifyClient = () => {
-  if (!notifyConfig.get('mockApi.useMock')) {
-    return new NotifyClient(notifyConfig.get('apiKey'))
+  if (!config.get('mockApi.useMock')) {
+    return new NotifyClient(config.get('apiKey'))
   }
 
   return new NotifyClient(
-    notifyConfig.get('mockApi.endpoint'),
-    notifyConfig.get('apiKey'),
+    config.get('mockApi.endpoint'),
+    config.get('apiKey'),
     'random-service-id'
   )
 }
