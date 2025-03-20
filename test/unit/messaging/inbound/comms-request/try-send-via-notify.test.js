@@ -3,12 +3,15 @@ import { trySendViaNotify } from '../../../../../src/messaging/inbound/comms-req
 import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 
 const mockSendEmail = jest.fn()
+const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
 
-jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => ({
-  default: {
-    sendEmail: mockSendEmail
+jest.mock('../../../../../src/notify/notify-client.js', () => {
+  return {
+    NotifyClient: jest.fn().mockImplementation(() => ({
+      sendEmail: mockSendEmail
+    }))
   }
-}))
+})
 
 describe('trySendViaNotify', () => {
   beforeEach(() => {
@@ -50,6 +53,11 @@ describe('trySendViaNotify', () => {
         personalisation: mockCommsRequest.data.personalisation,
         reference: mockCommsRequest.data.reference
       }
+    )
+
+    expect(mockConsoleError).toHaveBeenCalledWith(
+      'Failed to send email via GOV Notify. Error:',
+      mockError
     )
     expect(response).toBeNull()
     expect(error).toEqual(mockError)
