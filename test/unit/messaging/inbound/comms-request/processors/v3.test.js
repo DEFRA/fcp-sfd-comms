@@ -80,8 +80,21 @@ describe('comms request v3 processor', () => {
     await processV3CommsRequest(testMessage)
 
     expect(mockTrySendViaNotify).toHaveBeenCalledTimes(2)
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'test1@example.com')
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'test2@example.com')
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test1@example.com', {
+      personalisation: {
+        reference: 'test-reference'
+      },
+      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
+      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    })
+
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test2@example.com', {
+      personalisation: {
+        reference: 'test-reference'
+      },
+      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
+      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    })
   })
 
   test('should handle single email address correctly', async () => {
@@ -98,6 +111,12 @@ describe('comms request v3 processor', () => {
     await processV3CommsRequest(testMessage)
 
     expect(mockTrySendViaNotify).toHaveBeenCalledTimes(1)
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage, 'single@example.com')
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'single@example.com', {
+      personalisation: {
+        reference: 'test-reference'
+      },
+      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
+      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    })
   })
 })

@@ -1,18 +1,20 @@
+import { createLogger } from '../../../logging/logger.js'
+
 import notifyClient from '../../../notify/notify-client.js'
 
-const trySendViaNotify = async (message, emailAddress) => {
+const logger = createLogger()
+
+const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
   try {
-    const response = notifyClient.sendEmail(
-      message.data.notifyTemplateId,
-      emailAddress, {
-        personalisation: message.data.personalisation,
-        reference: message.correlationId ?? message.id
-      }
+    const response = await notifyClient.sendEmail(
+      templateId,
+      emailAddress,
+      params
     )
 
     return [response, null]
   } catch (error) {
-    console.error('Failed to send email via GOV Notify. Error:', error)
+    logger.error(`Failed to send email via GOV Notify: ${error.message}`)
 
     return [null, error]
   }

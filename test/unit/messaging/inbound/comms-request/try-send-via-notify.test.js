@@ -1,13 +1,21 @@
 import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+
 import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 
 const mockSendEmail = jest.fn()
-const mockConsoleError = jest.spyOn(console, 'error').mockImplementation(() => { })
 
 jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => ({
   default: {
     sendEmail: mockSendEmail
   }
+}))
+
+const mockLoggerError = jest.fn()
+
+jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
+  createLogger: () => ({
+    error: (...args) => mockLoggerError(...args)
+  })
 }))
 
 const { trySendViaNotify } = await import('../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js')
@@ -19,18 +27,22 @@ describe('trySendViaNotify', () => {
 
   test('should send email successfully', async () => {
     const mockResponse = { id: 'mock-id' }
+
     mockSendEmail.mockResolvedValue(mockResponse)
 
-    const emailAddress = mockCommsRequest.data.commsAddresses
+    const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(mockCommsRequest.data, emailAddress)
+    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+      personalisation: data.personalisation,
+      reference: data.reference
+    })
 
     expect(mockSendEmail).toHaveBeenCalledWith(
-      mockCommsRequest.data.notifyTemplateId,
-      emailAddress,
+      data.notifyTemplateId,
+      data.commsAddresses,
       {
-        personalisation: mockCommsRequest.data.personalisation,
-        reference: mockCommsRequest.data.reference
+        personalisation: data.personalisation,
+        reference: data.reference
       }
     )
 
@@ -40,24 +52,27 @@ describe('trySendViaNotify', () => {
 
   test('should handle errors when sending email fails', async () => {
     const mockError = new Error('Failed to send email')
+
     mockSendEmail.mockRejectedValue(mockError)
 
-    const emailAddress = mockCommsRequest.data.commsAddresses
+    const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(mockCommsRequest.data, emailAddress)
+    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+      personalisation: data.personalisation,
+      reference: data.reference
+    })
 
     expect(mockSendEmail).toHaveBeenCalledWith(
-      mockCommsRequest.data.notifyTemplateId,
-      emailAddress,
+      data.notifyTemplateId,
+      data.commsAddresses,
       {
-        personalisation: mockCommsRequest.data.personalisation,
-        reference: mockCommsRequest.data.reference
+        personalisation: data.personalisation,
+        reference: data.reference
       }
     )
 
-    expect(mockConsoleError).toHaveBeenCalledWith(
-      'Failed to send email via GOV Notify. Error:',
-      mockError
+    expect(mockLoggerError).toHaveBeenCalledWith(
+      'Failed to send email via GOV Notify: Failed to send email'
     )
     expect(response).toBeNull()
     expect(error).toEqual(mockError)

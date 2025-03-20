@@ -22,12 +22,20 @@ const processV3CommsRequest = async (message) => {
 
   await addNotificationRequest(validated)
 
-  const emailAddresses = Array.isArray(message.data.commsAddresses)
-    ? message.data.commsAddresses
-    : [message.data.commsAddresses]
+  const data = message.data
+
+  const params = {
+    personalisation: data.personalisation,
+    reference: data.correlationId ?? message.id,
+    emailReplyToId: data.emailReplyToId
+  }
+
+  const emailAddresses = Array.isArray(data.commsAddresses)
+    ? data.commsAddresses
+    : [data.commsAddresses]
 
   for (const emailAddress of emailAddresses) {
-    await trySendViaNotify(message, emailAddress)
+    await trySendViaNotify(data.notifyTemplateId, emailAddress, params)
   }
 
   return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)
