@@ -31,7 +31,23 @@ const checkNotificationIdempotency = async (message) => {
   }
 }
 
+const updateNotificationStatus = async (message, status, recipient) => {
+  try {
+    const notification = await dbClient.collection(collection).updateOne(
+      {
+        'message.id': message.id
+      },
+      {
+        $set: { [`status.${recipient}`]: status }
+      }
+    )
+  } catch (err) {
+    throw new Error(`Error updating notification status for messageId ${message.id}: ${err.message}`)
+  }
+}
+
 export {
   addNotificationRequest,
-  checkNotificationIdempotency
+  checkNotificationIdempotency,
+  updateNotificationStatus
 }
