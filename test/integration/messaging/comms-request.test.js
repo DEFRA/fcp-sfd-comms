@@ -7,6 +7,12 @@ import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
 
 jest.setTimeout(60000)
 
+jest.unstable_mockModule('../../../src/notify/notify-client.js', () => ({
+  default: {
+    sendEmail: jest.fn()
+  }
+}))
+
 const mockLoggerInfo = jest.fn()
 const mockLoggerError = jest.fn()
 
