@@ -23,7 +23,7 @@ jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () =
   checkNotificationIdempotency: mockCheckNotificationIdempotency
 }))
 
-jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js', () => ({
+jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service.js', () => ({
   notifyService: mockNotifyService
 }))
 
