@@ -4,7 +4,7 @@ import notifyClient from '../../../notify/notify-client.js'
 
 const logger = createLogger()
 
-const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
+const notifyService = async (templateId, emailAddress, params = {}) => {
   try {
     const response = await notifyClient.sendEmail(
       templateId,
@@ -20,4 +20,4 @@ const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
   }
 }
 
-export { trySendViaNotify }
+export { notifyService }

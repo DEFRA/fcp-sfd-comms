@@ -18,9 +18,9 @@ jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
   })
 }))
 
-const { trySendViaNotify } = await import('../../../../../src/messaging/inbound/comms-request/try-send-via-notify.js')
+const { notifyService } = await import('../../../../../src/messaging/inbound/comms-request/notify-service.js')
 
-describe('trySendViaNotify', () => {
+describe('Notify Service', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -32,7 +32,7 @@ describe('trySendViaNotify', () => {
 
     const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+    const [response, error] = await notifyService(data.notifyTemplateId, data.commsAddresses, {
       personalisation: data.personalisation,
       reference: data.reference
     })
@@ -57,7 +57,7 @@ describe('trySendViaNotify', () => {
 
     const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+    const [response, error] = await notifyService(data.notifyTemplateId, data.commsAddresses, {
       personalisation: data.personalisation,
       reference: data.reference
     })
