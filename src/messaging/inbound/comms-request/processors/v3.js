@@ -3,9 +3,10 @@ import { validate } from '../../../../schemas/validate.js'
 
 import { v3 } from '../../../../schemas/comms-request/index.js'
 
-import { checkNotificationIdempotency, addNotificationRequest } from '../../../../repos/notification-log.js'
+import { checkNotificationIdempotency, addNotificationRequest, updateNotificationStatus } from '../../../../repos/notification-log.js'
 
 import { trySendViaNotify } from '../notify-service.js'
+import { notifyStatuses } from '../../../../constants/notify-statuses.js'
 
 const logger = createLogger()
 
@@ -36,6 +37,8 @@ const processV3CommsRequest = async (message) => {
 
   for (const emailAddress of emailAddresses) {
     await trySendViaNotify(data.notifyTemplateId, emailAddress, params)
+
+    await updateNotificationStatus(validated, notifyStatuses.SENDING, emailAddress)
   }
 
   return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)

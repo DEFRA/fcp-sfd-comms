@@ -33,16 +33,49 @@ const checkNotificationIdempotency = async (message) => {
 
 const updateNotificationStatus = async (message, status, recipient) => {
   try {
-    const notification = await dbClient.collection(collection).updateOne(
+    await dbClient.collection(collection).updateOne(
       {
         'message.id': message.id
       },
-      {
-        $set: { [`status.${recipient}`]: status }
-      }
+      [
+        {
+          $set: {
+            recipients: {
+              $concatArrays: [
+                [
+                  {
+                    recipient,
+                    status,
+                    updatedAt: new Date().toISOString()
+                  }
+                ],
+                {
+                  $ifNull: [
+                    {
+                      $filter: {
+                        input: '$recipients',
+                        as: 'r',
+                        cond: {
+                          $ne: [
+                            '$$r.recipient',
+                            recipient
+                          ]
+                        }
+                      }
+                    },
+                    []
+                  ]
+                }
+              ],
+            }
+          }
+        }
+      ]
     )
   } catch (err) {
-    throw new Error(`Error updating notification status for messageId ${message.id}: ${err.message}`)
+    throw new Error(`Error updating notification status for messageId ${message.id}`, {
+      cause: err
+    })
   }
 }
 

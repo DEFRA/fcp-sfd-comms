@@ -1,7 +1,6 @@
 import { createLogger } from '../../../logging/logger.js'
 
 import notifyClient from '../../../notify/notify-client.js'
-import { getNotifyStatus } from './get-notify-status.js'
 
 const logger = createLogger()
 
