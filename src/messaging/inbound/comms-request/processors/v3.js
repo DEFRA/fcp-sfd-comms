@@ -5,7 +5,7 @@ import { v3 } from '../../../../schemas/comms-request/index.js'
 
 import { checkNotificationIdempotency, addNotificationRequest } from '../../../../repos/notification-log.js'
 
-import { notifyService } from '../notify-service.js'
+import { trySendViaNotify } from '../notify-service.js'
 
 const logger = createLogger()
 
@@ -35,7 +35,7 @@ const processV3CommsRequest = async (message) => {
     : [data.commsAddresses]
 
   for (const emailAddress of emailAddresses) {
-    await notifyService(data.notifyTemplateId, emailAddress, params)
+    await trySendViaNotify(data.notifyTemplateId, emailAddress, params)
   }
 
   return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)

@@ -16,7 +16,7 @@ jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
 
 const mockAddNotificationRequest = jest.fn()
 const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
-const mockNotifyService = jest.fn()
+const mockTrySendViaNotify = jest.fn()
 
 jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () => ({
   addNotificationRequest: mockAddNotificationRequest,
@@ -24,7 +24,7 @@ jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () =
 }))
 
 jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service.js', () => ({
-  notifyService: mockNotifyService
+  trySendViaNotify: mockTrySendViaNotify
 }))
 
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')
@@ -66,7 +66,7 @@ describe('comms request v3 processor', () => {
     expect(mockLoggerWarn).toHaveBeenCalledWith('Comms V3 request already processed, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
   })
 
-  test('should call notifyService for each email address', async () => {
+  test('should call trySendViaNotify for each email address', async () => {
     mockCheckNotificationIdempotency.mockResolvedValue(false)
 
     const testMessage = {
@@ -79,8 +79,8 @@ describe('comms request v3 processor', () => {
 
     await processV3CommsRequest(testMessage)
 
-    expect(mockNotifyService).toHaveBeenCalledTimes(2)
-    expect(mockNotifyService).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test1@example.com', {
+    expect(mockTrySendViaNotify).toHaveBeenCalledTimes(2)
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test1@example.com', {
       personalisation: {
         reference: 'test-reference'
       },
@@ -88,7 +88,7 @@ describe('comms request v3 processor', () => {
       emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
     })
 
-    expect(mockNotifyService).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test2@example.com', {
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test2@example.com', {
       personalisation: {
         reference: 'test-reference'
       },
@@ -110,8 +110,8 @@ describe('comms request v3 processor', () => {
 
     await processV3CommsRequest(testMessage)
 
-    expect(mockNotifyService).toHaveBeenCalledTimes(1)
-    expect(mockNotifyService).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'single@example.com', {
+    expect(mockTrySendViaNotify).toHaveBeenCalledTimes(1)
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'single@example.com', {
       personalisation: {
         reference: 'test-reference'
       },
