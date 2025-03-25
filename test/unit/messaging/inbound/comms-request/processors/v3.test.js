@@ -5,6 +5,11 @@ import v3CommsRequest from '../../../../../mocks/comms-request/v3.js'
 const mockLoggerInfo = jest.fn()
 const mockLoggerWarn = jest.fn()
 const mockLoggerError = jest.fn()
+const mockAddNotificationRequest = jest.fn()
+const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
+const mockUpdateNotificationStatus = jest.fn()
+const mockTrySendViaNotify = jest.fn().mockResolvedValue([{}, null])
+const mockCheckNotificationStatus = jest.fn()
 
 jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
@@ -14,18 +19,11 @@ jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
   })
 }))
 
-const mockAddNotificationRequest = jest.fn()
-const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
-const mockUpdateNotificationStatus = jest.fn()
-
 jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () => ({
   addNotificationRequest: mockAddNotificationRequest,
   checkNotificationIdempotency: mockCheckNotificationIdempotency,
   updateNotificationStatus: mockUpdateNotificationStatus
 }))
-
-const mockTrySendViaNotify = jest.fn().mockResolvedValue([{}, null])
-const mockCheckNotificationStatus = jest.fn()
 
 jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service.js', () => ({
   trySendViaNotify: mockTrySendViaNotify,
@@ -123,5 +121,39 @@ describe('comms request v3 processor', () => {
       reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
       emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
     })
+  })
+
+  test('should update notification status to SENDING if request is successful', async () => {
+    mockTrySendViaNotify.mockResolvedValue([{ data: { id: 'mock-response-id' } }])
+
+    await processV3CommsRequest(v3CommsRequest)
+
+    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'sending')
+  })
+
+  test('should handle failed status update and log error', async () => {
+    mockTrySendViaNotify.mockResolvedValue([{ data: { id: 'mock-response-id' } }])
+    mockUpdateNotificationStatus.mockRejectedValue(new Error('Update failed'))
+
+    await processV3CommsRequest(v3CommsRequest)
+
+    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed updating notification status/))
+  })
+
+  test('should update notification status to INTERNAL_FAILURE if request fails', async () => {
+    mockTrySendViaNotify.mockResolvedValue([null])
+
+    await processV3CommsRequest(v3CommsRequest)
+
+    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure')
+  })
+
+  test('should handle checkNotificationStatus failure and log error', async () => {
+    mockTrySendViaNotify.mockResolvedValue([{ data: { id: 'mock-response-id' } }])
+    mockCheckNotificationStatus.mockRejectedValue(new Error('Status check failed'))
+
+    await processV3CommsRequest(v3CommsRequest)
+
+    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
   })
 })
