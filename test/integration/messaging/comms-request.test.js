@@ -41,7 +41,7 @@ describe('comms request consumer integration', () => {
     const mockGetNotificationById = jest.fn().mockResolvedValue({ data: { status: 'sent' } })
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
-    notifyClient.sendEmail = sendEmailMock
+    notifyClient.sendEmail = mockSendEmail
     notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
@@ -53,7 +53,7 @@ describe('comms request consumer integration', () => {
       setTimeout(resolve, 3000)
     })
 
-    expect(sendEmailMock).toHaveBeenCalledWith(
+    expect(mockSendEmail).toHaveBeenCalledWith(
       v3.data.notifyTemplateId,
       v3.data.commsAddresses[0],
       expect.objectContaining({
@@ -84,7 +84,7 @@ describe('comms request consumer integration', () => {
     const mockGetNotificationById = jest.fn().mockResolvedValue({ data: { status: 'failed' } })
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
-    notifyClient.sendEmail = sendEmailMock
+    notifyClient.sendEmail = mockSendEmail
     notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
@@ -115,7 +115,7 @@ describe('comms request consumer integration', () => {
     const mockGetNotificationById = jest.fn().mockRejectedValue(new Error('Status check failure'))
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
-    notifyClient.sendEmail = sendEmailMock
+    notifyClient.sendEmail = mockSendEmail
     notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
@@ -139,3 +139,9 @@ describe('comms request consumer integration', () => {
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
     expect(size.available).toBe(0)
+  })
+
+  afterAll(() => {
+    stopMessaging()
+  })
+})
