@@ -37,12 +37,12 @@ describe('comms request consumer integration', () => {
   })
 
   test('should process valid comms message placed on sqs and send email via GOV Notify', async () => {
-    const sendEmailMock = jest.fn().mockResolvedValue({ data: { id: 'mockNotifyId' } })
-    const getNotificationByIdMock = jest.fn().mockResolvedValue({ data: { status: 'sent' } })
+    const mockSendEmail = jest.fn().mockResolvedValue({ data: { id: 'mock-id' } })
+    const mockGetNotificationById = jest.fn().mockResolvedValue({ data: { status: 'sent' } })
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
     notifyClient.sendEmail = sendEmailMock
-    notifyClient.getNotificationById = getNotificationByIdMock
+    notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
@@ -63,7 +63,7 @@ describe('comms request consumer integration', () => {
       })
     )
 
-    expect(getNotificationByIdMock).toHaveBeenCalledWith('mockNotifyId')
+    expect(mockGetNotificationById).toHaveBeenCalledWith('mock-id')
 
     expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
 
@@ -80,12 +80,12 @@ describe('comms request consumer integration', () => {
   })
 
   test('should handle failure when sending email via GOV Notify', async () => {
-    const sendEmailMock = jest.fn().mockRejectedValue(new Error('Notify service failure'))
-    const getNotificationByIdMock = jest.fn().mockResolvedValue({ data: { status: 'failed' } })
+    const mockSendEmail = jest.fn().mockRejectedValue(new Error('Notify service failure'))
+    const mockGetNotificationById = jest.fn().mockResolvedValue({ data: { status: 'failed' } })
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
     notifyClient.sendEmail = sendEmailMock
-    notifyClient.getNotificationById = getNotificationByIdMock
+    notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
@@ -111,12 +111,12 @@ describe('comms request consumer integration', () => {
   })
 
   test('should handle failure in checking notification status', async () => {
-    const sendEmailMock = jest.fn().mockResolvedValue({ data: { id: 'mockNotifyId' } })
-    const getNotificationByIdMock = jest.fn().mockRejectedValue(new Error('Status check failure'))
+    const mockSendEmail = jest.fn().mockResolvedValue({ data: { id: 'mock-id' } })
+    const mockGetNotificationById = jest.fn().mockRejectedValue(new Error('Status check failure'))
 
     const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
     notifyClient.sendEmail = sendEmailMock
-    notifyClient.getNotificationById = getNotificationByIdMock
+    notifyClient.getNotificationById = mockGetNotificationById
 
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
@@ -127,7 +127,7 @@ describe('comms request consumer integration', () => {
       setTimeout(resolve, 3000)
     })
 
-    expect(mockLoggerError).toHaveBeenCalledWith('Failed checking notification mockNotifyId: Status check failure')
+    expect(mockLoggerError).toHaveBeenCalledWith('Failed checking notification mock-id: Status check failure')
 
     const notification = await getAllEntities('notificationRequests', {
       'message.id': '79389915-7275-457a-b8ca-8bf206b2e67b'
@@ -139,9 +139,3 @@ describe('comms request consumer integration', () => {
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
     expect(size.available).toBe(0)
-  })
-
-  afterAll(() => {
-    stopMessaging()
-  })
-})
