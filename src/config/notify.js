@@ -6,11 +6,17 @@ export const notifyConfig = {
       default: null,
       env: 'NOTIFY_API_KEY'
     },
-    statusCheckTimeout: {
-      doc: 'Timeout interval (milliseconds) for checking Notify request status.',
+    statusCheckMaxAttempts: {
+      doc: 'Maximum number of attempts to check Notify request status.',
       format: Number,
-      default: 60000,
-      env: 'STATUS_CHECK_TIMEOUT'
+      default: 10,
+      env: 'STATUS_CHECK_MAX_ATTEMPTS'
+    },
+    statusCheckInterval: {
+      doc: 'Interval in milliseconds between Notify request status checks.',
+      format: Number,
+      default: 5000,
+      env: 'STATUS_CHECK_INTERVAL'
     }
   }
 }

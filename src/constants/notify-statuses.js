@@ -8,3 +8,11 @@ export const notifyStatuses = {
   INTERNAL_FAILURE: 'internal-failure',
   VALIDATION_FAILURE: 'validation-failure'
 }
+
+export const finishedStatus = [
+  notifyStatuses.DELIVERED,
+  notifyStatuses.INTERNAL_FAILURE,
+  notifyStatuses.TEMPORARY_FAILURE,
+  notifyStatuses.PERMANENT_FAILURE,
+  notifyStatuses.TECHNICAL_FAILURE
+]

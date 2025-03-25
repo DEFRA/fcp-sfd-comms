@@ -31,7 +31,7 @@ const checkNotificationIdempotency = async (message) => {
   }
 }
 
-const updateNotificationStatus = async (message, status, recipient) => {
+const updateNotificationStatus = async (message, recipient, status) => {
   try {
     await dbClient.collection(collection).updateOne(
       {
@@ -66,7 +66,7 @@ const updateNotificationStatus = async (message, status, recipient) => {
                     []
                   ]
                 }
-              ],
+              ]
             }
           }
         }

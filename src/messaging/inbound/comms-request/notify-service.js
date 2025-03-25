@@ -1,8 +1,21 @@
-import { createLogger } from '../../../logging/logger.js'
-
 import notifyClient from '../../../notify/notify-client.js'
 
+import { createLogger } from '../../../logging/logger.js'
+import { finishedStatus } from '../../../constants/notify-statuses.js'
+
+import { updateNotificationStatus } from '../../../repos/notification-log.js'
+import { config } from '../../../config/index.js'
+
 const logger = createLogger()
+
+const maxStatusPollingAttempts = config.get('notify.statusCheckMaxAttempts')
+const statusPollingInterval = config.get('notify.statusCheckInterval')
+
+const getNotifyStatus = async (id) => {
+  const { data } = await notifyClient.getNotificationById(id)
+
+  return data.status
+}
 
 const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
   try {
@@ -13,28 +26,38 @@ const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
     )
 
     return [response, null]
-  } catch (error) {
-    logger.error(`Failed to send email via GOV Notify: ${error.message}`)
+  } catch (err) {
+    logger.error(`Failed to send email via GOV Notify: ${err.message}`)
 
-    return [null, error]
+    return [null, err]
   }
 }
 
-const getNotifyStatus = async (id) => {
-  const { data } = await notifyClient.getNotificationById(id)
+const checkNotificationStatus = async (message, recipient, notifyId) => {
+  let status = null
+  let attempts = 0
 
-  return {
-    id: data.id,
-    status: data.status
+  while (!finishedStatus.includes(status) && attempts < maxStatusPollingAttempts) {
+    try {
+      status = await getNotifyStatus(notifyId)
+
+      await updateNotificationStatus(message, recipient, status)
+    } catch (err) {
+      logger.error(`Failed checking notification ${notifyId}: ${err.message}`)
+    }
+
+    if (!finishedStatus.includes(status)) {
+      await new Promise(resolve => setTimeout(resolve, statusPollingInterval))
+    }
+
+    attempts += 1
   }
+
+  if (!finishedStatus.includes(status)) {
+    throw new Error(`Status check for notification ${notifyId} timed out after ${attempts} attempts`)
+  }
+
+  return status
 }
 
-const checkNotificationStatus = async (messageId, notifyId) => {
-  try {
-    const { status } = await getNotifyStatus(notifyId)
-  } catch (error) {
-    throw new Error(`Failed to check notification status for ${messageId}`, { cause: error })
-  }
-}
-
-export { trySendViaNotify }
+export { trySendViaNotify, checkNotificationStatus }

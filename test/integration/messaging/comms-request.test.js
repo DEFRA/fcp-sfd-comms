@@ -9,7 +9,8 @@ jest.setTimeout(60000)
 
 jest.unstable_mockModule('../../../src/notify/notify-client.js', () => ({
   default: {
-    sendEmail: jest.fn()
+    sendEmail: jest.fn(),
+    getNotificationById: jest.fn()
   }
 }))
 

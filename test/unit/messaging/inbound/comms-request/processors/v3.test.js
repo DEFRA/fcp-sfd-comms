@@ -16,15 +16,20 @@ jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
 
 const mockAddNotificationRequest = jest.fn()
 const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
-const mockTrySendViaNotify = jest.fn()
+const mockUpdateNotificationStatus = jest.fn()
 
 jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () => ({
   addNotificationRequest: mockAddNotificationRequest,
-  checkNotificationIdempotency: mockCheckNotificationIdempotency
+  checkNotificationIdempotency: mockCheckNotificationIdempotency,
+  updateNotificationStatus: mockUpdateNotificationStatus
 }))
 
+const mockTrySendViaNotify = jest.fn().mockResolvedValue([{}, null])
+const mockCheckNotificationStatus = jest.fn()
+
 jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service.js', () => ({
-  trySendViaNotify: mockTrySendViaNotify
+  trySendViaNotify: mockTrySendViaNotify,
+  checkNotificationStatus: mockCheckNotificationStatus
 }))
 
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')

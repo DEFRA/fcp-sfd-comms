@@ -10,6 +10,12 @@ jest.unstable_mockModule('../../../../../src/notify/notify-client.js', () => ({
   }
 }))
 
+jest.unstable_mockModule('../../../../../src/repos/notification-log.js', () => ({
+  addNotificationRequest: jest.fn(),
+  checkNotificationIdempotency: jest.fn(),
+  updateNotificationStatus: jest.fn()
+}))
+
 const mockLoggerError = jest.fn()
 
 jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
