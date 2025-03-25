@@ -1,11 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test, jest } from '@jest/globals'
-
 import v3 from '../../mocks/comms-request/v3.js'
-
 import { getQueueSize, resetQueue, sendMessage } from '../../helpers/sqs.js'
 import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
-
-jest.setTimeout(60000)
 
 jest.unstable_mockModule('../../../src/notify/notify-client.js', () => ({
   default: {
@@ -40,7 +36,14 @@ describe('comms request consumer integration', () => {
     await clearCollection('notificationRequests')
   })
 
-  test('should process valid comms message placed on sqs', async () => {
+  test('should process valid comms message placed on sqs and send email via GOV Notify', async () => {
+    const sendEmailMock = jest.fn().mockResolvedValue({ data: { id: 'mockNotifyId' } })
+    const getNotificationByIdMock = jest.fn().mockResolvedValue({ data: { status: 'sent' } })
+
+    const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
+    notifyClient.sendEmail = sendEmailMock
+    notifyClient.getNotificationById = getNotificationByIdMock
+
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
       JSON.stringify(v3)
@@ -49,6 +52,18 @@ describe('comms request consumer integration', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 3000)
     })
+
+    expect(sendEmailMock).toHaveBeenCalledWith(
+      v3.data.notifyTemplateId,
+      v3.data.commsAddresses[0],
+      expect.objectContaining({
+        personalisation: v3.data.personalisation,
+        reference: v3.id,
+        emailReplyToId: v3.data.emailReplyToId
+      })
+    )
+
+    expect(getNotificationByIdMock).toHaveBeenCalledWith('mockNotifyId')
 
     expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
 
@@ -61,41 +76,68 @@ describe('comms request consumer integration', () => {
     const size = await getQueueSize(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
-
     expect(size.available).toBe(0)
   })
 
-  test('should not process invalid comms message', async () => {
-    const message = {
-      ...v3,
-      id: 'invalid',
-      data: {
-        ...v3.data,
-        commsAddresses: undefined
-      }
-    }
+  test('should handle failure when sending email via GOV Notify', async () => {
+    const sendEmailMock = jest.fn().mockRejectedValue(new Error('Notify service failure'))
+    const getNotificationByIdMock = jest.fn().mockResolvedValue({ data: { status: 'failed' } })
+
+    const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
+    notifyClient.sendEmail = sendEmailMock
+    notifyClient.getNotificationById = getNotificationByIdMock
 
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
-      JSON.stringify(message)
+      JSON.stringify(v3)
     )
 
     await new Promise((resolve) => {
       setTimeout(resolve, 3000)
     })
 
+    expect(mockLoggerError).toHaveBeenCalledWith('Failed to send email via GOV Notify: Notify service failure')
+
     const notification = await getAllEntities('notificationRequests', {
-      'message.id': 'invalid'
+      'message.id': '79389915-7275-457a-b8ca-8bf206b2e67b'
     })
 
-    expect(notification).toHaveLength(0)
-
-    expect(mockLoggerError).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
+    expect(notification[0].status).toBe('INTERNAL_FAILURE')
 
     const size = await getQueueSize(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
+    expect(size.available).toBe(0)
+  })
 
+  test('should handle failure in checking notification status', async () => {
+    const sendEmailMock = jest.fn().mockResolvedValue({ data: { id: 'mockNotifyId' } })
+    const getNotificationByIdMock = jest.fn().mockRejectedValue(new Error('Status check failure'))
+
+    const { default: notifyClient } = await import('../../../src/notify/notify-client.js')
+    notifyClient.sendEmail = sendEmailMock
+    notifyClient.getNotificationById = getNotificationByIdMock
+
+    await sendMessage(
+      'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
+      JSON.stringify(v3)
+    )
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, 3000)
+    })
+
+    expect(mockLoggerError).toHaveBeenCalledWith('Failed checking notification mockNotifyId: Status check failure')
+
+    const notification = await getAllEntities('notificationRequests', {
+      'message.id': '79389915-7275-457a-b8ca-8bf206b2e67b'
+    })
+
+    expect(notification[0].status).toBe('SENDING')
+
+    const size = await getQueueSize(
+      'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
+    )
     expect(size.available).toBe(0)
   })
 
