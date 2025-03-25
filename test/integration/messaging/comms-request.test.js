@@ -79,7 +79,7 @@ describe('comms request consumer integration', () => {
     expect(size.available).toBe(0)
   })
 
-  test('should not process invalid comms messag and handle failure when sending email via GOV.UK Notify', async () => {
+  test('should not process invalid comms message', async () => {
     const message = {
       ...v3,
       id: 'invalid',
@@ -102,13 +102,13 @@ describe('comms request consumer integration', () => {
       'message.id': 'invalid'
     })
 
-    expect(notification).toHaveLength(0)
-
-    expect(mockLoggerError).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
-
     const size = await getQueueSize(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
+
+    expect(notification).toHaveLength(0)
+
+    expect(mockLoggerError).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
 
     expect(size.available).toBe(0)
   })
