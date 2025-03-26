@@ -43,7 +43,7 @@ describe('comms request consumer integration', () => {
     await clearCollection('notificationRequests')
   })
 
-  test('should process valid comms message placed on SQS and send email via GOV.UK Notify', async () => {
+  test('should process valid V3 comms message placed on SQS', async () => {
     mockSendEmail.mockResolvedValue({ data: { id: '79389915-7275-457a-b8ca-8bf206b2e67b' } })
     mockGetNotificationById.mockResolvedValue({ data: { status: 'delivered' } })
 
@@ -116,7 +116,8 @@ describe('comms request consumer integration', () => {
     expect(size.available).toBe(0)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     stopMessaging()
+    await clearCollection('notificationRequests')
   })
 })

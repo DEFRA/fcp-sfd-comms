@@ -1,5 +1,5 @@
 const isServerErrorCode = (code) => {
-  return code >= 500 && code < 600
+  return code >= 500 && code <= 599
 }
 
 export {

@@ -83,20 +83,16 @@ describe('comms request v3 processor', () => {
     await processV3CommsRequest(testMessage)
 
     expect(mockTrySendViaNotify).toHaveBeenCalledTimes(2)
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test1@example.com', {
-      personalisation: {
-        reference: 'test-reference'
-      },
-      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
-      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test1@example.com', {
+      personalisation: testMessage.data.personalisation,
+      reference: testMessage.id,
+      emailReplyToId: testMessage.data.emailReplyToId
     })
 
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'test2@example.com', {
-      personalisation: {
-        reference: 'test-reference'
-      },
-      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
-      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test2@example.com', {
+      personalisation: testMessage.data.personalisation,
+      reference: testMessage.id,
+      emailReplyToId: testMessage.data.emailReplyToId
     })
   })
 
@@ -114,12 +110,10 @@ describe('comms request v3 processor', () => {
     await processV3CommsRequest(testMessage)
 
     expect(mockTrySendViaNotify).toHaveBeenCalledTimes(1)
-    expect(mockTrySendViaNotify).toHaveBeenCalledWith('d29257ce-974f-4214-8bbe-69ce5f2bb7f3', 'single@example.com', {
-      personalisation: {
-        reference: 'test-reference'
-      },
-      reference: '79389915-7275-457a-b8ca-8bf206b2e67b',
-      emailReplyToId: 'f824cbfa-f75c-40bb-8407-8edb0cc469d3'
+    expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
+      personalisation: testMessage.data.personalisation,
+      reference: testMessage.id,
+      emailReplyToId: testMessage.data.emailReplyToId
     })
   })
 
@@ -157,7 +151,29 @@ describe('comms request v3 processor', () => {
 
     await processV3CommsRequest(v3CommsRequest)
 
-    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure', mockError.data.error)
+    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure', mockError.data)
+  })
+
+  test('should update notification status to TECHNICAL_FAILURE if request fails with server error', async () => {
+    const mockError = {
+      status: 500,
+      data: {
+        error: {
+          status_code: 500,
+          errors: [
+            {
+              error: 'Internal server error'
+            }
+          ]
+        }
+      }
+    }
+
+    mockTrySendViaNotify.mockResolvedValue([null, mockError])
+
+    await processV3CommsRequest(v3CommsRequest)
+
+    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'technical-failure', mockError.data)
   })
 
   test('should handle checkNotificationStatus failure and log error', async () => {

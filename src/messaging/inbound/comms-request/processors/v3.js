@@ -40,7 +40,7 @@ const handleRecipient = async (message, recipient) => {
         ? notifyStatuses.TECHNICAL_FAILURE
         : notifyStatuses.INTERNAL_FAILURE
 
-      await updateNotificationStatus(message, recipient, status, notifyError.data.error)
+      await updateNotificationStatus(message, recipient, status, notifyError.data)
     } catch (err) {
       logger.error(`Failed updating failed notification status: ${err.message}`)
     }
