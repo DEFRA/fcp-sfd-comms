@@ -74,6 +74,8 @@ describe('comms request consumer integration', () => {
       })
     )
 
+    expect(mockGetNotificationById).toHaveBeenCalledTimes(1)
+
     expect(notification).toHaveLength(1)
 
     expect(size.available).toBe(0)
