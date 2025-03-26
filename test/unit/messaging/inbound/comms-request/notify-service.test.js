@@ -103,7 +103,7 @@ describe('Notify Service', () => {
   })
 
   test('should retry notification status check until max attempts reached', async () => {
-    mockGetNotificationById.mockResolvedValue({ data: { status: 'in-progress' } })
+    mockGetNotificationById.mockResolvedValue({ data: { status: 'sending' } })
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
