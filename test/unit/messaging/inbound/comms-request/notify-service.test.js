@@ -43,7 +43,7 @@ describe('Notify Service', () => {
   })
 
   test('should send email successfully', async () => {
-    const mockResponse = { id: 'mock-id' }
+    const mockResponse = { data: { id: 'mock-id' } }
     mockSendEmail.mockResolvedValue(mockResponse)
     const data = mockCommsRequest.data
 
@@ -65,8 +65,24 @@ describe('Notify Service', () => {
   })
 
   test('should handle errors when sending email fails', async () => {
-    const mockError = new Error('Failed to send email')
+    const mockError = {
+      response: {
+        status: 400,
+        data: {
+          error: {
+            status_code: 400,
+            errors: [
+              {
+                error: 'mock-error'
+              }
+            ]
+          }
+        }
+      }
+    }
+
     mockSendEmail.mockRejectedValue(mockError)
+
     const data = mockCommsRequest.data
 
     const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
@@ -82,11 +98,12 @@ describe('Notify Service', () => {
         reference: data.reference
       }
     )
+
     expect(mockLoggerError).toHaveBeenCalledWith(
-      'Failed to send email via GOV Notify: Failed to send email'
+      'Failed to send email via GOV Notify. Error code: 400'
     )
     expect(response).toBeNull()
-    expect(error).toEqual(mockError)
+    expect(error).toEqual(mockError.response)
   })
 
   test('should check notification status successfully', async () => {

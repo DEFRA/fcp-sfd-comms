@@ -31,7 +31,7 @@ const checkNotificationIdempotency = async (message) => {
   }
 }
 
-const updateNotificationStatus = async (message, recipient, status) => {
+const updateNotificationStatus = async (message, recipient, status, error) => {
   try {
     await dbClient.collection(collection).updateOne(
       {
@@ -46,7 +46,8 @@ const updateNotificationStatus = async (message, recipient, status) => {
                   {
                     recipient,
                     status,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date(),
+                    ...(error && { error })
                   }
                 ],
                 {

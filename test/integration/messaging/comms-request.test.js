@@ -65,6 +65,7 @@ describe('comms request consumer integration', () => {
     )
 
     expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+
     expect(mockSendEmail).toHaveBeenCalledWith(
       'd29257ce-974f-4214-8bbe-69ce5f2bb7f3',
       'test@example.com',

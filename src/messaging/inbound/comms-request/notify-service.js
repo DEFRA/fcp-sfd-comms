@@ -27,9 +27,9 @@ const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
 
     return [response, null]
   } catch (err) {
-    logger.error(`Failed to send email via GOV Notify: ${err.message}`)
+    logger.error(`Failed to send email via GOV Notify. Error code: ${err.response?.status}`)
 
-    return [null, err]
+    return [null, err.response]
   }
 }
 

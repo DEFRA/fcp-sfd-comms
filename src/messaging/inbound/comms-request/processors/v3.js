@@ -11,6 +11,7 @@ import {
 
 import { checkNotificationStatus, trySendViaNotify } from '../notify-service.js'
 import { notifyStatuses } from '../../../../constants/notify-statuses.js'
+import { isServerErrorCode } from '../../../../utils/errors.js'
 
 const logger = createLogger()
 
@@ -23,15 +24,9 @@ const handleRecipient = async (message, recipient) => {
     emailReplyToId: data.emailReplyToId
   }
 
-  const [response] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
+  const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
 
   if (response) {
-    try {
-      await updateNotificationStatus(message, recipient, notifyStatuses.SENDING)
-    } catch (err) {
-      logger.error(`Failed updating notification status: ${err.message}`)
-    }
-
     try {
       await checkNotificationStatus(message, recipient, response.data.id)
     } catch (err) {
@@ -39,9 +34,15 @@ const handleRecipient = async (message, recipient) => {
     }
   } else {
     try {
-      await updateNotificationStatus(message, recipient, notifyStatuses.INTERNAL_FAILURE)
+      const technicalFailure = isServerErrorCode(notifyError?.status)
+
+      const status = technicalFailure
+        ? notifyStatuses.TECHNICAL_FAILURE
+        : notifyStatuses.INTERNAL_FAILURE
+
+      await updateNotificationStatus(message, recipient, status, notifyError.data.error)
     } catch (err) {
-      logger.error(`Failed updating notification status: ${err.message}`)
+      logger.error(`Failed updating failed notification status: ${err.message}`)
     }
   }
 }
@@ -65,9 +66,9 @@ const processV3CommsRequest = async (message) => {
     ? data.commsAddresses
     : [data.commsAddresses]
 
-  const handlers = recipients.map((recipient) => handleRecipient(validated, recipient))
-
-  await Promise.all(handlers)
+  for (const recipient of recipients) {
+    await handleRecipient(validated, recipient)
+  }
 
   return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)
 }

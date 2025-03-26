@@ -123,29 +123,41 @@ describe('comms request v3 processor', () => {
     })
   })
 
-  test('should update notification status to SENDING if request is successful', async () => {
-    mockTrySendViaNotify.mockResolvedValue([{ data: { id: 'mock-response-id' } }])
+  test('should handle failed status check and log error', async () => {
+    const mockResponse = {
+      data: {
+        id: 'mock-response-id'
+      }
+    }
+
+    mockTrySendViaNotify.mockResolvedValue([mockResponse])
+    mockCheckNotificationStatus.mockRejectedValue(new Error('Update failed'))
 
     await processV3CommsRequest(v3CommsRequest)
 
-    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'sending')
-  })
-
-  test('should handle failed status update and log error', async () => {
-    mockTrySendViaNotify.mockResolvedValue([{ data: { id: 'mock-response-id' } }])
-    mockUpdateNotificationStatus.mockRejectedValue(new Error('Update failed'))
-
-    await processV3CommsRequest(v3CommsRequest)
-
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed updating notification status/))
+    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
   })
 
   test('should update notification status to INTERNAL_FAILURE if request fails', async () => {
-    mockTrySendViaNotify.mockResolvedValue([null])
+    const mockError = {
+      status: 400,
+      data: {
+        error: {
+          status_code: 400,
+          errors: [
+            {
+              error: 'mock-error'
+            }
+          ]
+        }
+      }
+    }
+
+    mockTrySendViaNotify.mockResolvedValue([null, mockError])
 
     await processV3CommsRequest(v3CommsRequest)
 
-    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure')
+    expect(mockUpdateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure', mockError.data.error)
   })
 
   test('should handle checkNotificationStatus failure and log error', async () => {
