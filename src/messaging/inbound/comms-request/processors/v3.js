@@ -1,18 +1,22 @@
 import { createLogger } from '../../../../logging/logger.js'
-import { validate } from '../../../../schemas/validate.js'
 
+import { config } from '../../../../config/index.js'
+
+import { validate } from '../../../../schemas/validate.js'
 import { v3 } from '../../../../schemas/comms-request/index.js'
 
 import {
   checkNotificationIdempotency,
   addNotificationRequest,
-  updateNotificationStatus
+  updateNotificationStatus,
+  getOriginalNotificationRequest
 } from '../../../../repos/notification-log.js'
 
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses } from '../../../../constants/notify-statuses.js'
-import { isServerErrorCode } from '../../../../utils/errors.js'
+import { checkRetryable, isServerErrorCode } from '../../../../utils/errors.js'
+import { publishRetryRequest } from '../../../outbound/notification-retry.js'
 
 const logger = createLogger()
 
@@ -29,7 +33,24 @@ const handleRecipient = async (message, recipient) => {
 
   if (response) {
     try {
-      await checkNotificationStatus(message, recipient, response.data.id)
+      const status = await checkNotificationStatus(message, recipient, response.data.id)
+
+      const correlationId = data.correlationId
+
+      let initialCreation = new Date(message.time)
+
+      if (correlationId) {
+        const { createdAt } = await getOriginalNotificationRequest(correlationId)
+
+        initialCreation = new Date(createdAt)
+      }
+
+      if (checkRetryable(status, initialCreation)) {
+        logger.info(`Scheduling notification retry for message: ${message.id}`)
+        await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
+      } else {
+        logger.info(`Retry window expired for request: ${correlationId || message.id}`)
+      }
     } catch (err) {
       logger.error(`Failed checking notification status: ${err.message}`)
     }
@@ -42,6 +63,11 @@ const handleRecipient = async (message, recipient) => {
         : notifyStatuses.INTERNAL_FAILURE
 
       await updateNotificationStatus(message, recipient, status, notifyError.data)
+
+      if (technicalFailure) {
+        logger.info(`Scheduling notification retry for message: ${message.id}`)
+        await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
+      }
     } catch (err) {
       logger.error(`Failed updating failed notification status: ${err.message}`)
     }

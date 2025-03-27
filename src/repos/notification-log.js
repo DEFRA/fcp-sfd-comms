@@ -5,7 +5,8 @@ const collection = 'notificationRequests'
 const addNotificationRequest = async (message) => {
   try {
     const notification = {
-      message
+      message,
+      createdAt: new Date()
     }
 
     await dbClient.collection(collection).insertOne(notification)
@@ -80,8 +81,26 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
   }
 }
 
+const getOriginalNotificationRequest = async (correlationId) => {
+  try {
+    const notification = await dbClient.collection(collection).findOne({
+      'message.id': correlationId
+    })
+
+    return {
+      id: notification.message.id,
+      createdAt: notification.createdAt
+    }
+  } catch (err) {
+    throw new Error(`Error finding original notification for correlationId ${correlationId}`, {
+      cause: err
+    })
+  }
+}
+
 export {
   addNotificationRequest,
   checkNotificationIdempotency,
-  updateNotificationStatus
+  updateNotificationStatus,
+  getOriginalNotificationRequest
 }
