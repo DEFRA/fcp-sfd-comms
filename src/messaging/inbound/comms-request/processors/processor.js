@@ -1,4 +1,4 @@
-import { commEvents } from '../../../../constants/comm-events.js'
+import { commEvents } from '../../../../constants/comms-events.js'
 import { UnprocessableMessageError } from '../../../../errors/message-errors.js'
 
 import { processV3CommsRequest } from './v3.js'

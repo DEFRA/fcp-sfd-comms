@@ -9,10 +9,16 @@ import {
   updateNotificationStatus
 } from '../../../../repos/notification-log.js'
 
+import {
+  publishReceivedMessage,
+  publishInvalidRequest
+} from '../../../outbound/publish/index.js'
+
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses } from '../../../../constants/notify-statuses.js'
 import { isServerErrorCode } from '../../../../utils/errors.js'
+import { publishStatus } from '../../../outbound/publish/status.js'
 
 const logger = createLogger()
 
@@ -29,7 +35,8 @@ const handleRecipient = async (message, recipient) => {
 
   if (response) {
     try {
-      await checkNotificationStatus(message, recipient, response.data.id)
+      const status = await checkNotificationStatus(message, recipient, response.data.id)
+      await publishStatus(message, recipient, status)
     } catch (err) {
       logger.error(`Failed checking notification status: ${err.message}`)
     }
@@ -42,6 +49,7 @@ const handleRecipient = async (message, recipient) => {
         : notifyStatuses.INTERNAL_FAILURE
 
       await updateNotificationStatus(message, recipient, status, notifyError.data)
+      await publishStatus(message, recipient, status, notifyError.data)
     } catch (err) {
       logger.error(`Failed updating failed notification status: ${err.message}`)
     }
@@ -52,6 +60,7 @@ const processV3CommsRequest = async (message) => {
   const [validated, err] = await validate(v3, message)
 
   if (err) {
+    await publishInvalidRequest(message, err)
     return logger.error(`Invalid comms V3 payload: ${err.details.map(d => d.message)}`)
   }
 
@@ -60,6 +69,7 @@ const processV3CommsRequest = async (message) => {
   }
 
   await addNotificationRequest(validated)
+  await publishReceivedMessage(validated)
 
   const data = message.data
 

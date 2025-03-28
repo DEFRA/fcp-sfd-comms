@@ -43,6 +43,14 @@ export const messagingConfig = {
         default: null,
         env: 'COMMS_REQUEST_DEAD_LETTER_QUEUE_URL'
       }
+    },
+    dataAccessLayer: {
+      topicArn: {
+        doc: 'ARN (Amazon Resource Name) for the comms event SNS topic (which is subscribed to the comms request ingest queue)',
+        format: String,
+        default: null,
+        env: 'DAL_TOPIC_ARN'
+      }
     }
   }
 }
