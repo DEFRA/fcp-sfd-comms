@@ -33,7 +33,8 @@ jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
   }
 }))
 
-const { trySendViaNotify, checkNotificationStatus } = await import('../../../../../src/messaging/inbound/comms-request/notify-service.js')
+const { trySendViaNotify } = await import('../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js')
+const { checkNotificationStatus } = await import('../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
 
 const { finishedStatus } = await import('../../../../../src/constants/notify-statuses.js')
 

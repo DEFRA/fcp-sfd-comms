@@ -25,8 +25,11 @@ jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () =
   updateNotificationStatus: mockUpdateNotificationStatus
 }))
 
-jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service.js', () => ({
-  trySendViaNotify: mockTrySendViaNotify,
+jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js', () => ({
+  trySendViaNotify: mockTrySendViaNotify
+}))
+
+jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js', () => ({
   checkNotificationStatus: mockCheckNotificationStatus
 }))
 

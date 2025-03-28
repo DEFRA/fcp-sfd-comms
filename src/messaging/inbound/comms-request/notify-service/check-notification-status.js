@@ -1,37 +1,12 @@
-import notifyClient from '../../../notify/notify-client.js'
-
-import { createLogger } from '../../../logging/logger.js'
-import { finishedStatus } from '../../../constants/notify-statuses.js'
-
-import { updateNotificationStatus } from '../../../repos/notification-log.js'
-import { config } from '../../../config/index.js'
+import { createLogger } from '../../../../logging/logger.js'
+import { finishedStatus } from '../../../../constants/notify-statuses.js'
+import { getNotifyStatus } from './get-notify-status.js'
+import { updateNotificationStatus } from '../../../../repos/notification-log.js'
+import { config } from '../../../../config/index.js'
 
 const logger = createLogger()
-
 const maxStatusPollingAttempts = config.get('notify.statusCheckMaxAttempts')
 const statusPollingInterval = config.get('notify.statusCheckInterval')
-
-const getNotifyStatus = async (id) => {
-  const { data } = await notifyClient.getNotificationById(id)
-
-  return data.status
-}
-
-const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
-  try {
-    const response = await notifyClient.sendEmail(
-      templateId,
-      emailAddress,
-      params
-    )
-
-    return [response, null]
-  } catch (err) {
-    logger.error(`Failed to send email via GOV Notify. Error code: ${err.response?.status}`)
-
-    return [null, err.response]
-  }
-}
 
 const checkNotificationStatus = async (message, recipient, notifyId) => {
   let status = null
@@ -60,4 +35,4 @@ const checkNotificationStatus = async (message, recipient, notifyId) => {
   return status
 }
 
-export { trySendViaNotify, checkNotificationStatus }
+export { checkNotificationStatus }

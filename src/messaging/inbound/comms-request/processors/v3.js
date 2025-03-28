@@ -9,7 +9,8 @@ import {
   updateNotificationStatus
 } from '../../../../repos/notification-log.js'
 
-import { checkNotificationStatus, trySendViaNotify } from '../notify-service.js'
+import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
+import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses } from '../../../../constants/notify-statuses.js'
 import { isServerErrorCode } from '../../../../utils/errors.js'
 
