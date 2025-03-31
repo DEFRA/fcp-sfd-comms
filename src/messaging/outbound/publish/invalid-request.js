@@ -20,8 +20,8 @@ const publishInvalidRequest = async (message, errors) => {
 
   try {
     await publish(snsClient, snsTopic, JSON.stringify(invalidRequest))
-  } catch (error) {
-    console.error('Error publishing invalid request to SNS:', { cause: error })
+  } catch (err) {
+    console.error('Error publishing invalid request to SNS:', { cause: err })
   }
 }
 
