@@ -1,6 +1,6 @@
-import notifyStatus from './notify-statuses.js'
+import { notifyStatuses } from './notify-statuses.js'
 
-export const commEvents = {
+export const commsEvents = {
   REQUEST: 'uk.gov.fcp.sfd.notification.request',
   RECEIVED: 'uk.gov.fcp.sfd.notification.received',
   RETRY: 'uk.gov.fcp.sfd.notification.retry',
@@ -12,12 +12,12 @@ export const commEvents = {
 }
 
 export const statusToEventMap = {
-  [notifyStatus.PERMANENT_FAILURE]: commEvents.PROVIDER_FAILURE,
-  [notifyStatus.TEMPORARY_FAILURE]: commEvents.PROVIDER_FAILURE,
-  [notifyStatus.TECHNICAL_FAILURE]: commEvents.PROVIDER_FAILURE,
-  [notifyStatus.VALIDATION_FAILURE]: commEvents.VALIDATION_FAILURE,
-  [notifyStatus.INTERNAL_FAILURE]: commEvents.INTERNAL_FAILURE,
-  [notifyStatus.DELIVERED]: commEvents.DELIVERED,
-  [notifyStatus.SENDING]: commEvents.SENDING,
-  [notifyStatus.CREATED]: commEvents.SENDING
+  [notifyStatuses.PERMANENT_FAILURE]: commsEvents.PROVIDER_FAILURE,
+  [notifyStatuses.TEMPORARY_FAILURE]: commsEvents.PROVIDER_FAILURE,
+  [notifyStatuses.TECHNICAL_FAILURE]: commsEvents.PROVIDER_FAILURE,
+  [notifyStatuses.VALIDATION_FAILURE]: commsEvents.VALIDATION_FAILURE,
+  [notifyStatuses.INTERNAL_FAILURE]: commsEvents.INTERNAL_FAILURE,
+  [notifyStatuses.DELIVERED]: commsEvents.DELIVERED,
+  [notifyStatuses.SENDING]: commsEvents.SENDING,
+  [notifyStatuses.CREATED]: commsEvents.SENDING
 }

@@ -1,12 +1,21 @@
 import { PublishCommand } from '@aws-sdk/client-sns'
 
 const publish = async (snsClient, topicArn, message) => {
-  const command = new PublishCommand({
+  const isFifo = topicArn.endsWith('.fifo')
+
+  const params = {
     TopicArn: topicArn,
     Message: message
-  })
+  }
 
-  await snsClient.send(command)
+  if (isFifo) {
+    params.MessageGroupId = message.id || 'default-message-group-id'
+    params.MessageDeduplicationId = message.id || 'default-message-deduplication-id'
+  }
+
+  const command = new PublishCommand(params)
+
+  await snsClient.send((command))
 }
 
 export { publish }

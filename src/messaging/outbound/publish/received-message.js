@@ -2,7 +2,7 @@ import { config } from '../../../config/index.js'
 import { snsClient } from '../sns/client.js'
 import { publish } from '../sns/publish.js'
 import { buildReceivedMessage } from '../build/received-message.js'
-import { commsEvents } from '../../../constants/comm-events.js'
+import { commsEvents } from '../../../constants/comms-events.js'
 
 const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
 
@@ -15,8 +15,9 @@ const publishReceivedMessage = async (message) => {
 
   try {
     await publish(snsClient, snsTopic, JSON.stringify(receivedMessage))
+    console.log('Message sucessfully published to SNS:', JSON.stringify(receivedMessage))
   } catch (error) {
-    throw new Error('Error publishing received message to SNS:', { cause: error })
+    console.error('Error publishing received message to SNS:', { cause: error })
   }
 }
 

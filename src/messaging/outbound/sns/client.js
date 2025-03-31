@@ -1,4 +1,4 @@
-import { environments } from '../../../constants/environments.js'
+import environments from '../../../constants/environments.js'
 
 import { SNSClient } from '@aws-sdk/client-sns'
 

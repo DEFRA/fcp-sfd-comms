@@ -11,14 +11,14 @@ import {
 
 import {
   publishReceivedMessage,
-  publishInvalidRequest
+  publishInvalidRequest,
+  publishStatus
 } from '../../../outbound/publish/index.js'
 
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses } from '../../../../constants/notify-statuses.js'
 import { isServerErrorCode } from '../../../../utils/errors.js'
-import { publishStatus } from '../../../outbound/publish/status.js'
 
 const logger = createLogger()
 
@@ -35,6 +35,7 @@ const handleRecipient = async (message, recipient) => {
 
   if (response) {
     try {
+      // await checkNotificationStatus(message, recipient, response.data.id)
       const status = await checkNotificationStatus(message, recipient, response.data.id)
       await publishStatus(message, recipient, status)
     } catch (err) {

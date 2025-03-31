@@ -16,12 +16,12 @@ const publishInvalidRequest = async (message, errors) => {
     }))
   }
 
-  const invalidMessage = buildInvalidMessage(message, commsEvents.VALIDATION_FAILURE, statusDetails)
+  const invalidRequest = buildInvalidMessage(message, commsEvents.VALIDATION_FAILURE, statusDetails)
 
   try {
-    await publish(snsClient, snsTopic, JSON.stringify(invalidMessage))
+    await publish(snsClient, snsTopic, JSON.stringify(invalidRequest))
   } catch (error) {
-    throw new Error('Error publishing invalid request to SNS:', { cause: error })
+    console.error('Error publishing invalid request to SNS:', { cause: error })
   }
 }
 

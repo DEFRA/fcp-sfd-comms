@@ -46,7 +46,7 @@ export const messagingConfig = {
     },
     dataAccessLayer: {
       topicArn: {
-        doc: 'ARN (Amazon Resource Name) for the comms event SNS topic (which is subscribed to the comms request ingest queue)',
+        doc: 'ARN (Amazon Resource Name) for the DAL (data access layer) SNS topic on which comms events are published',
         format: String,
         default: null,
         env: 'DAL_TOPIC_ARN'
