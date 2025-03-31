@@ -15,7 +15,6 @@ const publishReceivedMessage = async (message) => {
 
   try {
     await publish(snsClient, snsTopic, JSON.stringify(receivedMessage))
-    console.log('Message sucessfully published to SNS:', JSON.stringify(receivedMessage))
   } catch (err) {
     console.error('Error publishing received message to SNS:', { cause: err })
   }
