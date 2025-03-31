@@ -35,7 +35,6 @@ const handleRecipient = async (message, recipient) => {
 
   if (response) {
     try {
-      // await checkNotificationStatus(message, recipient, response.data.id)
       const status = await checkNotificationStatus(message, recipient, response.data.id)
       await publishStatus(message, recipient, status)
     } catch (err) {
