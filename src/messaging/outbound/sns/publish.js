@@ -15,7 +15,7 @@ const publish = async (snsClient, topicArn, message) => {
 
   const command = new PublishCommand(params)
 
-  await snsClient.send((command))
+  await snsClient.send(command)
 }
 
 export { publish }
