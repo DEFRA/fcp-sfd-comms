@@ -22,11 +22,11 @@ services:
     environment:
       PORT: 3001
       NODE_ENV: development
-      SQS_ENDPOINT: http://localstack:4566
-      SNS_ENDPOINT: http://localstack:4566
       MONGO_URI: mongodb://mongodb:27017/
+      SQS_ENDPOINT: http://localstack:4566
       COMMS_REQUEST_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request
       COMMS_REQUEST_DEAD_LETTER_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter
+      SNS_ENDPOINT: http://localstack:4566
       DAL_TOPIC_ARN: arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo
       AWS_REGION: ${AWS_REGION:-eu-west-2}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-eu-west-2}
