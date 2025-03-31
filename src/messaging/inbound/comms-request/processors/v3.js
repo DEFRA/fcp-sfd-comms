@@ -14,63 +14,57 @@ import {
 
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
-import { notifyStatuses } from '../../../../constants/notify-statuses.js'
+import { notifyStatuses, retryableStatus } from '../../../../constants/notify-statuses.js'
 import { checkRetryable, isServerErrorCode } from '../../../../utils/errors.js'
 import { publishRetryRequest } from '../../../outbound/notification-retry.js'
 
 const logger = createLogger()
 
-const handleRecipient = async (message, recipient) => {
-  const data = message.data
+const handleNotifySuccess = async (message, recipient, response) => {
+  try {
+    const status = await checkNotificationStatus(message, recipient, response.data.id)
 
-  const params = {
-    personalisation: data.personalisation,
-    reference: data.correlationId ?? message.id,
-    emailReplyToId: data.emailReplyToId
+    if (!retryableStatus.includes(status)) {
+      return
+    }
+
+    const correlationId = message.data.correlationId
+
+    let initialCreation = new Date()
+
+    if (correlationId) {
+      const { createdAt } = await getOriginalNotificationRequest(correlationId)
+
+      initialCreation = createdAt
+    }
+
+    if (checkRetryable(status, initialCreation)) {
+      logger.info(`Scheduling notification retry for message: ${message.id}`)
+      await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
+    } else {
+      logger.info(`Retry window expired for request: ${correlationId || message.id}`)
+    }
+  } catch (err) {
+    logger.error(`Failed checking notification status: ${err.message}`)
   }
+}
 
-  const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
+const handleNotifyError = async (message, recipient, notifyError) => {
+  try {
+    const technicalFailure = isServerErrorCode(notifyError?.status)
 
-  if (response) {
-    try {
-      const status = await checkNotificationStatus(message, recipient, response.data.id)
+    const status = technicalFailure
+      ? notifyStatuses.TECHNICAL_FAILURE
+      : notifyStatuses.INTERNAL_FAILURE
 
-      const correlationId = data.correlationId
+    await updateNotificationStatus(message, recipient, status, notifyError.data)
 
-      let initialCreation = new Date(message.time)
-
-      if (correlationId) {
-        const { createdAt } = await getOriginalNotificationRequest(correlationId)
-
-        initialCreation = new Date(createdAt)
-      }
-
-      if (checkRetryable(status, initialCreation)) {
-        logger.info(`Scheduling notification retry for message: ${message.id}`)
-        await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
-      } else {
-        logger.info(`Retry window expired for request: ${correlationId || message.id}`)
-      }
-    } catch (err) {
-      logger.error(`Failed checking notification status: ${err.message}`)
+    if (technicalFailure) {
+      logger.info(`Scheduling notification retry for message: ${message.id}`)
+      await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     }
-  } else {
-    try {
-      const technicalFailure = isServerErrorCode(notifyError?.status)
-
-      const status = technicalFailure
-        ? notifyStatuses.TECHNICAL_FAILURE
-        : notifyStatuses.INTERNAL_FAILURE
-
-      await updateNotificationStatus(message, recipient, status, notifyError.data)
-
-      if (technicalFailure) {
-        logger.info(`Scheduling notification retry for message: ${message.id}`)
-        await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
-      }
-    } catch (err) {
-      logger.error(`Failed updating failed notification status: ${err.message}`)
-    }
+  } catch (err) {
+    logger.error(`Failed handling failed notification status: ${err.message}`)
   }
 }
 
@@ -89,12 +83,24 @@ const processV3CommsRequest = async (message) => {
 
   const data = message.data
 
+  const params = {
+    personalisation: data.personalisation,
+    reference: data.correlationId ?? message.id,
+    emailReplyToId: data.emailReplyToId
+  }
+
   const recipients = Array.isArray(data.commsAddresses)
     ? data.commsAddresses
     : [data.commsAddresses]
 
   for (const recipient of recipients) {
-    await handleRecipient(validated, recipient)
+    const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
+
+    if (response) {
+      await handleNotifySuccess(message, recipient, response)
+    } else {
+      await handleNotifyError(message, recipient, notifyError)
+    }
   }
 
   return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)

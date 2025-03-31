@@ -8,6 +8,7 @@ const mockLoggerError = jest.fn()
 const mockAddNotificationRequest = jest.fn()
 const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
 const mockUpdateNotificationStatus = jest.fn()
+const mockGetOriginalNotificationRequest = jest.fn()
 const mockTrySendViaNotify = jest.fn().mockResolvedValue([{}, null])
 const mockCheckNotificationStatus = jest.fn()
 
@@ -22,7 +23,8 @@ jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
 jest.unstable_mockModule('../../../../../../src/repos/notification-log.js', () => ({
   addNotificationRequest: mockAddNotificationRequest,
   checkNotificationIdempotency: mockCheckNotificationIdempotency,
-  updateNotificationStatus: mockUpdateNotificationStatus
+  updateNotificationStatus: mockUpdateNotificationStatus,
+  getOriginalNotificationRequest: mockGetOriginalNotificationRequest
 }))
 
 jest.unstable_mockModule('../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js', () => ({

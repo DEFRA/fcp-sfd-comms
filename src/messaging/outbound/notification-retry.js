@@ -1,11 +1,11 @@
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
 
-import { config } from '../../config'
+import { config } from '../../config/index.js'
 import { sqsClient } from '../sqs/client.js'
-import { commEvents } from '../../constants/comm-events'
+import { commEvents } from '../../constants/comm-events.js'
 
 const publishRetryRequest = async (message, recipient, delay) => {
-  if (delay >= 15) {
+  if (delay > 15) {
     throw new Error('Delay must be less than or equal to 15 minutes')
   }
 

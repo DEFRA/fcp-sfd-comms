@@ -1,5 +1,9 @@
 import { addHours, addMinutes } from 'date-fns'
 
+import { config } from '../config/index.js'
+
+import { notifyStatuses, retryableStatus } from '../constants/notify-statuses.js'
+
 const isServerErrorCode = (code) => {
   return code >= 500 && code <= 599
 }
@@ -9,18 +13,18 @@ const checkRetryable = (status, requestTime) => {
     return false
   }
 
-  if (status === notifyStatus.TECHNICAL_FAILURE) {
+  if (status === notifyStatuses.TECHNICAL_FAILURE) {
     return true
   }
 
   const adjustedNow = addMinutes(
     new Date(),
-    notifyConfig.get('messageRetries.retryDelay')
+    config.get('notify.retries.retryDelay')
   )
 
   const timeoutDate = addHours(
     requestTime,
-    notifyConfig.get('messageRetries.temporaryFailureTimeout')
+    config.get('notify.retries.temporaryFailureTimeout')
   )
 
   return adjustedNow < timeoutDate
