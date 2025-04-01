@@ -5,10 +5,6 @@ import { sqsClient } from '../sqs/client.js'
 import { commEvents } from '../../constants/comm-events.js'
 
 const publishRetryRequest = async (message, recipient, delay) => {
-  if (delay > 15) {
-    throw new Error('Delay must be less than or equal to 15 minutes')
-  }
-
   const retryMessage = {
     ...message,
     id: crypto.randomUUID(),
@@ -27,7 +23,13 @@ const publishRetryRequest = async (message, recipient, delay) => {
     DelaySeconds: delay * 60
   })
 
-  await sqsClient.send(command)
+  try {
+    await sqsClient.send(command)
+  } catch (err) {
+    throw new Error(`Error publishing retry message: ${err.message}`, {
+      cause: err
+    })
+  }
 }
 
 export { publishRetryRequest }

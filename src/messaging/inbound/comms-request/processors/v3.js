@@ -20,7 +20,7 @@ import { publishRetryRequest } from '../../../outbound/notification-retry.js'
 
 const logger = createLogger()
 
-const handleNotifySuccess = async (message, recipient, response) => {
+const processNotifySuccess = async (message, recipient, response) => {
   try {
     const status = await checkNotificationStatus(message, recipient, response.data.id)
 
@@ -49,7 +49,7 @@ const handleNotifySuccess = async (message, recipient, response) => {
   }
 }
 
-const handleNotifyError = async (message, recipient, notifyError) => {
+const processNotifyError = async (message, recipient, notifyError) => {
   try {
     const technicalFailure = isServerErrorCode(notifyError?.status)
 
@@ -64,7 +64,7 @@ const handleNotifyError = async (message, recipient, notifyError) => {
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     }
   } catch (err) {
-    logger.error(`Failed handling failed notification status: ${err.message}`)
+    logger.error(`Failed handling failed notification: ${err.message}`)
   }
 }
 
@@ -97,9 +97,9 @@ const processV3CommsRequest = async (message) => {
     const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
 
     if (response) {
-      await handleNotifySuccess(message, recipient, response)
+      await processNotifySuccess(message, recipient, response)
     } else {
-      await handleNotifyError(message, recipient, notifyError)
+      await processNotifyError(message, recipient, notifyError)
     }
   }
 
