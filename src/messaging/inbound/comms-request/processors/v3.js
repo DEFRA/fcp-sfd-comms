@@ -12,6 +12,11 @@ import {
   getOriginalNotificationRequest
 } from '../../../../repos/notification-log.js'
 
+import {
+  publishReceivedMessage,
+  publishInvalidRequest
+} from '../../../outbound/publish/index.js'
+
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses, retryableStatus } from '../../../../constants/notify-statuses.js'
@@ -72,6 +77,7 @@ const processV3CommsRequest = async (message) => {
   const [validated, err] = await validate(v3, message)
 
   if (err) {
+    await publishInvalidRequest(message, err)
     return logger.error(`Invalid comms V3 payload: ${err.details.map(d => d.message)}`)
   }
 
@@ -80,6 +86,7 @@ const processV3CommsRequest = async (message) => {
   }
 
   await addNotificationRequest(validated)
+  await publishReceivedMessage(validated)
 
   const data = message.data
 

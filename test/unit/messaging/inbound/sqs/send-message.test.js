@@ -12,13 +12,13 @@ jest.unstable_mockModule('@aws-sdk/client-sqs', () => ({
 
 const mockLoggerError = jest.fn()
 
-jest.unstable_mockModule('../../../../src/logging/logger.js', () => ({
+jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
 }))
 
-const { sendMessage } = await import('../../../../src/messaging/sqs/send-message.js')
+const { sendMessage } = await import('../../../../../src/messaging/inbound/sqs/send-message.js')
 
 describe('sqs send message', () => {
   beforeEach(async () => {

@@ -1,4 +1,4 @@
-import { sqsClient } from '../sqs/client.js'
+import { sqsClient } from './sqs/client.js'
 import { startCommsListener, stopCommsListener } from './comms-request/consumer.js'
 
 const startMessaging = () => {

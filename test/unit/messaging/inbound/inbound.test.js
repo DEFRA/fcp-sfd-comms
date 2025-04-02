@@ -1,6 +1,6 @@
 import { jest, describe, test, expect, beforeEach } from '@jest/globals'
 
-import { sqsClient } from '../../../../src/messaging/sqs/client.js'
+import { sqsClient } from '../../../../src/messaging/inbound/sqs/client.js'
 
 const mockStartCommsListener = jest.fn()
 const mockStopCommsListener = jest.fn()

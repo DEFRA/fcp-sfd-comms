@@ -22,7 +22,7 @@ describe('sqs client', () => {
   test('should create sqs client using access / secret key in development', async () => {
     process.env.NODE_ENV = 'development'
 
-    const { sqsClient } = await import('../../../../src/messaging/sqs/client.js')
+    const { sqsClient } = await import('../../../../../src/messaging/inbound/sqs/client.js')
 
     expect(sqsClient).toBeDefined()
     expect(mockSqsClient).toHaveBeenCalledWith({
@@ -38,7 +38,7 @@ describe('sqs client', () => {
   test('should create sqs client without access / secret key in production', async () => {
     process.env.NODE_ENV = 'production'
 
-    const { sqsClient } = await import('../../../../src/messaging/sqs/client.js')
+    const { sqsClient } = await import('../../../../../src/messaging/inbound/sqs/client.js')
 
     expect(sqsClient).toBeDefined()
     expect(mockSqsClient).toHaveBeenCalledWith({
