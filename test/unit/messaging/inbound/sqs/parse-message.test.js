@@ -1,10 +1,10 @@
 import { describe, test, expect } from '@jest/globals'
 
-import { UnprocessableMessageError } from '../../../../src/errors/message-errors.js'
+import { UnprocessableMessageError } from '../../../../../src/errors/message-errors.js'
 
-import sqsMessage from '../../../mocks/aws/sqs-message.js'
+import sqsMessage from '../../../../mocks/aws/sqs-message.js'
 
-import { parseSqsMessage } from '../../../../src/messaging/sqs/parse-message.js'
+import { parseSqsMessage } from '../../../../../src/messaging/inbound/sqs/parse-message.js'
 
 describe('sqs message parser', () => {
   test('sqs message should return message object', () => {

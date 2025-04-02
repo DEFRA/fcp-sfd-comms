@@ -19,7 +19,7 @@ jest.unstable_mockModule('../../../../../src/messaging/inbound/comms-request/pro
   getCommsProcessor: jest.fn(() => mockProcessor)
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sqs/send-message', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/inbound/sqs/send-message', () => ({
   sendMessage: mockSendMessage
 }))
 
