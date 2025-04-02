@@ -2,17 +2,13 @@ import { addHours, addMinutes } from 'date-fns'
 
 import { config } from '../config/index.js'
 
-import { notifyStatuses, retryableStatus } from '../constants/notify-statuses.js'
+import { notifyStatuses } from '../constants/notify-statuses.js'
 
 const isServerErrorCode = (code) => {
   return code >= 500 && code <= 599
 }
 
-const checkRetryable = (status, requestTime) => {
-  if (!retryableStatus.includes(status)) {
-    return false
-  }
-
+const checkRetryWindow = (status, requestTime) => {
   if (status === notifyStatuses.TECHNICAL_FAILURE) {
     return true
   }
@@ -32,5 +28,5 @@ const checkRetryable = (status, requestTime) => {
 
 export {
   isServerErrorCode,
-  checkRetryable
+  checkRetryWindow
 }

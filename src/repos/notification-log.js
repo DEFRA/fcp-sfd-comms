@@ -75,7 +75,7 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
       ]
     )
   } catch (err) {
-    throw new Error(`Error updating notification status for messageId ${message.id}`, {
+    throw new Error(`Error updating notification status for message id: ${message.id}`, {
       cause: err
     })
   }
@@ -92,7 +92,7 @@ const getOriginalNotificationRequest = async (correlationId) => {
       createdAt: notification.createdAt
     }
   } catch (err) {
-    throw new Error(`Error finding original notification for correlationId ${correlationId}`, {
+    throw new Error(`Error finding original notification for correlationId: ${correlationId}`, {
       cause: err
     })
   }

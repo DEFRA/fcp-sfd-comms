@@ -327,6 +327,27 @@ describe('comms request v3 processor', () => {
       expect(mockPublishRetryRequest).not.toHaveBeenCalled()
     })
 
+    test('should schedule retry on technical-failure', async () => {
+      const mockMessage = {
+        ...v3CommsRequest,
+        data: {
+          ...v3CommsRequest.data,
+          correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
+        }
+      }
+
+      mockCheckNotificationStatus.mockResolvedValue('technical-failure')
+
+      mockGetOriginalNotificationRequest.mockResolvedValue({
+        id: 'cbbcdc5d-35e2-43e6-8c15-002a94f1dcce',
+        createdAt: '2025-01-01T11:00:00.000Z'
+      })
+
+      await processV3CommsRequest(mockMessage)
+
+      expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    })
+
     afterAll(() => {
       jest.useFakeTimers()
     })

@@ -15,7 +15,7 @@ import {
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
 import { notifyStatuses, retryableStatus } from '../../../../constants/notify-statuses.js'
-import { checkRetryable, isServerErrorCode } from '../../../../utils/errors.js'
+import { checkRetryWindow, isServerErrorCode } from '../../../../utils/errors.js'
 import { publishRetryRequest } from '../../../outbound/notification-retry.js'
 
 const logger = createLogger()
@@ -38,7 +38,7 @@ const processNotifySuccess = async (message, recipient, response) => {
       initialCreation = createdAt
     }
 
-    if (checkRetryable(status, initialCreation)) {
+    if (checkRetryWindow(status, initialCreation)) {
       logger.info(`Scheduling notification retry for message: ${message.id}`)
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     } else {
