@@ -5,12 +5,12 @@ const publish = async (snsClient, topicArn, message) => {
 
   const params = {
     TopicArn: topicArn,
-    Message: message
+    Message: JSON.stringify(message)
   }
 
   if (isFifo) {
-    params.MessageGroupId = message.id || 'default-message-group-id'
-    params.MessageDeduplicationId = message.id || 'default-message-deduplication-id'
+    params.MessageGroupId = message.data?.correlationId ?? message.id
+    params.MessageDeduplicationId = message.id
   }
 
   const command = new PublishCommand(params)

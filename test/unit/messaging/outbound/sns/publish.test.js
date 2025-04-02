@@ -27,17 +27,18 @@ describe('SNS Publish', () => {
   test('should receive and execute publish command if SNS topic is FiFo', async () => {
     const topicArn = 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo'
 
-    const message = JSON.stringify({
-      test: 'hello world'
-    })
+    const message = {
+      test: 'hello world',
+      id: '149C5ACA-C971-45BA-8D94-9664A91B5471'
+    }
 
     await publish(mockSnsClient, topicArn, message)
 
     expect(mockPublishCommand).toHaveBeenCalledWith({
       TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
-      Message: message,
-      MessageGroupId: 'default-message-group-id',
-      MessageDeduplicationId: 'default-message-deduplication-id'
+      Message: JSON.stringify(message),
+      MessageGroupId: message.id,
+      MessageDeduplicationId: message.id
     })
 
     expect(mockSnsClient.send).toHaveBeenCalledTimes(1)
@@ -46,15 +47,16 @@ describe('SNS Publish', () => {
   test('should receive and execute publish command if SNS topic is not FiFo', async () => {
     const topicArn = 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data'
 
-    const message = JSON.stringify({
-      test: 'hello world'
-    })
+    const message = {
+      test: 'hello world',
+      id: '149C5ACA-C971-45BA-8D94-9664A91B5471'
+    }
 
     await publish(mockSnsClient, topicArn, message)
 
     expect(mockPublishCommand).toHaveBeenCalledWith({
       TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data',
-      Message: message
+      Message: JSON.stringify(message)
     })
 
     expect(mockSnsClient.send).toHaveBeenCalledTimes(1)

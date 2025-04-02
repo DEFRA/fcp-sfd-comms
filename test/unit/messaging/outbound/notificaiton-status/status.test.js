@@ -18,7 +18,7 @@ jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/publish.js',
   publish: mockPublish
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/build/index.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/outbound/notification-status/update-message.js', () => ({
   buildUpdateMessage: mockBuildUpdateMessage
 }))
 
@@ -39,11 +39,11 @@ describe('Publish Status', () => {
 
     mockBuildUpdateMessage.mockReturnValue(statusMessage)
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/publish/index.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', JSON.stringify(statusMessage))
+    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
   })
 
   test('should publish a status message with error details if error is provided', async () => {
@@ -57,11 +57,11 @@ describe('Publish Status', () => {
 
     mockBuildUpdateMessage.mockReturnValue(statusMessage)
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/publish/index.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', JSON.stringify(statusMessage))
+    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
   })
 
   test('should log an error if publish fails', async () => {
@@ -74,7 +74,7 @@ describe('Publish Status', () => {
     mockBuildUpdateMessage.mockReturnValue({ transformed: 'message' })
     mockPublish.mockRejectedValue(new Error('Publish error'))
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/publish/index.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error publishing comms event status details to SNS:', expect.objectContaining({ cause: expect.any(Error) }))

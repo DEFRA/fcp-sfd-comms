@@ -45,7 +45,7 @@ describe('Publish Invalid Request', () => {
     await publishInvalidRequest(message, errors)
 
     expect(mockBuildInvalidMessage).toHaveBeenCalledWith(message, commsEvents.VALIDATION_FAILURE, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-invalid-topic-arn', JSON.stringify(invalidRequest))
+    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-invalid-topic-arn', invalidRequest)
   })
 
   test('should log an error if publish fails', async () => {

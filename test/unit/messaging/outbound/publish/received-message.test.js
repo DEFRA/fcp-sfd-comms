@@ -39,7 +39,7 @@ describe('Publish Received Message', () => {
     await publishReceivedMessage(message)
 
     expect(mockBuildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.received')
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', JSON.stringify(receivedMessage))
+    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', receivedMessage)
   })
 
   test('should publish a received message with RETRY type if message type is RETRY', async () => {
@@ -52,7 +52,7 @@ describe('Publish Received Message', () => {
     await publishReceivedMessage(message)
 
     expect(mockBuildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.retry')
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', JSON.stringify(receivedMessage))
+    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', receivedMessage)
   })
 
   test('should log an error if publish fails', async () => {

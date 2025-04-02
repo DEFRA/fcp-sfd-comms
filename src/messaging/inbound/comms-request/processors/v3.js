@@ -11,9 +11,10 @@ import {
 
 import {
   publishReceivedMessage,
-  publishInvalidRequest,
-  publishStatus
+  publishInvalidRequest
 } from '../../../outbound/publish/index.js'
+
+import { publishStatus } from '../../../outbound/notification-status/status.js'
 
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
