@@ -56,12 +56,6 @@ jest.unstable_mockModule('../../../../../../src/messaging/outbound/notification-
   publishStatus: jest.fn()
 }))
 
-// const mockCheckRetryWindow = jest.fn()
-
-// jest.unstable_mockModule('../../../../../../src/utils/errors.js', () => ({
-//   checkRetryWindow: mockCheckRetryWindow
-// }))
-
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')
 
 describe('comms request v3 processor', () => {
