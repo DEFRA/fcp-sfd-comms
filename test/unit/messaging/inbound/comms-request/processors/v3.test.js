@@ -56,6 +56,12 @@ jest.unstable_mockModule('../../../../../../src/messaging/outbound/notification-
   publishStatus: jest.fn()
 }))
 
+// const mockCheckRetryWindow = jest.fn()
+
+// jest.unstable_mockModule('../../../../../../src/utils/errors.js', () => ({
+//   checkRetryWindow: mockCheckRetryWindow
+// }))
+
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')
 
 describe('comms request v3 processor', () => {
@@ -339,6 +345,26 @@ describe('comms request v3 processor', () => {
       expect(mockPublishRetryRequest).not.toHaveBeenCalled()
     })
 
+    test('should schedule retry if no correlationId', async () => {
+      const mockMessage = {
+        ...v3CommsRequest,
+        data: {
+          ...v3CommsRequest.data
+        }
+      }
+
+      mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+
+      mockGetOriginalNotificationRequest.mockResolvedValue({
+        id: 'mock-id',
+        createdAt: '2025-01-01T11:00:00.000Z'
+      })
+
+      await processV3CommsRequest(mockMessage)
+
+      expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    })
+
     test('should schedule retry on technical-failure', async () => {
       const mockMessage = {
         ...v3CommsRequest,
@@ -358,6 +384,29 @@ describe('comms request v3 processor', () => {
       await processV3CommsRequest(mockMessage)
 
       expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    })
+
+    test('should log correlationId if set when retry window expires', async () => {
+      const mockMessage = {
+        ...v3CommsRequest,
+        data: {
+          ...v3CommsRequest.data,
+          correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
+        }
+      }
+
+      jest.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
+
+      mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+
+      mockGetOriginalNotificationRequest.mockResolvedValue({
+        id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
+        createdAt: '2025-01-01T11:00:00.000Z'
+      })
+
+      await processV3CommsRequest(mockMessage)
+
+      expect(mockLoggerInfo).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
     })
 
     afterAll(() => {
