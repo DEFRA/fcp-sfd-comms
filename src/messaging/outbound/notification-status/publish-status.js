@@ -1,5 +1,5 @@
-import { snsClient } from '../sns/client.js'
-import { publish } from '../sns/publish.js'
+import { snsClient } from '../../sns/client.js'
+import { publish } from '../../sns/publish.js'
 import { config } from '../../../config/index.js'
 import { statusToEventMap } from '../../../constants/comms-events.js'
 import { buildUpdateMessage } from './update-message.js'

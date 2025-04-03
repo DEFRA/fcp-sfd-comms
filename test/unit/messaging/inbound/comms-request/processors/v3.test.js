@@ -44,6 +44,18 @@ jest.unstable_mockModule('../../../../../../src/messaging/outbound/notification-
   publishRetryRequest: mockPublishRetryRequest
 }))
 
+jest.unstable_mockModule('../../../../../../src/messaging/outbound/received-request/publish-received.js', () => ({
+  publishReceivedMessage: jest.fn()
+}))
+
+jest.unstable_mockModule('../../../../../../src/messaging/outbound/invalid-request/publish-invalid.js', () => ({
+  publishInvalidRequest: jest.fn()
+}))
+
+jest.unstable_mockModule('../../../../../../src/messaging/outbound/notification-status/publish-status.js', () => ({
+  publishStatus: jest.fn()
+}))
+
 const { processV3CommsRequest } = await import('../../../../../../src/messaging/inbound/comms-request/processors/v3.js')
 
 describe('comms request v3 processor', () => {

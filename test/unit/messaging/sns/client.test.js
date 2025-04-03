@@ -22,7 +22,7 @@ describe('SNS (Simple Notification Service) Client', () => {
   test('should create SNS client with access/secret key in development', async () => {
     process.env.NODE_ENV = 'development'
 
-    const { snsClient } = await import('../../../../../src/messaging/outbound/sns/client.js')
+    const { snsClient } = await import('../../../../src/messaging/sns/client.js')
 
     expect(snsClient).toBeDefined()
     expect(mockSnsClient).toHaveBeenCalledWith({
@@ -38,7 +38,7 @@ describe('SNS (Simple Notification Service) Client', () => {
   test('should create SNS client without access/secret key in production', async () => {
     process.env.NODE_ENV = 'production'
 
-    const { snsClient } = await import('../../../../../src/messaging/outbound/sns/client.js')
+    const { snsClient } = await import('../../../../src/messaging/sns/client.js')
 
     expect(snsClient).toBeDefined()
     expect(mockSnsClient).toHaveBeenCalledWith({

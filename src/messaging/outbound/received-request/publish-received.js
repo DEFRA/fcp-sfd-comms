@@ -1,7 +1,7 @@
 import { config } from '../../../config/index.js'
-import { snsClient } from '../sns/client.js'
-import { publish } from '../sns/publish.js'
-import { buildReceivedMessage } from '../build/received-message.js'
+import { snsClient } from '../../sns/client.js'
+import { publish } from '../../sns/publish.js'
+import { buildReceivedMessage } from './received-message.js'
 import { commsEvents } from '../../../constants/comms-events.js'
 
 const snsTopic = config.get('messaging.dataAccessLayer.topicArn')

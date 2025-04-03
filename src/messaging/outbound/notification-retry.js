@@ -2,13 +2,13 @@ import { SendMessageCommand } from '@aws-sdk/client-sqs'
 
 import { config } from '../../config/index.js'
 import { sqsClient } from '../sqs/client.js'
-import { commEvents } from '../../constants/comm-events.js'
+import { commsEvents } from '../../constants/comms-events.js'
 
 const publishRetryRequest = async (message, recipient, delay) => {
   const retryMessage = {
     ...message,
     id: crypto.randomUUID(),
-    type: commEvents.RETRY,
+    type: commsEvents.RETRY,
     time: new Date(),
     data: {
       ...message.data,

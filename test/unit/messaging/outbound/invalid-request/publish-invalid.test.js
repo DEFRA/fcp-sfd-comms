@@ -12,20 +12,20 @@ jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
   config: { get: mockConfigGet }
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/client.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
   snsClient: mockSnsClient
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/publish.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
   publish: mockPublish
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/build/invalid-message.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/outbound/invalid-request/invalid-message.js', () => ({
   buildInvalidMessage: mockBuildInvalidMessage
 }))
 
 describe('Publish Invalid Request', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.resetModules()
     mockConfigGet.mockReturnValue('test-invalid-topic-arn')
   })
@@ -41,7 +41,7 @@ describe('Publish Invalid Request', () => {
 
     mockBuildInvalidMessage.mockReturnValue(invalidRequest)
 
-    const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/publish/invalid-request.js')
+    const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/invalid-request/publish-invalid.js')
     await publishInvalidRequest(message, errors)
 
     expect(mockBuildInvalidMessage).toHaveBeenCalledWith(message, commsEvents.VALIDATION_FAILURE, statusDetails)
@@ -56,7 +56,7 @@ describe('Publish Invalid Request', () => {
     mockBuildInvalidMessage.mockReturnValue({ transformed: 'invalid-message' })
     mockPublish.mockRejectedValue(new Error('Publish error'))
 
-    const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/publish/invalid-request.js')
+    const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/invalid-request/publish-invalid.js')
     await publishInvalidRequest(message, errors)
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error publishing invalid request to SNS:', expect.objectContaining({ cause: expect.any(Error) }))

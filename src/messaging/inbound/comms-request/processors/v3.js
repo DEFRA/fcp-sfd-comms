@@ -2,6 +2,8 @@ import { createLogger } from '../../../../logging/logger.js'
 
 import { config } from '../../../../config/index.js'
 
+import { notifyStatuses, retryableStatus } from '../../../../constants/notify-statuses.js'
+
 import { validate } from '../../../../schemas/validate.js'
 import { v3 } from '../../../../schemas/comms-request/index.js'
 
@@ -12,16 +14,13 @@ import {
   getOriginalNotificationRequest
 } from '../../../../repos/notification-log.js'
 
-import {
-  publishReceivedMessage,
-  publishInvalidRequest
-} from '../../../outbound/publish/index.js'
-
 import { trySendViaNotify } from '../notify-service/try-send-via-notify.js'
 import { checkNotificationStatus } from '../notify-service/check-notification-status.js'
-import { notifyStatuses, retryableStatus } from '../../../../constants/notify-statuses.js'
 import { checkRetryWindow, isServerErrorCode } from '../../../../utils/errors.js'
+
 import { publishRetryRequest } from '../../../outbound/notification-retry.js'
+import { publishReceivedMessage } from '../../../outbound/received-request/publish-received.js'
+import { publishInvalidRequest } from '../../../outbound/invalid-request/publish-invalid.js'
 
 const logger = createLogger()
 
