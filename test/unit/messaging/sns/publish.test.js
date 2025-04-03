@@ -11,13 +11,13 @@ jest.unstable_mockModule('@aws-sdk/client-sns', () => ({
   PublishCommand: mockPublishCommand
 }))
 
-jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
+jest.unstable_mockModule('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
 }))
 
-const { publish } = await import('../../../../../src/messaging/outbound/sns/publish.js')
+const { publish } = await import('../../../../src/messaging/sns/publish.js')
 
 describe('SNS Publish', () => {
   beforeEach(async () => {

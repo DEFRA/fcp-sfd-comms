@@ -17,6 +17,20 @@ export const notifyConfig = {
       format: Number,
       default: 5000,
       env: 'STATUS_CHECK_INTERVAL'
+    },
+    retries: {
+      temporaryFailureTimeout: {
+        doc: 'Timeout in hours for temporary failure retries.',
+        format: 'int',
+        default: 168,
+        env: 'NOTIFY_TEMPORARY_FAILURE_TIMEOUT'
+      },
+      retryDelay: {
+        doc: 'Delay to schedule messages for retry in minutes.',
+        format: 'int',
+        default: 15,
+        env: 'MESSAGE_RETRY_DELAY'
+      }
     }
   }
 }

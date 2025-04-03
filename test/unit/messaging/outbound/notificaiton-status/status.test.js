@@ -10,11 +10,11 @@ jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
   config: { get: mockConfigGet }
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/client.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
   snsClient: mockSnsClient
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/publish.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
   publish: mockPublish
 }))
 
@@ -39,7 +39,7 @@ describe('Publish Status', () => {
 
     mockBuildUpdateMessage.mockReturnValue(statusMessage)
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
@@ -57,7 +57,7 @@ describe('Publish Status', () => {
 
     mockBuildUpdateMessage.mockReturnValue(statusMessage)
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
@@ -74,7 +74,7 @@ describe('Publish Status', () => {
     mockBuildUpdateMessage.mockReturnValue({ transformed: 'message' })
     mockPublish.mockRejectedValue(new Error('Publish error'))
 
-    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/status.js')
+    const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error publishing comms event status details to SNS:', expect.objectContaining({ cause: expect.any(Error) }))

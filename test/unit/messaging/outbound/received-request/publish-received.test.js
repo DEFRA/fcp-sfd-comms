@@ -11,20 +11,20 @@ jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
   config: { get: mockConfigGet }
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/client.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
   snsClient: mockSnsClient
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/sns/publish.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
   publish: mockPublish
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/build/received-message.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/outbound/received-request/received-message.js', () => ({
   buildReceivedMessage: mockBuildReceivedMessage
 }))
 
 describe('Publish Received Message', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.resetModules()
     mockConfigGet.mockReturnValue('test-topic-arn')
   })
@@ -35,7 +35,7 @@ describe('Publish Received Message', () => {
 
     mockBuildReceivedMessage.mockReturnValue(receivedMessage)
 
-    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/publish/received-message.js')
+    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/received-request/publish-received.js')
     await publishReceivedMessage(message)
 
     expect(mockBuildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.received')
@@ -48,7 +48,7 @@ describe('Publish Received Message', () => {
 
     mockBuildReceivedMessage.mockReturnValue(receivedMessage)
 
-    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/publish/received-message.js')
+    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/received-request/publish-received.js')
     await publishReceivedMessage(message)
 
     expect(mockBuildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.retry')
@@ -62,7 +62,7 @@ describe('Publish Received Message', () => {
     mockBuildReceivedMessage.mockReturnValue({ transformed: 'message' })
     mockPublish.mockRejectedValue(new Error('Publish error'))
 
-    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/publish/received-message.js')
+    const { publishReceivedMessage } = await import('../../../../../src/messaging/outbound/received-request/publish-received.js')
     await publishReceivedMessage(message)
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Error publishing received message to SNS:', expect.objectContaining({ cause: expect.any(Error) }))
