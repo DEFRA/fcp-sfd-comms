@@ -11,7 +11,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 ## Code Quality Metrics
 | Metric | Badge |
 | ------ | ----- |
-| Publish | ![Build](https://github.com/defra/fcp-sfd-comms/actions/workflows/publish.yml/badge.svg) |
+| Publish | ![Publish](https://github.com/defra/fcp-sfd-comms/actions/workflows/publish.yml/badge.svg) |
 | Quality Gate | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms) |
 | Bugs | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=bugs)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms) |
 | Code Smells | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms) |
