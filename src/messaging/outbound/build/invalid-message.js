@@ -8,7 +8,7 @@ export const buildInvalidMessage = (message, type, statusDetails) => ({
   type,
   time: new Date(),
   data: {
-    correlationId: message.id,
+    correlationId: message.data?.correlationId ?? message.id,
     statusDetails
   },
   datacontenttype: 'application/json',
