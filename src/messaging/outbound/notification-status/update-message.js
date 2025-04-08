@@ -8,7 +8,7 @@ export const buildUpdateMessage = (message, recipient, type, statusDetails) => (
   type,
   time: new Date(),
   data: {
-    correlationId: message.id,
+    correlationId: message.data?.correlationId ?? message.id,
     commsAddresses: recipient,
     statusDetails
   },
