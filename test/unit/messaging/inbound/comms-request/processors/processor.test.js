@@ -4,7 +4,7 @@ import v3CommsRequest from '../../../../../../src/schemas/comms-request/v3.js'
 
 import { UnprocessableMessageError } from '../../../../../../src/errors/message-errors.js'
 import { getCommsProcessor } from '../../../../../../src/messaging/inbound/comms-request/processors/processor.js'
-import { processV3CommsRequest } from '../../../../../../src/messaging/inbound/comms-request/processors/v3.js'
+import { processV3CommsRequest } from '../../../../../../src/messaging/inbound/comms-request/processors/v3/v3.js'
 
 describe('comms request processor selection', () => {
   test('unknown message type should throw unprocessable message', () => {
