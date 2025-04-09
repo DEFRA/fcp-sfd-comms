@@ -38,6 +38,18 @@ jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-reque
   checkNotificationStatus: mockCheckNotificationStatus
 }))
 
+const mockProcessNotifySuccess = jest.fn()
+
+jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js', () => ({
+  processNotifySuccess: mockProcessNotifySuccess
+}))
+
+const mockProcessNotifyError = jest.fn()
+
+jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js', () => ({
+  processNotifyError: mockProcessNotifyError
+}))
+
 const mockPublishRetryRequest = jest.fn()
 
 jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry.js', () => ({
@@ -138,6 +150,60 @@ describe('comms request v3 processor', () => {
         reference: testMessage.id,
         emailReplyToId: testMessage.data.emailReplyToId
       })
+    })
+
+    test('valid response from GOV Notify should proccess success', async () => {
+      const mockResponse = {
+        data: {
+          id: 'mock-response-id'
+        }
+      }
+
+      const testMessage = {
+        ...v3CommsRequest,
+        data: {
+          ...v3CommsRequest.data,
+          commsAddresses: 'single@example.com'
+        }
+      }
+
+      mockTrySendViaNotify.mockReturnValue([mockResponse, null])
+
+      await processV3CommsRequest(testMessage)
+
+      expect(mockProcessNotifySuccess).toHaveBeenCalledWith(testMessage, 'single@example.com', mockResponse)
+      expect(mockProcessNotifyError).not.toHaveBeenCalled()
+    })
+
+    test('error response from GOV Notify should process error', async () => {
+      const mockError = {
+        status: 500,
+        data: {
+          error: {
+            status_code: 500,
+            errors: [
+              {
+                error: 'Internal server error'
+              }
+            ]
+          }
+        }
+      }
+
+      const testMessage = {
+        ...v3CommsRequest,
+        data: {
+          ...v3CommsRequest.data,
+          commsAddresses: 'single@example.com'
+        }
+      }
+
+      mockTrySendViaNotify.mockReturnValue([null, mockError])
+
+      await processV3CommsRequest(testMessage)
+
+      expect(mockProcessNotifyError).toHaveBeenCalledWith(testMessage, 'single@example.com', mockError)
+      expect(mockProcessNotifySuccess).not.toHaveBeenCalled()
     })
   })
 })

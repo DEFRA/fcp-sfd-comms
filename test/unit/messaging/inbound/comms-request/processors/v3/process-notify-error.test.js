@@ -125,4 +125,26 @@ describe('comms request v3 notify error', () => {
 
     expect(mockPublishRetryRequest).not.toHaveBeenCalled()
   })
+
+  test('should log error if exception thrown', async () => {
+    const mockError = {
+      status: 400,
+      data: {
+        error: {
+          status_code: 400,
+          errors: [
+            {
+              error: 'mock-error'
+            }
+          ]
+        }
+      }
+    }
+
+    mockUpdateNotificationStatus.mockRejectedValue(new Error('Test error'))
+
+    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+
+    expect(mockLoggerError).toHaveBeenCalledWith('Error handling failed notification: Test error')
+  })
 })

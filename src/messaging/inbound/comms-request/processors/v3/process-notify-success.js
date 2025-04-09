@@ -36,7 +36,7 @@ const processNotifySuccess = async (message, recipient, response) => {
       logger.info(`Scheduling notification retry for message: ${message.id}`)
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     } else {
-      logger.info(`Retry window expired for request: ${correlationId || message.id}`)
+      logger.info(`Retry window expired for request: ${correlationId}`)
     }
   } catch (err) {
     logger.error(`Failed checking notification status: ${err.message}`)
