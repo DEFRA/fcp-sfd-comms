@@ -28,7 +28,7 @@ jest.unstable_mockModule('../../../../../../../src/repos/notification-log.js', (
 
 const mockPublishRetryRequest = jest.fn()
 
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry.js', () => ({
+jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
   publishRetryRequest: mockPublishRetryRequest
 }))
 

@@ -1,6 +1,6 @@
 import { afterAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
 
-import v3 from '../../../mocks/comms-request/v3.js'
+import v3 from '../../../../mocks/comms-request/v3.js'
 
 const mockSendMessageCommand = jest.fn()
 
@@ -12,11 +12,11 @@ const mockSqsClient = {
   send: jest.fn()
 }
 
-jest.unstable_mockModule('../../../../src/messaging/sqs/client.js', () => ({
+jest.unstable_mockModule('../../../../../src/messaging/sqs/client.js', () => ({
   sqsClient: mockSqsClient
 }))
 
-const { publishRetryRequest } = await import('../../../../src/messaging/outbound/notification-retry.js')
+const { publishRetryRequest } = await import('../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
 
 describe('notification retry publish', () => {
   beforeEach(() => {

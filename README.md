@@ -53,12 +53,14 @@ Use Docker Compose to run service locally.
 docker-compose up --build
 ```
 
-## Test structure
+## Tests
+
+### Test structure
 
 The tests have been structured into subfolders of `./test` as per the
 [Microservice test approach and repository structure](https://eaflood.atlassian.net/wiki/spaces/FPS/pages/1845396477/Microservice+test+approach+and+repository+structure)
 
-## Running tests
+### Running tests
 
 A convenience npm script is provided to run automated tests in a containerised
 environment. This will rebuild images before running tests via docker-compose,

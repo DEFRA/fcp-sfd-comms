@@ -6,7 +6,7 @@ import { createLogger } from '../../../../../logging/logger.js'
 
 import { isServerErrorCode } from '../../../../../utils/errors.js'
 import { updateNotificationStatus } from '../../../../../repos/notification-log.js'
-import { publishRetryRequest } from '../../../../outbound/notification-retry.js'
+import { publishRetryRequest } from '../../../../outbound/notification-retry/notification-retry.js'
 import { publishStatus } from '../../../../outbound/notification-status/publish-status.js'
 
 const logger = createLogger()

@@ -34,8 +34,14 @@ jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-reque
 
 const mockPublishRetryRequest = jest.fn()
 
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry.js', () => ({
+jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
   publishRetryRequest: mockPublishRetryRequest
+}))
+
+const mockPublishRetryExpired = jest.fn()
+
+jest.unstable_mockModule('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js', () => ({
+  publishRetryExpired: mockPublishRetryExpired
 }))
 
 jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-status/publish-status.js', () => ({
@@ -237,6 +243,36 @@ describe('comms request v3 notify success', () => {
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
     expect(mockLoggerInfo).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
+  })
+
+  test('should publish retry expired event if retry window expired', async () => {
+    const mockResponse = {
+      data: {
+        id: 'mock-response-id'
+      }
+    }
+
+    const mockMessage = {
+      ...v3CommsRequest,
+      data: {
+        ...v3CommsRequest.data,
+        correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
+        commsAddresses: 'test@example.com'
+      }
+    }
+
+    jest.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
+
+    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+
+    mockGetOriginalNotificationRequest.mockResolvedValue({
+      id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
+      createdAt: '2025-01-01T11:00:00.000Z'
+    })
+
+    await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
+
+    expect(mockPublishRetryExpired).toHaveBeenCalledWith(mockMessage, 'test@example.com')
   })
 
   afterAll(() => {
