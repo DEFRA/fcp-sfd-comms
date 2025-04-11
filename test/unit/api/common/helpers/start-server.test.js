@@ -1,35 +1,35 @@
-import { jest, describe, test, expect, beforeAll } from '@jest/globals'
+import { vi, describe, test, expect, beforeAll } from 'vitest'
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerError = jest.fn()
+import { config } from '../../../../../src/config/index.js'
+import { createLogger } from '../../../../../src/logging/logger.js'
+import { createServer } from '../../../../../src/api/index.js'
+import { startServer } from '../../../../../src/api/common/helpers/start-server.js'
 
-jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    error: (...args) => mockLoggerError(...args)
+vi.mock('../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-const mockServer = {
-  start: jest.fn(),
-  stop: jest.fn(),
-  logger: {
-    info: mockLoggerInfo,
-    error: mockLoggerError
-  }
-}
-
-jest.unstable_mockModule('../../../../../src/api/index.js', () => ({
-  createServer: jest.fn().mockResolvedValue(mockServer)
+vi.mock('../../../../../src/api/index.js', () => ({
+  createServer: vi.fn()
 }))
 
-const { config } = await import('../../../../../src/config/index.js')
-const { createServer } = await import('../../../../../src/api/index.js')
-const { startServer } = await import('../../../../../src/api/common/helpers/start-server.js')
+const mockLogger = createLogger()
+
+const mockServer = {
+  start: vi.fn(),
+  stop: vi.fn(),
+  logger: mockLogger
+}
 
 describe('#startServer', () => {
   beforeAll(async () => {
     config.set('port', 3098)
+
+    createServer.mockResolvedValue(mockServer)
   })
 
   describe('When server starts', () => {
@@ -38,11 +38,11 @@ describe('#startServer', () => {
 
       expect(createServer).toHaveBeenCalled()
 
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(
+      expect(mockLogger.info).toHaveBeenNthCalledWith(
         1,
         'Server started successfully'
       )
-      expect(mockLoggerInfo).toHaveBeenNthCalledWith(
+      expect(mockLogger.info).toHaveBeenNthCalledWith(
         2,
         'Access your backend on http://localhost:3098'
       )
@@ -57,8 +57,8 @@ describe('#startServer', () => {
     test('Should log failed startup message', async () => {
       await startServer()
 
-      expect(mockLoggerInfo).toHaveBeenCalledWith('Server failed to start :(')
-      expect(mockLoggerError).toHaveBeenCalledWith(
+      expect(mockLogger.info).toHaveBeenCalledWith('Server failed to start :(')
+      expect(mockLogger.error).toHaveBeenCalledWith(
         Error('Server failed to start')
       )
     })

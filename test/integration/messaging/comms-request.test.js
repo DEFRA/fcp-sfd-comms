@@ -1,33 +1,31 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, test, jest } from '@jest/globals'
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import v3 from '../../mocks/comms-request/v3.js'
 
 import { getQueueSize, resetQueue, sendMessage } from '../../helpers/sqs.js'
 import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
 
-const mockSendEmail = jest.fn()
-const mockGetNotificationById = jest.fn()
+import notifyClient from '../../../src/notify/notify-client.js'
 
-jest.setTimeout(60000)
+import { createLogger } from '../../../src/logging/logger.js'
+import { startMessaging, stopMessaging } from '../../../src/messaging/inbound/inbound.js'
 
-jest.unstable_mockModule('../../../src/notify/notify-client.js', () => ({
+vi.mock('../../../src/notify/notify-client.js', () => ({
   default: {
-    sendEmail: mockSendEmail,
-    getNotificationById: mockGetNotificationById
+    sendEmail: vi.fn(),
+    getNotificationById: vi.fn()
   }
 }))
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerError = jest.fn()
-
-jest.unstable_mockModule('../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    error: (...args) => mockLoggerError(...args)
+vi.mock('../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-const { startMessaging, stopMessaging } = await import('../../../src/messaging/inbound/inbound.js')
+const mockLogger = createLogger()
 
 describe('comms request consumer integration', () => {
   beforeAll(() => {
@@ -35,7 +33,7 @@ describe('comms request consumer integration', () => {
   })
 
   beforeEach(async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
     await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request')
     await resetQueue('http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter')
@@ -44,8 +42,8 @@ describe('comms request consumer integration', () => {
   })
 
   test('should process valid V3 comms message placed on SQS', async () => {
-    mockSendEmail.mockResolvedValue({ data: { id: '79389915-7275-457a-b8ca-8bf206b2e67b' } })
-    mockGetNotificationById.mockResolvedValue({ data: { status: 'delivered' } })
+    notifyClient.sendEmail.mockResolvedValue({ data: { id: '79389915-7275-457a-b8ca-8bf206b2e67b' } })
+    notifyClient.getNotificationById.mockResolvedValue({ data: { status: 'delivered' } })
 
     await sendMessage(
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
@@ -64,9 +62,9 @@ describe('comms request consumer integration', () => {
       'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
     )
 
-    expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+    expect(mockLogger.info).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(notifyClient.sendEmail).toHaveBeenCalledWith(
       'd29257ce-974f-4214-8bbe-69ce5f2bb7f3',
       'test@example.com',
       expect.objectContaining({
@@ -75,7 +73,7 @@ describe('comms request consumer integration', () => {
       })
     )
 
-    expect(mockGetNotificationById).toHaveBeenCalledTimes(1)
+    expect(notifyClient.getNotificationById).toHaveBeenCalledTimes(1)
 
     expect(notification).toHaveLength(1)
 
@@ -111,7 +109,7 @@ describe('comms request consumer integration', () => {
 
     expect(notification).toHaveLength(0)
 
-    expect(mockLoggerError).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
+    expect(mockLogger.error).toHaveBeenCalledWith('Invalid comms V3 payload: "id" must be a valid GUID,"data.commsAddresses" is required')
 
     expect(size.available).toBe(0)
   })
@@ -120,4 +118,4 @@ describe('comms request consumer integration', () => {
     stopMessaging()
     await clearCollection('notificationRequests')
   })
-})
+}, 60000)

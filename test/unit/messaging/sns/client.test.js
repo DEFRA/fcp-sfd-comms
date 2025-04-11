@@ -1,14 +1,14 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { afterEach, beforeAll, beforeEach, describe, expect, vi, test } from 'vitest'
 
-const mockSnsClient = jest.fn()
+const SNSClient = vi.fn()
 
-jest.unstable_mockModule('@aws-sdk/client-sns', () => {
+vi.mock('@aws-sdk/client-sns', () => {
   return {
-    SNSClient: mockSnsClient
+    SNSClient
   }
 })
 
-describe('SNS (Simple Notification Service) Client', () => {
+describe('SNS Client', () => {
   let originalEnv
 
   beforeAll(() => {
@@ -16,7 +16,7 @@ describe('SNS (Simple Notification Service) Client', () => {
   })
 
   beforeEach(async () => {
-    jest.resetModules()
+    vi.resetModules()
   })
 
   test('should create SNS client with access/secret key in development', async () => {
@@ -25,7 +25,7 @@ describe('SNS (Simple Notification Service) Client', () => {
     const { snsClient } = await import('../../../../src/messaging/sns/client.js')
 
     expect(snsClient).toBeDefined()
-    expect(mockSnsClient).toHaveBeenCalledWith({
+    expect(SNSClient).toHaveBeenCalledWith({
       endpoint: 'http://localstack:4566',
       region: 'eu-west-2',
       credentials: {
@@ -41,7 +41,7 @@ describe('SNS (Simple Notification Service) Client', () => {
     const { snsClient } = await import('../../../../src/messaging/sns/client.js')
 
     expect(snsClient).toBeDefined()
-    expect(mockSnsClient).toHaveBeenCalledWith({
+    expect(SNSClient).toHaveBeenCalledWith({
       endpoint: 'http://localstack:4566',
       region: 'eu-west-2'
     })

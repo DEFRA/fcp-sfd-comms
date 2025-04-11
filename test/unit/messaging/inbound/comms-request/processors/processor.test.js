@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals'
+import { describe, test, expect } from 'vitest'
 
 import v3CommsRequest from '../../../../../../src/schemas/comms-request/v3.js'
 

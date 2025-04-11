@@ -1,31 +1,29 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import { sqsClient } from '../../../../src/messaging/sqs/client.js'
+import { startCommsListener, stopCommsListener } from '../../../../src/messaging/inbound/comms-request/consumer.js'
 
-const mockStartCommsListener = jest.fn()
-const mockStopCommsListener = jest.fn()
-
-jest.unstable_mockModule('../../../../src/messaging/inbound/comms-request/consumer.js', () => ({
-  startCommsListener: mockStartCommsListener,
-  stopCommsListener: mockStopCommsListener
+vi.mock('../../../../src/messaging/inbound/comms-request/consumer.js', () => ({
+  startCommsListener: vi.fn(),
+  stopCommsListener: vi.fn()
 }))
 
 const { startMessaging, stopMessaging } = await import('../../../../src/messaging/inbound/inbound.js')
 
 describe('inbound messaging setup', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should start message consumers', () => {
     startMessaging()
 
-    expect(mockStartCommsListener).toHaveBeenCalledWith(sqsClient)
+    expect(startCommsListener).toHaveBeenCalledWith(sqsClient)
   })
 
   test('should stop message consumers', () => {
     stopMessaging()
 
-    expect(mockStopCommsListener).toHaveBeenCalled()
+    expect(stopCommsListener).toHaveBeenCalled()
   })
 })

@@ -1,18 +1,18 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { beforeEach, describe, expect, vi, test } from 'vitest'
 
 const mockSqsClient = {
-  send: jest.fn()
+  send: vi.fn()
 }
 
-const mockSendMessageCommand = jest.fn()
+const mockSendMessageCommand = vi.fn()
 
-jest.unstable_mockModule('@aws-sdk/client-sqs', () => ({
+vi.mock('@aws-sdk/client-sqs', () => ({
   SendMessageCommand: mockSendMessageCommand
 }))
 
-const mockLoggerError = jest.fn()
+const mockLoggerError = vi.fn()
 
-jest.unstable_mockModule('../../../../src/logging/logger.js', () => ({
+vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
@@ -22,7 +22,7 @@ const { sendMessage } = await import('../../../../src/messaging/sqs/send-message
 
 describe('sqs send message', () => {
   beforeEach(async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should create and execute send message command', async () => {

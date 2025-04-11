@@ -1,32 +1,33 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { beforeEach, describe, expect, vi, test } from 'vitest'
 
 import { commsEvents } from '../../../../../src/constants/comms-events.js'
 import { notifyStatuses } from '../../../../../src/constants/notify-statuses.js'
 
-const mockConfigGet = jest.fn()
-const mockSnsClient = {}
-const mockPublish = jest.fn()
-const mockBuildInvalidMessage = jest.fn()
+import { publish } from '../../../../../src/messaging/sns/publish.js'
+import { buildInvalidMessage } from '../../../../../src/messaging/outbound/invalid-request/invalid-message.js'
 
-jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
+const mockSnsClient = {}
+const mockConfigGet = vi.fn()
+
+vi.mock('../../../../../src/config/index.js', () => ({
   config: { get: mockConfigGet }
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
+vi.mock('../../../../../src/messaging/sns/client.js', () => ({
   snsClient: mockSnsClient
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: mockPublish
+vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
+  publish: vi.fn()
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/invalid-request/invalid-message.js', () => ({
-  buildInvalidMessage: mockBuildInvalidMessage
+vi.mock('../../../../../src/messaging/outbound/invalid-request/invalid-message.js', () => ({
+  buildInvalidMessage: vi.fn()
 }))
 
 describe('Publish Invalid Request', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     mockConfigGet.mockReturnValue('test-invalid-topic-arn')
   })
 
@@ -39,22 +40,22 @@ describe('Publish Invalid Request', () => {
     }
     const invalidRequest = { transformed: 'invalid-message' }
 
-    mockBuildInvalidMessage.mockReturnValue(invalidRequest)
+    buildInvalidMessage.mockReturnValue(invalidRequest)
 
     const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/invalid-request/publish-invalid.js')
     await publishInvalidRequest(message, errors)
 
-    expect(mockBuildInvalidMessage).toHaveBeenCalledWith(message, commsEvents.VALIDATION_FAILURE, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-invalid-topic-arn', invalidRequest)
+    expect(buildInvalidMessage).toHaveBeenCalledWith(message, commsEvents.VALIDATION_FAILURE, statusDetails)
+    expect(publish).toHaveBeenCalledWith(mockSnsClient, 'test-invalid-topic-arn', invalidRequest)
   })
 
   test('should log an error if publish fails', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const message = { id: '9F37DA7E-4422-40C6-983C-85F692477BE6', type: 'some-event' }
     const errors = { details: [{ message: 'Invalid field' }] }
 
-    mockBuildInvalidMessage.mockReturnValue({ transformed: 'invalid-message' })
-    mockPublish.mockRejectedValue(new Error('Publish error'))
+    buildInvalidMessage.mockReturnValue({ transformed: 'invalid-message' })
+    publish.mockRejectedValue(new Error('Publish error'))
 
     const { publishInvalidRequest } = await import('../../../../../src/messaging/outbound/invalid-request/publish-invalid.js')
     await publishInvalidRequest(message, errors)

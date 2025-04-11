@@ -1,10 +1,10 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-const mockInsertOne = jest.fn()
-const mockFindOne = jest.fn()
-const mockUpdateOne = jest.fn()
+const mockInsertOne = vi.fn()
+const mockFindOne = vi.fn()
+const mockUpdateOne = vi.fn()
 
-jest.unstable_mockModule('../../../src/db/db-client.js', () => ({
+vi.mock('../../../src/db/db-client.js', () => ({
   default: {
     collection: () => ({
       insertOne: mockInsertOne,
@@ -23,7 +23,7 @@ const {
 
 describe('notification log repository', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('add notification request should wrap error', async () => {

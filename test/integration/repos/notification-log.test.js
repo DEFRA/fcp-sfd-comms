@@ -1,11 +1,9 @@
-import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals'
+import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 
 import v3 from '../../mocks/comms-request/v3.js'
 
 import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
 import { addNotificationRequest, checkNotificationIdempotency, getOriginalNotificationRequest, updateNotificationStatus } from '../../../src/repos/notification-log.js'
-
-jest.setTimeout(60000)
 
 describe('mongo notification request repository', () => {
   beforeAll(async () => {
@@ -117,4 +115,4 @@ describe('mongo notification request repository', () => {
   afterAll(async () => {
     await clearCollection('notificationRequests')
   })
-})
+}, 60000)
