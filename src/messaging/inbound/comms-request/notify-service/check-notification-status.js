@@ -5,6 +5,7 @@ import { updateNotificationStatus } from '../../../../repos/notification-log.js'
 import { config } from '../../../../config/index.js'
 
 const logger = createLogger()
+
 const maxStatusPollingAttempts = config.get('notify.statusCheckMaxAttempts')
 const statusPollingInterval = config.get('notify.statusCheckInterval')
 

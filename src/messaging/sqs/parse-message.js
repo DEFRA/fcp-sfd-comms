@@ -1,4 +1,4 @@
-import { UnprocessableMessageError } from '../../../errors/message-errors.js'
+import { UnprocessableMessageError } from '../../errors/message-errors.js'
 
 const parseSqsMessage = (message) => {
   try {

@@ -1,7 +1,7 @@
 import { commsEvents } from '../../../../constants/comms-events.js'
 import { UnprocessableMessageError } from '../../../../errors/message-errors.js'
 
-import { processV3CommsRequest } from './v3.js'
+import { processV3CommsRequest } from './v3/v3.js'
 
 const processorMap = {
   [commsEvents.REQUEST]: processV3CommsRequest,

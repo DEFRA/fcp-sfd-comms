@@ -17,7 +17,8 @@ jest.unstable_mockModule('../../../src/db/db-client.js', () => ({
 const {
   addNotificationRequest,
   checkNotificationIdempotency,
-  updateNotificationStatus
+  updateNotificationStatus,
+  getOriginalNotificationRequest
 } = await import('../../../src/repos/notification-log.js')
 
 describe('notification log repository', () => {
@@ -54,6 +55,17 @@ describe('notification log repository', () => {
 
     await expect(updateNotificationStatus({}, 'recipient@example.com', 'delivered')).rejects.toMatchObject({
       message: expect.stringContaining('Error updating notification status'),
+      cause: mockError
+    })
+  })
+
+  test('get original notification should wrap error', async () => {
+    const mockError = new Error('test error')
+
+    mockFindOne.mockRejectedValue(mockError)
+
+    await expect(getOriginalNotificationRequest('c259c4aa-0ec2-4d64-a67d-e737f858d527')).rejects.toMatchObject({
+      message: 'Error finding original notification for correlationId: c259c4aa-0ec2-4d64-a67d-e737f858d527',
       cause: mockError
     })
   })

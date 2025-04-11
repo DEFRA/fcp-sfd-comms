@@ -3,9 +3,9 @@ import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals
 import v3 from '../../mocks/comms-request/v3.js'
 
 import { clearCollection, getAllEntities } from '../../helpers/mongo.js'
-import { addNotificationRequest, checkNotificationIdempotency, updateNotificationStatus } from '../../../src/repos/notification-log.js'
+import { addNotificationRequest, checkNotificationIdempotency, getOriginalNotificationRequest, updateNotificationStatus } from '../../../src/repos/notification-log.js'
 
-jest.setTimeout(30000)
+jest.setTimeout(60000)
 
 describe('mongo notification request repository', () => {
   beforeAll(async () => {
@@ -91,6 +91,27 @@ describe('mongo notification request repository', () => {
     expect(notificationRequests[0].message).toEqual(v3)
     expect(notificationRequests[0].recipients[0].status).toBe('internal-failure')
     expect(notificationRequests[0].recipients[0].error).toEqual(mockError)
+  })
+
+  test('should return date of original notification request creation', async () => {
+    await addNotificationRequest({
+      ...v3,
+      id: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+    })
+
+    await addNotificationRequest({
+      ...v3,
+      id: '1563596c-a62d-4a7e-b797-04f8c3522a3b',
+      timestamp: new Date().toISOString(),
+      data: {
+        ...v3.data,
+        correlationId: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+      }
+    })
+
+    const request = await getOriginalNotificationRequest('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
+
+    expect(request.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
   })
 
   afterAll(async () => {

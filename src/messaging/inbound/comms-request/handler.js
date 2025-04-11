@@ -2,7 +2,7 @@ import { createLogger } from '../../../logging/logger.js'
 
 import { getCommsProcessor } from './processors/processor.js'
 
-import { parseSqsMessage } from '../sqs/parse-message.js'
+import { parseSqsMessage } from '../../sqs/parse-message.js'
 
 const logger = createLogger()
 
