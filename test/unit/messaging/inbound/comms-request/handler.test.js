@@ -1,33 +1,32 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import sqsMessage from '../../../../mocks/aws/sqs-message'
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerError = jest.fn()
+import { handleCommRequestMessages } from '../../../../../src/messaging/inbound/comms-request/handler.js'
 
-jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
+const mockLoggerInfo = vi.fn()
+const mockLoggerError = vi.fn()
+
+vi.mock('../../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     info: (...args) => mockLoggerInfo(...args),
     error: (...args) => mockLoggerError(...args)
   })
 }))
 
-const mockSendMessage = jest.fn()
-const mockProcessor = jest.fn()
+const mockProcessor = vi.fn()
 
-jest.unstable_mockModule('../../../../../src/messaging/inbound/comms-request/processors/processor.js', () => ({
-  getCommsProcessor: jest.fn(() => mockProcessor)
+vi.mock('../../../../../src/messaging/inbound/comms-request/processors/processor.js', () => ({
+  getCommsProcessor: vi.fn(() => mockProcessor)
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sqs/send-message.js', () => ({
-  sendMessage: mockSendMessage
+vi.mock('../../../../../src/messaging/sqs/send-message.js', () => ({
+  sendMessage: vi.fn()
 }))
-
-const { handleCommRequestMessages } = await import('../../../../../src/messaging/inbound/comms-request/handler.js')
 
 describe('comms request handler', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should return completed messages', async () => {

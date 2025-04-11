@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test, jest } from '@jest/globals'
+import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import mockV3CommsRequest from '../../../mocks/comms-request/v3.js'
 import environments from '../../../../src/constants/environments.js'
@@ -349,7 +349,7 @@ describe('comms request schema v3 validation', () => {
       const originalEnv = process.env
 
       beforeEach(() => {
-        jest.resetModules()
+        vi.resetModules()
       })
 
       test.each([

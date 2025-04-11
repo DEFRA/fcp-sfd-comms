@@ -1,30 +1,32 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { beforeEach, describe, expect, vi, test } from 'vitest'
+
 import { statusToEventMap } from '../../../../../src/constants/comms-events.js'
 
-const mockConfigGet = jest.fn()
-const mockSnsClient = {}
-const mockPublish = jest.fn()
-const mockBuildUpdateMessage = jest.fn()
+import { publish } from '../../../../../src/messaging/sns/publish.js'
+import { buildUpdateMessage } from '../../../../../src/messaging/outbound/notification-status/update-message.js'
 
-jest.unstable_mockModule('../../../../../src/config/index.js', () => ({
+const mockSnsClient = {}
+const mockConfigGet = vi.fn()
+
+vi.mock('../../../../../src/config/index.js', () => ({
   config: { get: mockConfigGet }
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
+vi.mock('../../../../../src/messaging/sns/client.js', () => ({
   snsClient: mockSnsClient
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: mockPublish
+vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
+  publish: vi.fn()
 }))
 
-jest.unstable_mockModule('../../../../../src/messaging/outbound/notification-status/update-message.js', () => ({
-  buildUpdateMessage: mockBuildUpdateMessage
+vi.mock('../../../../../src/messaging/outbound/notification-status/update-message.js', () => ({
+  buildUpdateMessage: vi.fn()
 }))
 
 describe('Publish Status', () => {
   beforeEach(async () => {
-    jest.resetModules()
+    vi.resetModules()
     mockConfigGet.mockReturnValue('test-topic-arn')
   })
 
@@ -37,13 +39,13 @@ describe('Publish Status', () => {
     const statusDetails = { status, errorCode: undefined, errors: undefined }
     const statusMessage = { transformed: 'message' }
 
-    mockBuildUpdateMessage.mockReturnValue(statusMessage)
+    buildUpdateMessage.mockReturnValue(statusMessage)
 
     const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)
 
-    expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
+    expect(buildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
+    expect(publish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
   })
 
   test('should publish a status message with error details if error is provided', async () => {
@@ -55,24 +57,24 @@ describe('Publish Status', () => {
     const statusDetails = { status, errorCode: 500, errors: ['Internal Server Error'] }
     const statusMessage = { transformed: 'message' }
 
-    mockBuildUpdateMessage.mockReturnValue(statusMessage)
+    buildUpdateMessage.mockReturnValue(statusMessage)
 
     const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)
 
-    expect(mockBuildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
-    expect(mockPublish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
+    expect(buildUpdateMessage).toHaveBeenCalledWith(message, recipient, type, statusDetails)
+    expect(publish).toHaveBeenCalledWith(mockSnsClient, 'test-topic-arn', statusMessage)
   })
 
   test('should log an error if publish fails', async () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     const message = { id: 'BB3F13B8-A48B-43C3-85B7-6E53DE9EF227' }
     const recipient = 'test@example.com'
     const status = 'DELIVERED'
     const error = null
 
-    mockBuildUpdateMessage.mockReturnValue({ transformed: 'message' })
-    mockPublish.mockRejectedValue(new Error('Publish error'))
+    buildUpdateMessage.mockReturnValue({ transformed: 'message' })
+    publish.mockRejectedValue(new Error('Publish error'))
 
     const { publishStatus } = await import('../../../../../src/messaging/outbound/notification-status/publish-status.js')
     await publishStatus(message, recipient, status, error)

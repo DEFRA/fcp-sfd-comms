@@ -1,15 +1,15 @@
-import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals'
+import { afterAll, beforeAll, describe, expect, vi, test } from 'vitest'
 
 import { checkRetryWindow } from '../../../src/utils/errors.js'
 
 describe('error utils', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   describe('check retry window', () => {
     test('technical failure should return true', () => {
-      jest.setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
+      vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
 
       const retry = checkRetryWindow('technical-failure', new Date('2025-01-01T11:00:00.000Z'))
 
@@ -22,7 +22,7 @@ describe('error utils', () => {
         '2025-01-08T10:44:59.000Z'
       ]
     )('should schedule retry on temporary-failure within retry window (%s)', (time) => {
-      jest.setSystemTime(new Date(time))
+      vi.setSystemTime(new Date(time))
 
       const retry = checkRetryWindow('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
 
@@ -35,7 +35,7 @@ describe('error utils', () => {
         '2025-01-08T11:00:00.000Z'
       ]
     )('should not schedule retry on temporary-failure outside retry window (%s)', (time) => {
-      jest.setSystemTime(new Date(time))
+      vi.setSystemTime(new Date(time))
 
       const retry = checkRetryWindow('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
 
@@ -44,6 +44,6 @@ describe('error utils', () => {
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 })

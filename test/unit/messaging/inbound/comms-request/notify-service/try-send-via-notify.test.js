@@ -1,34 +1,33 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import mockCommsRequest from '../../../../../mocks/comms-request/v3.js'
 
-const mockSendEmail = jest.fn()
-const mockGetNotificationById = jest.fn()
-const mockLoggerError = jest.fn()
+import notifyClient from '../../../../../../src/notify/notify-client.js'
+import { trySendViaNotify } from '../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
 
-jest.unstable_mockModule('../../../../../../src/notify/notify-client.js', () => ({
+vi.mock('../../../../../../src/notify/notify-client.js', () => ({
   default: {
-    sendEmail: mockSendEmail,
-    getNotificationById: mockGetNotificationById
+    sendEmail: vi.fn(),
+    getNotificationById: vi.fn()
   }
 }))
 
-jest.unstable_mockModule('../../../../../../src/logging/logger.js', () => ({
+const mockLoggerError = vi.fn()
+
+vi.mock('../../../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
 }))
 
-const { trySendViaNotify } = await import('../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js')
-
 describe('Try sending emails via GOV.UK Notify', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should send email successfully', async () => {
     const mockResponse = { data: { id: 'mock-id' } }
-    mockSendEmail.mockResolvedValue(mockResponse)
+    notifyClient.sendEmail.mockResolvedValue(mockResponse)
     const data = mockCommsRequest.data
 
     const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
@@ -36,7 +35,7 @@ describe('Try sending emails via GOV.UK Notify', () => {
       reference: data.reference
     })
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(notifyClient.sendEmail).toHaveBeenCalledWith(
       data.notifyTemplateId,
       data.commsAddresses,
       {
@@ -65,7 +64,7 @@ describe('Try sending emails via GOV.UK Notify', () => {
       }
     }
 
-    mockSendEmail.mockRejectedValue(mockError)
+    notifyClient.sendEmail.mockRejectedValue(mockError)
 
     const data = mockCommsRequest.data
 
@@ -74,7 +73,7 @@ describe('Try sending emails via GOV.UK Notify', () => {
       reference: data.reference
     })
 
-    expect(mockSendEmail).toHaveBeenCalledWith(
+    expect(notifyClient.sendEmail).toHaveBeenCalledWith(
       data.notifyTemplateId,
       data.commsAddresses,
       {
