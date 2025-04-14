@@ -1,3 +1,4 @@
+import { createLogger } from '../../../logging/logger.js'
 import { config } from '../../../config/index.js'
 import { snsClient } from '../../sns/client.js'
 import { publish } from '../../sns/publish.js'
@@ -6,6 +7,7 @@ import { notifyStatuses } from '../../../constants/notify-statuses.js'
 import { buildInvalidMessage } from './invalid-message.js'
 
 const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
+const logger = createLogger()
 
 const publishInvalidRequest = async (message, errors) => {
   const statusDetails = {
@@ -21,7 +23,7 @@ const publishInvalidRequest = async (message, errors) => {
   try {
     await publish(snsClient, snsTopic, invalidRequest)
   } catch (err) {
-    console.error('Error publishing invalid request to SNS:', { cause: err })
+    logger.error('Error publishing invalid request to SNS:', { cause: err })
   }
 }
 
