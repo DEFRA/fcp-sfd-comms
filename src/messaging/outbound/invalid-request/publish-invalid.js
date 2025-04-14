@@ -23,7 +23,7 @@ const publishInvalidRequest = async (message, errors) => {
   try {
     await publish(snsClient, snsTopic, invalidRequest)
   } catch (err) {
-    logger.error('Error publishing invalid request to SNS:', { cause: err })
+    logger.error(`Error publishing invalid request to SNS: ${err.message}`)
   }
 }
 
