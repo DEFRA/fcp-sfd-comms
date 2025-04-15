@@ -22,13 +22,11 @@ const mockLogger = createLogger()
 describe('Publish Invalid Request', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
   })
 
   test('should publish an invalid request with VALIDATION_FAILURE status', async () => {
-    vi.useFakeTimers()
-
-    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
-
     const errors = {
       details: [
         {
