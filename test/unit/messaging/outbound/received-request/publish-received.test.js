@@ -1,60 +1,80 @@
 import { beforeEach, describe, expect, vi, test } from 'vitest'
-
-import { commsEvents } from '../../../../../src/constants/comms-events.js'
-
+import { createLogger } from '../../../../../src/logging/logger.js'
+import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'
-import { buildReceivedMessage } from '../../../../../src/messaging/outbound/received-request/received-message.js'
 import { publishReceivedMessage } from '../../../../../src/messaging/outbound/received-request/publish-received.js'
 
 vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
   publish: vi.fn()
 }))
 
-vi.mock('../../../../../src/messaging/outbound/received-request/received-message.js', () => ({
-  buildReceivedMessage: vi.fn()
+vi.mock('../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  })
 }))
+
+const mockLogger = createLogger()
 
 describe('Publish Received Message', () => {
   beforeEach(() => {
-    vi.resetModules()
+    vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
   })
 
   test('should publish a received message with RECEIVED if message type is RECEIVED', async () => {
-    const message = { id: '2DA6D8DB-81DD-48DF-88CE-938F4D3AA8F6', type: commsEvents.RECEIVED }
-    const receivedMessage = { transformed: 'message' }
+    await publishReceivedMessage(mockCommsRequest)
 
-    buildReceivedMessage.mockReturnValue(receivedMessage)
-
-    await publishReceivedMessage(message)
-
-    expect(buildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.received')
-    expect(publish).toHaveBeenCalledWith(snsClient, 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo', receivedMessage)
+    expect(publish).toHaveBeenCalledWith(
+      snsClient,
+      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
+      expect.objectContaining({
+        id: expect.any(String),
+        source: 'fcp-sfd-comms',
+        type: 'uk.gov.fcp.sfd.notification.received',
+        time: new Date('2025-01-08T11:00:00.000Z'),
+        data: {
+          correlationId: mockCommsRequest.id
+        },
+        datacontenttype: 'application/json',
+        specversion: '1.0'
+      })
+    )
   })
 
   test('should publish a received message with RETRY type if message type is RETRY', async () => {
-    const message = { id: '2DA6D8DB-81DD-48DF-88CE-938F4D3AA8F6', type: commsEvents.RETRY }
-    const receivedMessage = { transformed: 'retry-message' }
+    const receivedMessage = { ...mockCommsRequest, type: 'uk.gov.fcp.sfd.notification.retry' }
 
-    buildReceivedMessage.mockReturnValue(receivedMessage)
+    await publishReceivedMessage(receivedMessage)
 
-    await publishReceivedMessage(message)
-
-    expect(buildReceivedMessage).toHaveBeenCalledWith(message, 'uk.gov.fcp.sfd.notification.retry')
-    expect(publish).toHaveBeenCalledWith(snsClient, 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo', receivedMessage)
+    expect(publish).toHaveBeenCalledWith(
+      snsClient,
+      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
+      expect.objectContaining({
+        id: expect.any(String),
+        source: 'fcp-sfd-comms',
+        type: 'uk.gov.fcp.sfd.notification.retry',
+        time: new Date('2025-01-08T11:00:00.000Z'),
+        data: {
+          correlationId: mockCommsRequest.id
+        },
+        datacontenttype: 'application/json',
+        specversion: '1.0'
+      })
+    )
   })
 
   test('should log an error if publish fails', async () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const message = { id: '12342DA6D8DB-81DD-48DF-88CE-938F4D3AA8F6', type: commsEvents.VALIDATION_FAILURE }
+    const message = { ...mockCommsRequest, type: 'uk.gov.fcp.sfd.notification.failure.validation' }
 
-    buildReceivedMessage.mockReturnValue({ transformed: 'message' })
     publish.mockRejectedValue(new Error('Publish error'))
 
     await publishReceivedMessage(message)
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error publishing received message to SNS:', expect.objectContaining({ cause: expect.any(Error) }))
-
-    consoleErrorSpy.mockRestore()
+    expect(mockLogger.error).toHaveBeenCalledWith('Error publishing received message to SNS:', expect.objectContaining({ cause: expect.any(Error) }))
   })
 })
