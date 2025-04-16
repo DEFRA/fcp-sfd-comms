@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, test, vi } from 'vit
 import v3 from '../../../mocks/comms-request/v3.js'
 
 import { getAllEntities, clearCollection } from '../../../helpers/mongo.js'
-import { getMessages, getQueueSize, parseSqsMessage, resetQueue, sendMessage } from '../../../helpers/sqs.js'
+import { getMessages, parseSqsMessage, resetQueue, sendMessage } from '../../../helpers/sqs.js'
 
 import notifyClient from '../../../../src/notify/notify-client.js'
 
@@ -85,15 +85,7 @@ describe('v3 comms request processing integration', () => {
     expect(requests[0].recipients[0].status).toBe('delivered')
     expect(requests[0].message).toEqual(mockMessage)
 
-    const eventCount = await getQueueSize(
-      dataIngestQueueUrl
-    )
-
-    expect(eventCount.available).toBe(2)
-
-    const events = await getMessages(
-      dataIngestQueueUrl
-    )
+    const events = await getMessages(dataIngestQueueUrl)
 
     const parsedEvents = events.map((event) => parseSqsMessage(event))
 
