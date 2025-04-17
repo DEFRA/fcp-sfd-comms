@@ -1,59 +1,38 @@
-import { jest, describe, test, expect, beforeEach, afterAll } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach, afterAll } from 'vitest'
 
 import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerWarn = jest.fn()
-const mockLoggerError = jest.fn()
+import { createLogger } from '../../../../../../../src/logging/logger.js'
+import { getOriginalNotificationRequest } from '../../../../../../../src/repos/notification-log.js'
+import { checkNotificationStatus } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
+import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
+import { publishRetryExpired } from '../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
+import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js'
 
-jest.unstable_mockModule('../../../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    warn: (...args) => mockLoggerWarn(...args),
-    error: (...args) => mockLoggerError(...args)
+vi.mock('../../../../../../../src/repos/notification-log.js')
+
+vi.mock('../../../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-const mockAddNotificationRequest = jest.fn()
-const mockCheckNotificationIdempotency = jest.fn()
-const mockUpdateNotificationStatus = jest.fn()
-const mockGetOriginalNotificationRequest = jest.fn()
+const mockLogger = createLogger()
 
-jest.unstable_mockModule('../../../../../../../src/repos/notification-log.js', () => ({
-  addNotificationRequest: mockAddNotificationRequest,
-  checkNotificationIdempotency: mockCheckNotificationIdempotency,
-  updateNotificationStatus: mockUpdateNotificationStatus,
-  getOriginalNotificationRequest: mockGetOriginalNotificationRequest
-}))
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
 
-const mockCheckNotificationStatus = jest.fn()
+vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
 
-jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js', () => ({
-  checkNotificationStatus: mockCheckNotificationStatus
-}))
+vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js')
 
-const mockPublishRetryRequest = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
-  publishRetryRequest: mockPublishRetryRequest
-}))
-
-const mockPublishRetryExpired = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js', () => ({
-  publishRetryExpired: mockPublishRetryExpired
-}))
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-status/publish-status.js', () => ({
-  publishStatus: jest.fn()
-}))
-
-const { processNotifySuccess } = await import('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js')
+vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
 describe('comms request v3 notify success', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.clearAllMocks()
+    vi.useFakeTimers()
+    vi.clearAllMocks()
   })
 
   test('should handle failed status check and log error', async () => {
@@ -63,11 +42,11 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    mockCheckNotificationStatus.mockRejectedValue(new Error('Update failed'))
+    checkNotificationStatus.mockRejectedValue(new Error('Update failed'))
 
     await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
 
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
   })
 
   test.each([
@@ -76,9 +55,9 @@ describe('comms request v3 notify success', () => {
     'delivered',
     'permanent-failure'
   ])('should not attempt retry if status is %s', async (status) => {
-    mockCheckNotificationStatus.mockResolvedValue(status)
+    checkNotificationStatus.mockResolvedValue(status)
 
-    expect(mockPublishRetryRequest).not.toHaveBeenCalled()
+    expect(publishRetryRequest).not.toHaveBeenCalled()
   })
 
   test('should handle checkNotificationStatus failure and log error', async () => {
@@ -88,11 +67,11 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    mockCheckNotificationStatus.mockRejectedValue(new Error('Status check failed'))
+    checkNotificationStatus.mockRejectedValue(new Error('Status check failed'))
 
     await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
 
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
   })
 
   test.each(
@@ -115,18 +94,18 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    jest.setSystemTime(new Date(time))
+    vi.setSystemTime(new Date(time))
 
-    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+    checkNotificationStatus.mockResolvedValue('temporary-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'mock-id',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    expect(publishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
   })
 
   test.each(
@@ -149,18 +128,18 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    jest.setSystemTime(new Date(time))
+    vi.setSystemTime(new Date(time))
 
-    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+    checkNotificationStatus.mockResolvedValue('temporary-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'mock-id',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockPublishRetryRequest).not.toHaveBeenCalled()
+    expect(publishRetryRequest).not.toHaveBeenCalled()
   })
 
   test('should schedule retry if no correlationId', async () => {
@@ -177,16 +156,16 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+    checkNotificationStatus.mockResolvedValue('temporary-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'mock-id',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    expect(publishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
   })
 
   test('should schedule retry on technical-failure', async () => {
@@ -204,16 +183,16 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    mockCheckNotificationStatus.mockResolvedValue('technical-failure')
+    checkNotificationStatus.mockResolvedValue('technical-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'cbbcdc5d-35e2-43e6-8c15-002a94f1dcce',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockPublishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
+    expect(publishRetryRequest).toHaveBeenCalledWith(mockMessage, 'test@example.com', 15)
   })
 
   test('should log correlationId if set when retry window expires', async () => {
@@ -231,18 +210,18 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    jest.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
+    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
 
-    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+    checkNotificationStatus.mockResolvedValue('temporary-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockLoggerInfo).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
+    expect(mockLogger.info).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
   })
 
   test('should publish retry expired event if retry window expired', async () => {
@@ -261,21 +240,21 @@ describe('comms request v3 notify success', () => {
       }
     }
 
-    jest.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
+    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
 
-    mockCheckNotificationStatus.mockResolvedValue('temporary-failure')
+    getOriginalNotificationRequest.mockResolvedValue('temporary-failure')
 
-    mockGetOriginalNotificationRequest.mockResolvedValue({
+    getOriginalNotificationRequest.mockResolvedValue({
       id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
       createdAt: '2025-01-01T11:00:00.000Z'
     })
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockPublishRetryExpired).toHaveBeenCalledWith(mockMessage, 'test@example.com')
+    expect(publishRetryExpired).toHaveBeenCalledWith(mockMessage, 'test@example.com')
   })
 
   afterAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 })

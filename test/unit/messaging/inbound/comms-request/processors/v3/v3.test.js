@@ -1,111 +1,82 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
 
-const mockLoggerInfo = jest.fn()
-const mockLoggerWarn = jest.fn()
-const mockLoggerError = jest.fn()
+import { createLogger } from '../../../../../../../src/logging/logger.js'
 
-jest.unstable_mockModule('../../../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    warn: (...args) => mockLoggerWarn(...args),
-    error: (...args) => mockLoggerError(...args)
+import { checkNotificationIdempotency } from '../../../../../../../src/repos/notification-log.js'
+import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js'
+import { processNotifyError } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js'
+import { trySendViaNotify } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
+import { processV3CommsRequest } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/v3.js'
+
+vi.mock('../../../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-const mockAddNotificationRequest = jest.fn()
-const mockCheckNotificationIdempotency = jest.fn().mockRejectedValue(false)
-const mockUpdateNotificationStatus = jest.fn()
-const mockGetOriginalNotificationRequest = jest.fn()
+vi.mock('../../../../../../../src/repos/notification-log.js')
 
-jest.unstable_mockModule('../../../../../../../src/repos/notification-log.js', () => ({
-  addNotificationRequest: mockAddNotificationRequest,
-  checkNotificationIdempotency: mockCheckNotificationIdempotency,
-  updateNotificationStatus: mockUpdateNotificationStatus,
-  getOriginalNotificationRequest: mockGetOriginalNotificationRequest
-}))
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js')
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js')
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js')
 
-const mockTrySendViaNotify = jest.fn().mockResolvedValue([{}, null])
+vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
+vi.mock('../../../../../../../src/messaging/outbound/received-request/publish-received.js')
+vi.mock('../../../../../../../src/messaging/outbound/invalid-request/publish-invalid.js')
 
-jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js', () => ({
-  trySendViaNotify: mockTrySendViaNotify
-}))
-
-const mockCheckNotificationStatus = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js', () => ({
-  checkNotificationStatus: mockCheckNotificationStatus
-}))
-
-const mockProcessNotifySuccess = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js', () => ({
-  processNotifySuccess: mockProcessNotifySuccess
-}))
-
-const mockProcessNotifyError = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js', () => ({
-  processNotifyError: mockProcessNotifyError
-}))
-
-const mockPublishRetryRequest = jest.fn()
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
-  publishRetryRequest: mockPublishRetryRequest
-}))
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/received-request/publish-received.js', () => ({
-  publishReceivedMessage: jest.fn()
-}))
-
-jest.unstable_mockModule('../../../../../../../src/messaging/outbound/invalid-request/publish-invalid.js', () => ({
-  publishInvalidRequest: jest.fn()
-}))
-
-const { processV3CommsRequest } = await import('../../../../../../../src/messaging/inbound/comms-request/processors/v3/v3.js')
+const mockLogger = createLogger()
 
 describe('comms request v3 processor', () => {
   describe('sending comms', () => {
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     test('should process a valid comms message', async () => {
-      mockCheckNotificationIdempotency.mockResolvedValue(false)
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
 
       await processV3CommsRequest(v3CommsRequest)
 
-      expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+      expect(mockLogger.info).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
     })
 
     test('should log error if message is invalid', async () => {
       await processV3CommsRequest({})
 
-      expect(mockLoggerError).toHaveBeenCalledWith(
+      expect(mockLogger.error).toHaveBeenCalledWith(
         'Invalid comms V3 payload: "id" is required,"source" is required,"specversion" is required,"type" is required,"datacontenttype" is required,"time" is required,"data" is required'
       )
     })
 
     test('should process message if idempotency check passes', async () => {
-      mockCheckNotificationIdempotency.mockResolvedValue(false)
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
 
       await processV3CommsRequest(v3CommsRequest)
 
-      expect(mockLoggerInfo).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+      expect(mockLogger.info).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
     })
 
     test('should process message if idempotency check fails', async () => {
-      mockCheckNotificationIdempotency.mockResolvedValue(true)
+      checkNotificationIdempotency.mockResolvedValue(true)
 
       await processV3CommsRequest(v3CommsRequest)
 
-      expect(mockLoggerWarn).toHaveBeenCalledWith('Comms V3 request already processed, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
+      expect(mockLogger.warn).toHaveBeenCalledWith('Comms V3 request already processed, eventId: 79389915-7275-457a-b8ca-8bf206b2e67b')
     })
 
     test('should call trySendViaNotify for each email address', async () => {
-      mockCheckNotificationIdempotency.mockResolvedValue(false)
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
 
       const testMessage = {
         ...v3CommsRequest,
@@ -117,14 +88,14 @@ describe('comms request v3 processor', () => {
 
       await processV3CommsRequest(testMessage)
 
-      expect(mockTrySendViaNotify).toHaveBeenCalledTimes(2)
-      expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test1@example.com', {
+      expect(trySendViaNotify).toHaveBeenCalledTimes(2)
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test1@example.com', {
         personalisation: testMessage.data.personalisation,
         reference: testMessage.id,
         emailReplyToId: testMessage.data.emailReplyToId
       })
 
-      expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test2@example.com', {
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'test2@example.com', {
         personalisation: testMessage.data.personalisation,
         reference: testMessage.id,
         emailReplyToId: testMessage.data.emailReplyToId
@@ -132,7 +103,9 @@ describe('comms request v3 processor', () => {
     })
 
     test('should handle single email address', async () => {
-      mockCheckNotificationIdempotency.mockResolvedValue(false)
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
 
       const testMessage = {
         ...v3CommsRequest,
@@ -144,8 +117,8 @@ describe('comms request v3 processor', () => {
 
       await processV3CommsRequest(testMessage)
 
-      expect(mockTrySendViaNotify).toHaveBeenCalledTimes(1)
-      expect(mockTrySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
+      expect(trySendViaNotify).toHaveBeenCalledTimes(1)
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
         personalisation: testMessage.data.personalisation,
         reference: testMessage.id,
         emailReplyToId: testMessage.data.emailReplyToId
@@ -167,12 +140,12 @@ describe('comms request v3 processor', () => {
         }
       }
 
-      mockTrySendViaNotify.mockReturnValue([mockResponse, null])
+      trySendViaNotify.mockReturnValue([mockResponse, null])
 
       await processV3CommsRequest(testMessage)
 
-      expect(mockProcessNotifySuccess).toHaveBeenCalledWith(testMessage, 'single@example.com', mockResponse)
-      expect(mockProcessNotifyError).not.toHaveBeenCalled()
+      expect(processNotifySuccess).toHaveBeenCalledWith(testMessage, 'single@example.com', mockResponse)
+      expect(processNotifyError).not.toHaveBeenCalled()
     })
 
     test('error response from GOV Notify should process error', async () => {
@@ -198,12 +171,12 @@ describe('comms request v3 processor', () => {
         }
       }
 
-      mockTrySendViaNotify.mockReturnValue([null, mockError])
+      trySendViaNotify.mockReturnValue([null, mockError])
 
       await processV3CommsRequest(testMessage)
 
-      expect(mockProcessNotifyError).toHaveBeenCalledWith(testMessage, 'single@example.com', mockError)
-      expect(mockProcessNotifySuccess).not.toHaveBeenCalled()
+      expect(processNotifyError).toHaveBeenCalledWith(testMessage, 'single@example.com', mockError)
+      expect(processNotifySuccess).not.toHaveBeenCalled()
     })
   })
 })

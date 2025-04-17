@@ -1,4 +1,10 @@
-import { GetQueueAttributesCommand, PurgeQueueCommand, SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
+import {
+  GetQueueAttributesCommand,
+  PurgeQueueCommand,
+  ReceiveMessageCommand,
+  SQSClient,
+  SendMessageCommand
+} from '@aws-sdk/client-sqs'
 
 const sqsClient = new SQSClient({
   endpoint: process.env.SQS_ENDPOINT,
@@ -45,4 +51,31 @@ const sendMessage = async (queueUrl, message) => {
   await sqsClient.send(command)
 }
 
-export { getQueueSize, resetQueue, sendMessage }
+const getMessages = async (queueUrl) => {
+  const command = new ReceiveMessageCommand({
+    QueueUrl: queueUrl,
+    MaxNumberOfMessages: 10
+  })
+
+  const { Messages: messages } = await sqsClient.send(command)
+
+  return messages
+}
+
+const parseSqsMessage = (message) => {
+  const body = JSON.parse(message.Body)
+
+  if (body.Type === 'Notification' && body.TopicArn) {
+    return JSON.parse(body.Message)
+  }
+
+  return body
+}
+
+export {
+  getQueueSize,
+  resetQueue,
+  sendMessage,
+  getMessages,
+  parseSqsMessage
+}

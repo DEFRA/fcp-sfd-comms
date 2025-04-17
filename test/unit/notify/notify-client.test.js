@@ -1,8 +1,8 @@
-import { afterAll, expect, describe, beforeEach, jest, test } from '@jest/globals'
+import { afterAll, expect, describe, beforeEach, vi, test } from 'vitest'
 
-const mockNotifyClient = jest.fn()
+const mockNotifyClient = vi.fn()
 
-jest.mock('notifications-node-client', () => ({
+vi.mock('notifications-node-client', () => ({
   NotifyClient: mockNotifyClient
 }))
 
@@ -13,8 +13,8 @@ describe('Notify client', () => {
     process.env = { ...originalEnv }
     process.env.NOTIFY_API_KEY = 'test'
 
-    jest.resetModules()
-    jest.clearAllMocks()
+    vi.resetModules()
+    vi.clearAllMocks()
   })
 
   test('should create a new Notify client', async () => {
@@ -25,7 +25,7 @@ describe('Notify client', () => {
   })
 
   afterAll(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     process.env = originalEnv
   })
 })

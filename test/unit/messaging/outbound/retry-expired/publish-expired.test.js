@@ -1,43 +1,34 @@
-import { afterAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { afterAll, beforeEach, describe, expect, vi, test } from 'vitest'
+import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
+import { createLogger } from '../../../../../src/logging/logger.js'
+import { snsClient } from '../../../../../src/messaging/sns/client.js'
+import { publish } from '../../../../../src/messaging/sns/publish.js'
+import { publishRetryExpired } from '../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
 
-import v3CommsRequest from '../../../../mocks/comms-request/v3.js'
+vi.mock('../../../../../src/messaging/sns/publish.js')
 
-const mockLoggerError = jest.fn()
-
-jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    error: (...args) => mockLoggerError(...args)
+vi.mock('../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-const mockSnsClient = {}
-
-jest.unstable_mockModule('../../../../../src/messaging/sns/client.js', () => ({
-  snsClient: mockSnsClient
-}))
-
-const mockPublish = jest.fn()
-
-jest.unstable_mockModule('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: mockPublish
-}))
-
-const { publishRetryExpired } = await import('../../../../../src/messaging/outbound/retry-expired/publish-expired.js')
+const mockLogger = createLogger()
 
 describe('Publish retry expired', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
   })
 
   test('should publish an retry expiry event', async () => {
-    jest.useFakeTimers()
-
-    jest.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
-
     const mockMessage = {
-      ...v3CommsRequest,
+      ...mockCommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...mockCommsRequest.data,
         commsAddresses: 'test@example.com',
         correlationId: '92145216-a3de-45a3-86e6-09cbece4c6a8'
       }
@@ -45,8 +36,8 @@ describe('Publish retry expired', () => {
 
     await publishRetryExpired(mockMessage, 'test@example.com')
 
-    expect(mockPublish).toHaveBeenCalledWith(
-      mockSnsClient,
+    expect(publish).toHaveBeenCalledWith(
+      snsClient,
       'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
       expect.objectContaining({
         id: expect.any(String),
@@ -64,14 +55,14 @@ describe('Publish retry expired', () => {
   })
 
   test('should log an error if publish fails', async () => {
-    mockPublish.mockRejectedValue(new Error('Publish error'))
+    publish.mockRejectedValue(new Error('Publish error'))
 
     await publishRetryExpired({}, 'test@example.com')
 
-    expect(mockLoggerError).toHaveBeenCalledWith('Error publishing retry expiry to SNS: Publish error')
+    expect(mockLogger.error).toHaveBeenCalledWith('Error publishing retry expiry to SNS: Publish error')
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 })

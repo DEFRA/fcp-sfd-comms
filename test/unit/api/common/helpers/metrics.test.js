@@ -1,25 +1,33 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals'
+import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-import { StorageResolution, Unit } from 'aws-embedded-metrics'
+import { config } from '../../../../../src/config/index.js'
 
-const mockPutMetric = jest.fn()
-const mockFlush = jest.fn()
-const mockLoggerError = jest.fn()
+import { createLogger } from '../../../../../src/logging/logger.js'
+import { createMetricsLogger, StorageResolution, Unit } from 'aws-embedded-metrics'
+import { metricsCounter } from '../../../../../src/api/common/helpers/metrics.js'
 
-jest.mock('aws-embedded-metrics', () => ({
-  ...jest.requireActual('aws-embedded-metrics'),
-  createMetricsLogger: () => ({
-    putMetric: mockPutMetric,
-    flush: mockFlush
+vi.mock('aws-embedded-metrics', async (originalImport) => {
+  const actual = await originalImport()
+
+  return {
+    ...actual,
+    createMetricsLogger: vi.fn().mockReturnValue({
+      putMetric: vi.fn(),
+      flush: vi.fn()
+    })
+  }
+})
+
+vi.mock('../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-jest.unstable_mockModule('../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({ error: (...args) => mockLoggerError(...args) })
-}))
-
-const { config } = await import('../../../../../src/config/index.js')
-const { metricsCounter } = await import('../../../../../src/api/common/helpers/metrics.js')
+const mockLogger = createLogger()
+const mockMetricsLogger = createMetricsLogger()
 
 const mockMetricsName = 'mock-metrics-name'
 const defaultMetricsValue = 1
@@ -33,11 +41,11 @@ describe('#metrics', () => {
     })
 
     test('Should not call metric', () => {
-      expect(mockPutMetric).not.toHaveBeenCalled()
+      expect(mockMetricsLogger.putMetric).not.toHaveBeenCalled()
     })
 
     test('Should not call flush', () => {
-      expect(mockFlush).not.toHaveBeenCalled()
+      expect(mockMetricsLogger.flush).not.toHaveBeenCalled()
     })
   })
 
@@ -49,7 +57,7 @@ describe('#metrics', () => {
     test('Should send metric with default value', async () => {
       await metricsCounter(mockMetricsName)
 
-      expect(mockPutMetric).toHaveBeenCalledWith(
+      expect(mockMetricsLogger.putMetric).toHaveBeenCalledWith(
         mockMetricsName,
         defaultMetricsValue,
         Unit.Count,
@@ -60,7 +68,7 @@ describe('#metrics', () => {
     test('Should send metric', async () => {
       await metricsCounter(mockMetricsName, mockValue)
 
-      expect(mockPutMetric).toHaveBeenCalledWith(
+      expect(mockMetricsLogger.putMetric).toHaveBeenCalledWith(
         mockMetricsName,
         mockValue,
         Unit.Count,
@@ -70,7 +78,7 @@ describe('#metrics', () => {
 
     test('Should not call flush', async () => {
       await metricsCounter(mockMetricsName, mockValue)
-      expect(mockFlush).toHaveBeenCalled()
+      expect(mockMetricsLogger.flush).toHaveBeenCalled()
     })
   })
 
@@ -79,13 +87,13 @@ describe('#metrics', () => {
 
     beforeEach(async () => {
       config.set('isMetricsEnabled', true)
-      mockFlush.mockRejectedValue(new Error(mockError))
+      mockMetricsLogger.flush.mockRejectedValue(new Error(mockError))
 
       await metricsCounter(mockMetricsName, mockValue)
     })
 
     test('Should log expected error', () => {
-      expect(mockLoggerError).toHaveBeenCalledWith(Error(mockError), mockError)
+      expect(mockLogger.error).toHaveBeenCalledWith(Error(mockError), mockError)
     })
   })
 })

@@ -1,8 +1,10 @@
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-
+import { createLogger } from '../../../logging/logger.js'
 import { config } from '../../../config/index.js'
 import { sqsClient } from '../../sqs/client.js'
 import { buildRetryMessage } from './retry-message.js'
+
+const logger = createLogger()
 
 const publishRetryRequest = async (message, recipient, delay) => {
   const retryMessage = buildRetryMessage(message, recipient)
@@ -16,9 +18,7 @@ const publishRetryRequest = async (message, recipient, delay) => {
   try {
     await sqsClient.send(command)
   } catch (err) {
-    throw new Error(`Error publishing retry message: ${err.message}`, {
-      cause: err
-    })
+    logger.error(`Error publishing retry message: ${err.message}`, { cause: err })
   }
 }
 

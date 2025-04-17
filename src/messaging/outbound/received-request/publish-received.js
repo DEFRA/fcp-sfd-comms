@@ -1,9 +1,11 @@
+import { createLogger } from '../../../logging/logger.js'
 import { config } from '../../../config/index.js'
 import { snsClient } from '../../sns/client.js'
 import { publish } from '../../sns/publish.js'
 import { buildReceivedMessage } from './received-message.js'
 import { commsEvents } from '../../../constants/comms-events.js'
 
+const logger = createLogger()
 const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
 
 const publishReceivedMessage = async (message) => {
@@ -16,7 +18,7 @@ const publishReceivedMessage = async (message) => {
   try {
     await publish(snsClient, snsTopic, receivedMessage)
   } catch (err) {
-    console.error('Error publishing received message to SNS:', { cause: err })
+    logger.error('Error publishing received message to SNS:', { cause: err })
   }
 }
 

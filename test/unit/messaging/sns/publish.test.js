@@ -1,27 +1,25 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { beforeEach, describe, expect, vi, test } from 'vitest'
+
+import { PublishCommand } from '@aws-sdk/client-sns'
+import { publish } from '../../../../src/messaging/sns/publish.js'
 
 const mockSnsClient = {
-  send: jest.fn()
+  send: vi.fn()
 }
 
-const mockPublishCommand = jest.fn()
-const mockLoggerError = jest.fn()
+vi.mock('@aws-sdk/client-sns')
 
-jest.unstable_mockModule('@aws-sdk/client-sns', () => ({
-  PublishCommand: mockPublishCommand
-}))
+const mockLoggerError = vi.fn()
 
-jest.unstable_mockModule('../../../../src/logging/logger.js', () => ({
+vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
 }))
 
-const { publish } = await import('../../../../src/messaging/sns/publish.js')
-
 describe('SNS Publish', () => {
   beforeEach(async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should receive and execute publish command if SNS topic is FiFo', async () => {
@@ -34,7 +32,7 @@ describe('SNS Publish', () => {
 
     await publish(mockSnsClient, topicArn, message)
 
-    expect(mockPublishCommand).toHaveBeenCalledWith({
+    expect(PublishCommand).toHaveBeenCalledWith({
       TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
       Message: JSON.stringify(message),
       MessageGroupId: message.id,
@@ -54,7 +52,7 @@ describe('SNS Publish', () => {
 
     await publish(mockSnsClient, topicArn, message)
 
-    expect(mockPublishCommand).toHaveBeenCalledWith({
+    expect(PublishCommand).toHaveBeenCalledWith({
       TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data',
       Message: JSON.stringify(message)
     })
