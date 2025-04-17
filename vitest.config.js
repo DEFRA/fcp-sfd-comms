@@ -8,10 +8,10 @@ export default defineConfig({
       clean: false,
       include: ['src/**/*.js'],
       exclude: [
-         '**/node_modules/**',
-         '**/test/**',
-         '.server',
-         'index.js'
+        '**/node_modules/**',
+        '**/test/**',
+        '.server',
+        'index.js'
       ]
     }
   }
