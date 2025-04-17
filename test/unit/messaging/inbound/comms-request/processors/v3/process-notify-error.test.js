@@ -2,36 +2,24 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
 
+import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { updateNotificationStatus } from '../../../../../../../src/repos/notification-log.js'
 import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 import { processNotifyError } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js'
 
-vi.mock('../../../../../../../src/repos/notification-log.js', () => ({
-  addNotificationRequest: vi.fn(),
-  checkNotificationIdempotency: vi.fn(),
-  updateNotificationStatus: vi.fn(),
-  getOriginalNotificationRequest: vi.fn()
-}))
-
-vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
-  publishRetryRequest: vi.fn()
-}))
-
-vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js', () => ({
-  publishStatus: vi.fn()
-}))
-
-const mockLoggerInfo = vi.fn()
-const mockLoggerWarn = vi.fn()
-const mockLoggerError = vi.fn()
+vi.mock('../../../../../../../src/repos/notification-log.js')
+vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
+vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
 vi.mock('../../../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    warn: (...args) => mockLoggerWarn(...args),
-    error: (...args) => mockLoggerError(...args)
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
+
+const mockLogger = createLogger()
 
 describe('comms request v3 notify error', () => {
   beforeEach(() => {
@@ -140,6 +128,6 @@ describe('comms request v3 notify error', () => {
 
     await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
 
-    expect(mockLoggerError).toHaveBeenCalledWith('Error handling failed notification: Test error')
+    expect(mockLogger.error).toHaveBeenCalledWith('Error handling failed notification: Test error')
   })
 })

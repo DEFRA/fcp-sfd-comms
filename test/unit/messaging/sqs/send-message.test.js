@@ -1,14 +1,12 @@
 import { beforeEach, describe, expect, vi, test } from 'vitest'
 
+import { SendMessageCommand } from '@aws-sdk/client-sqs'
+
 const mockSqsClient = {
   send: vi.fn()
 }
 
-const mockSendMessageCommand = vi.fn()
-
-vi.mock('@aws-sdk/client-sqs', () => ({
-  SendMessageCommand: mockSendMessageCommand
-}))
+vi.mock('@aws-sdk/client-sqs')
 
 const mockLoggerError = vi.fn()
 
@@ -36,7 +34,7 @@ describe('sqs send message', () => {
       message
     )
 
-    expect(mockSendMessageCommand).toHaveBeenCalledWith({
+    expect(SendMessageCommand).toHaveBeenCalledWith({
       QueueUrl: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
       MessageBody: message
     })

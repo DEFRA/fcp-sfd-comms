@@ -4,8 +4,6 @@ import mockCommsRequest from '../../../../../mocks/comms-request/v3.js'
 
 import notifyClient from '../../../../../../src/notify/notify-client.js'
 
-import { finishedStatus } from '../../../../../../src/constants/notify-statuses.js'
-
 import { createLogger } from '../../../../../../src/logging/logger.js'
 import { updateNotificationStatus } from '../../../../../../src/repos/notification-log.js'
 import { checkNotificationStatus } from '../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
@@ -45,16 +43,15 @@ describe('Check notification status', () => {
   })
 
   test('should check notification status successfully', async () => {
-    const mockStatus = finishedStatus[0]
-    notifyClient.getNotificationById.mockResolvedValue({ data: { status: mockStatus } })
+    notifyClient.getNotificationById.mockResolvedValue({ data: { status: 'delivered' } })
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
     const status = await checkNotificationStatus(data.message, data.commsAddresses, notifyId)
 
     expect(notifyClient.getNotificationById).toHaveBeenCalledWith(notifyId)
-    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, data.commsAddresses, mockStatus)
-    expect(status).toEqual(mockStatus)
+    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, data.commsAddresses, 'delivered')
+    expect(status).toEqual('delivered')
   })
 
   test('should retry notification status check until max attempts reached', async () => {

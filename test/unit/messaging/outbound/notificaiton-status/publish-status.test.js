@@ -6,9 +6,7 @@ import { publish } from '../../../../../src/messaging/sns/publish.js'
 import { publishStatus } from '../../../../../src/messaging/outbound/notification-status/publish-status.js'
 import { statusToEventMap } from '../../../../../src/constants/comms-events.js'
 
-vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: vi.fn()
-}))
+vi.mock('../../../../../src/messaging/sns/publish.js')
 
 vi.mock('../../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({

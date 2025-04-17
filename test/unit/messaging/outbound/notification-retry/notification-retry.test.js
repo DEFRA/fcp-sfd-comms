@@ -4,9 +4,7 @@ import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 import { sqsClient } from '../../../../../src/messaging/sqs/client.js'
 import { publishRetryRequest } from '../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 
-vi.mock('@aws-sdk/client-sqs', () => ({
-  SendMessageCommand: vi.fn()
-}))
+vi.mock('@aws-sdk/client-sqs')
 
 vi.mock('../../../../../src/messaging/sqs/client.js', () => ({
   sqsClient: {

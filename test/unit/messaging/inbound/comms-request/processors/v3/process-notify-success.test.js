@@ -2,43 +2,30 @@ import { vi, describe, test, expect, beforeEach, afterAll } from 'vitest'
 
 import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
 
+import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { getOriginalNotificationRequest } from '../../../../../../../src/repos/notification-log.js'
 import { checkNotificationStatus } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
 import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 import { publishRetryExpired } from '../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
-
 import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js'
 
-vi.mock('../../../../../../../src/repos/notification-log.js', () => ({
-  addNotificationRequest: vi.fn(),
-  checkNotificationIdempotency: vi.fn(),
-  updateNotificationStatus: vi.fn(),
-  getOriginalNotificationRequest: vi.fn()
-}))
-
-const mockLoggerInfo = vi.fn()
-const mockLoggerWarn = vi.fn()
-const mockLoggerError = vi.fn()
+vi.mock('../../../../../../../src/repos/notification-log.js')
 
 vi.mock('../../../../../../../src/logging/logger.js', () => ({
-  createLogger: () => ({
-    info: (...args) => mockLoggerInfo(...args),
-    warn: (...args) => mockLoggerWarn(...args),
-    error: (...args) => mockLoggerError(...args)
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   })
 }))
 
-vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js', () => ({
-  checkNotificationStatus: vi.fn()
-}))
+const mockLogger = createLogger()
 
-vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js', () => ({
-  publishRetryRequest: vi.fn()
-}))
+vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
 
-vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js', () => ({
-  publishRetryExpired: vi.fn()
-}))
+vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
+
+vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js')
 
 vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
@@ -59,7 +46,7 @@ describe('comms request v3 notify success', () => {
 
     await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
 
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
   })
 
   test.each([
@@ -84,7 +71,7 @@ describe('comms request v3 notify success', () => {
 
     await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
 
-    expect(mockLoggerError).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
   })
 
   test.each(
@@ -234,7 +221,7 @@ describe('comms request v3 notify success', () => {
 
     await processNotifySuccess(mockMessage, 'test@example.com', mockResponse)
 
-    expect(mockLoggerInfo).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
+    expect(mockLogger.info).toHaveBeenCalledWith(`Retry window expired for request: ${mockMessage.data.correlationId}`)
   })
 
   test('should publish retry expired event if retry window expired', async () => {

@@ -5,9 +5,7 @@ import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'
 import { publishInvalidRequest } from '../../../../../src/messaging/outbound/invalid-request/publish-invalid.js'
 
-vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: vi.fn()
-}))
+vi.mock('../../../../../src/messaging/sns/publish.js')
 
 vi.mock('../../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({

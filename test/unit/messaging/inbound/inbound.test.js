@@ -3,10 +3,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 import { sqsClient } from '../../../../src/messaging/sqs/client.js'
 import { startCommsListener, stopCommsListener } from '../../../../src/messaging/inbound/comms-request/consumer.js'
 
-vi.mock('../../../../src/messaging/inbound/comms-request/consumer.js', () => ({
-  startCommsListener: vi.fn(),
-  stopCommsListener: vi.fn()
-}))
+vi.mock('../../../../src/messaging/inbound/comms-request/consumer.js')
 
 const { startMessaging, stopMessaging } = await import('../../../../src/messaging/inbound/inbound.js')
 

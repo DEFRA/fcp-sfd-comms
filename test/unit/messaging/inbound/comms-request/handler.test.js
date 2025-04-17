@@ -20,9 +20,7 @@ vi.mock('../../../../../src/messaging/inbound/comms-request/processors/processor
   getCommsProcessor: vi.fn(() => mockProcessor)
 }))
 
-vi.mock('../../../../../src/messaging/sqs/send-message.js', () => ({
-  sendMessage: vi.fn()
-}))
+vi.mock('../../../../../src/messaging/sqs/send-message.js')
 
 describe('comms request handler', () => {
   beforeEach(() => {

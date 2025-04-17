@@ -5,16 +5,14 @@ import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'
 import { publishRetryExpired } from '../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
 
+vi.mock('../../../../../src/messaging/sns/publish.js')
+
 vi.mock('../../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn()
   })
-}))
-
-vi.mock('../../../../../src/messaging/sns/publish.js', () => ({
-  publish: vi.fn()
 }))
 
 const mockLogger = createLogger()

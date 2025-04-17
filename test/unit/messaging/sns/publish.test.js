@@ -7,9 +7,7 @@ const mockSnsClient = {
   send: vi.fn()
 }
 
-vi.mock('@aws-sdk/client-sns', () => ({
-  PublishCommand: vi.fn()
-}))
+vi.mock('@aws-sdk/client-sns')
 
 const mockLoggerError = vi.fn()
 
