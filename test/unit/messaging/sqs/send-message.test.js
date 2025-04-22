@@ -1,18 +1,16 @@
-import { beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { beforeEach, describe, expect, vi, test } from 'vitest'
+
+import { SendMessageCommand } from '@aws-sdk/client-sqs'
 
 const mockSqsClient = {
-  send: jest.fn()
+  send: vi.fn()
 }
 
-const mockSendMessageCommand = jest.fn()
+vi.mock('@aws-sdk/client-sqs')
 
-jest.unstable_mockModule('@aws-sdk/client-sqs', () => ({
-  SendMessageCommand: mockSendMessageCommand
-}))
+const mockLoggerError = vi.fn()
 
-const mockLoggerError = jest.fn()
-
-jest.unstable_mockModule('../../../../src/logging/logger.js', () => ({
+vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
     error: (...args) => mockLoggerError(...args)
   })
@@ -22,7 +20,7 @@ const { sendMessage } = await import('../../../../src/messaging/sqs/send-message
 
 describe('sqs send message', () => {
   beforeEach(async () => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('should create and execute send message command', async () => {
@@ -36,7 +34,7 @@ describe('sqs send message', () => {
       message
     )
 
-    expect(mockSendMessageCommand).toHaveBeenCalledWith({
+    expect(SendMessageCommand).toHaveBeenCalledWith({
       QueueUrl: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request',
       MessageBody: message
     })

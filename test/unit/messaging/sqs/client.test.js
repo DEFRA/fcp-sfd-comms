@@ -1,8 +1,8 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { afterEach, beforeAll, beforeEach, describe, expect, vi, test } from 'vitest'
 
-const mockSqsClient = jest.fn()
+const mockSqsClient = vi.fn()
 
-jest.unstable_mockModule('@aws-sdk/client-sqs', () => {
+vi.mock('@aws-sdk/client-sqs', () => {
   return {
     SQSClient: mockSqsClient
   }
@@ -16,7 +16,7 @@ describe('sqs client', () => {
   })
 
   beforeEach(async () => {
-    jest.resetModules()
+    vi.resetModules()
   })
 
   test('should create sqs client using access / secret key in development', async () => {
