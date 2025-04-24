@@ -1,6 +1,6 @@
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-import mockCommsRequest from '../../../../../mocks/comms-request/v3.js'
+import mockCommsRequest from '../../../../../mocks/comms-request/v1.js'
 
 import notifyClient from '../../../../../../src/notify/notify-client.js'
 import { trySendViaNotify } from '../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'

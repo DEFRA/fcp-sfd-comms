@@ -123,8 +123,8 @@ components:
           $ref: "#/components/schemas/notifyTemplateId"
         commsType:
           $ref: "#/components/schemas/commsType"
-        commsAddresses:
-          $ref: "#/components/schemas/commsAddresses"
+        commsAddress:
+          $ref: "#/components/schemas/commsAddress"
         personalisation:
           $ref: "#/components/schemas/personalisation"
         reference:
@@ -155,8 +155,8 @@ components:
           $ref: '#/components/schemas/notifyTemplateId'
         commsType:
           $ref: '#/components/schemas/commsType'
-        commsAddresses:
-          $ref: '#/components/schemas/commsAddresses'
+        commsAddress:
+          $ref: '#/components/schemas/commsAddress'
         personalisation:
           $ref: '#/components/schemas/personalisation'
         reference:
@@ -205,30 +205,13 @@ components:
       example: "email"
       enum: ["email"]
 
-    commsAddresses:
-      oneOf:
-        - type: array
-          title: an array of strings
-          description: List of contact email addresses
-          example: [
-            "example-customer1@example.com",
-            "example-customer2@example.com"
-          ]
-          minItems: 1
-          maxItems: 10
-          items:
-            type: string
-            description: Contact email address
-            example: "example-customer1@example.com"
-            minLength: 1
-            maxLength: 320
-            pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})?$"
-        - type: string
-          description: Contact email address
-          example: "example-customer1@example.com"
-          minLength: 1
-          maxLength: 320
-          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})?$"
+    commsAddress:
+      type: string
+      description: Contact email address
+      example: "example-customer1@example.com"
+      minLength: 1
+      maxLength: 320
+      pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})?$"
 
     personalisation:
       type: object

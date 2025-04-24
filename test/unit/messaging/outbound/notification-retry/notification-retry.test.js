@@ -1,6 +1,8 @@
 import { afterAll, beforeEach, describe, expect, vi, test } from 'vitest'
+
+import mockCommsRequest from '../../../../mocks/comms-request/v1.js'
+
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 import { sqsClient } from '../../../../../src/messaging/sqs/client.js'
 import { publishRetryRequest } from '../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 

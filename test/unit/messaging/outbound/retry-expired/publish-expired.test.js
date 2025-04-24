@@ -1,5 +1,7 @@
 import { afterAll, beforeEach, describe, expect, vi, test } from 'vitest'
-import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
+
+import mockCommsRequest from '../../../../mocks/comms-request/v1.js'
+
 import { createLogger } from '../../../../../src/logging/logger.js'
 import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'

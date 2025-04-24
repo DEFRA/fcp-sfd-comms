@@ -1,13 +1,13 @@
 import { vi, describe, test, expect, beforeEach, afterAll } from 'vitest'
 
-import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
+import v1CommsRequest from '../../../../../../mocks/comms-request/v1.js'
 
 import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { getOriginalNotificationRequest } from '../../../../../../../src/repos/notification-log.js'
 import { checkNotificationStatus } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
 import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 import { publishRetryExpired } from '../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
-import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-success.js'
+import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-success.js'
 
 vi.mock('../../../../../../../src/repos/notification-log.js')
 
@@ -29,7 +29,7 @@ vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expir
 
 vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
-describe('comms request v3 notify success', () => {
+describe('comms request v1 notify success', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.clearAllMocks()
@@ -44,7 +44,7 @@ describe('comms request v3 notify success', () => {
 
     checkNotificationStatus.mockRejectedValue(new Error('Update failed'))
 
-    await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
+    await processNotifySuccess(v1CommsRequest, 'test@example.com', mockResponse)
 
     expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification/))
   })
@@ -69,7 +69,7 @@ describe('comms request v3 notify success', () => {
 
     checkNotificationStatus.mockRejectedValue(new Error('Status check failed'))
 
-    await processNotifySuccess(v3CommsRequest, 'test@example.com', mockResponse)
+    await processNotifySuccess(v1CommsRequest, 'test@example.com', mockResponse)
 
     expect(mockLogger.error).toHaveBeenCalledWith(expect.stringMatching(/Failed checking notification status/))
   })
@@ -87,9 +87,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
       }
     }
@@ -121,9 +121,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
       }
     }
@@ -150,9 +150,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data
+        ...v1CommsRequest.data
       }
     }
 
@@ -176,9 +176,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
       }
     }
@@ -203,9 +203,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf'
       }
     }
@@ -232,9 +232,9 @@ describe('comms request v3 notify success', () => {
     }
 
     const mockMessage = {
-      ...v3CommsRequest,
+      ...v1CommsRequest,
       data: {
-        ...v3CommsRequest.data,
+        ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
         commsAddresses: 'test@example.com'
       }

@@ -1,7 +1,7 @@
 import { createLogger } from '../../../../../logging/logger.js'
 
 import { validate } from '../../../../../schemas/validate.js'
-import { v3 } from '../../../../../schemas/comms-request/index.js'
+import { v1 } from '../../../../../schemas/comms-request/index.js'
 
 import {
   checkNotificationIdempotency,
@@ -18,16 +18,16 @@ import { processNotifyError } from './process-notify-error.js'
 
 const logger = createLogger()
 
-const processV3CommsRequest = async (message) => {
-  const [validated, err] = await validate(v3, message)
+const processV1CommsRequest = async (message) => {
+  const [validated, err] = await validate(v1, message)
 
   if (err) {
     await publishInvalidRequest(message, err)
-    return logger.error(`Invalid comms V3 payload: ${err.details.map(d => d.message)}`)
+    return logger.error(`Invalid comms V1 payload: ${err.details.map(d => d.message)}`)
   }
 
   if (await checkNotificationIdempotency(validated)) {
-    return logger.warn(`Comms V3 request already processed, eventId: ${validated.id}`)
+    return logger.warn(`Comms V1 request already processed, eventId: ${validated.id}`)
   }
 
   await addNotificationRequest(validated)
@@ -55,7 +55,7 @@ const processV3CommsRequest = async (message) => {
     }
   }
 
-  return logger.info(`Comms V3 request processed successfully, eventId: ${validated.id}`)
+  return logger.info(`Comms V1 request processed successfully, eventId: ${validated.id}`)
 }
 
-export { processV3CommsRequest }
+export { processV1CommsRequest }
