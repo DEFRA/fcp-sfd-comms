@@ -16,4 +16,8 @@ const config = convict({
 
 config.validate({ allowed: 'strict' })
 
+if (process.env.NODE_ENV !== 'test') {
+  console.log('Config:', config.toString())
+}
+
 export { config }
