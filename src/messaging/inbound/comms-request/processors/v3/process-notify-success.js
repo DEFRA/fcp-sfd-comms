@@ -1,6 +1,6 @@
 import { config } from '../../../../../config/index.js'
 
-import { retryableStatus } from '../../../../../constants/notify-statuses.js'
+import { notifyStatuses, retryableStatus } from '../../../../../constants/notify-statuses.js'
 
 import { createLogger } from '../../../../../logging/logger.js'
 
@@ -15,6 +15,8 @@ const logger = createLogger()
 
 const processNotifySuccess = async (message, recipient, response) => {
   try {
+    await publishStatus(message, recipient, notifyStatuses.SENDING)
+
     const status = await checkNotificationStatus(message, recipient, response.data.id)
 
     await publishStatus(message, recipient, status)

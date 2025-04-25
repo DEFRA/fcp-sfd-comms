@@ -106,6 +106,21 @@ describe('v3 comms request processing integration', () => {
           id: expect.any(String),
           source: 'fcp-sfd-comms',
           time: expect.any(String),
+          type: 'uk.gov.fcp.sfd.notification.sending',
+          data: {
+            correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
+            commsAddresses: 'test@example.com',
+            statusDetails: {
+              status: 'sending'
+            }
+          },
+          datacontenttype: 'application/json',
+          specversion: '1.0'
+        }),
+        expect.objectContaining({
+          id: expect.any(String),
+          source: 'fcp-sfd-comms',
+          time: expect.any(String),
           type: 'uk.gov.fcp.sfd.notification.delivered',
           data: {
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
