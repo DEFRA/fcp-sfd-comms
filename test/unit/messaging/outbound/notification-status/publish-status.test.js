@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, vi, test, afterAll } from 'vitest'
+
+import mockCommsRequest from '../../../../mocks/comms-request/v1.js'
+
 import { createLogger } from '../../../../../src/logging/logger.js'
-import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'
 import { publishStatus } from '../../../../../src/messaging/outbound/notification-status/publish-status.js'
@@ -42,7 +44,7 @@ describe('Publish Status', () => {
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
-          commsAddresses: recipient,
+          recipient,
           statusDetails: {
             status,
             errorCode: undefined,
@@ -72,7 +74,7 @@ describe('Publish Status', () => {
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
-          commsAddresses: recipient,
+          recipient,
           statusDetails: {
             status,
             errorCode: 500,

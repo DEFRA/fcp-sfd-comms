@@ -10,7 +10,7 @@ export const buildExpiredMessage = (message, recipient) => ({
   time: new Date(),
   data: {
     correlationId: message.data?.correlationId ?? message.id,
-    commsAddresses: recipient
+    recipient
   },
   datacontenttype: 'application/json',
   specversion: '1.0'

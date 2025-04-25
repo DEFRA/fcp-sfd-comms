@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import v3 from '../../../../mocks/comms-request/v3.js'
+import v1 from '../../../../mocks/comms-request/v1.js'
 
 import { getQueueSize, resetQueue, sendMessage } from '../../../../helpers/sqs.js'
 
@@ -27,7 +27,7 @@ describe('comms request consumer integration', () => {
   test('should complete comms message placed on SQS', async () => {
     await sendMessage(
       commsRequestQueueUrl,
-      JSON.stringify(v3)
+      JSON.stringify(v1)
     )
 
     await new Promise((resolve) => {
@@ -52,7 +52,7 @@ describe('comms request consumer integration', () => {
 
     await sendMessage(
       commsRequestQueueUrl,
-      JSON.stringify(v3)
+      JSON.stringify(v1)
     )
 
     await new Promise((resolve) => {
