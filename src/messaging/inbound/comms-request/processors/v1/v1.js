@@ -41,18 +41,14 @@ const processV1CommsRequest = async (message) => {
     emailReplyToId: data.emailReplyToId
   }
 
-  const recipients = Array.isArray(data.commsAddresses)
-    ? data.commsAddresses
-    : [data.commsAddresses]
+  const recipient = data.commsAddresses
 
-  for (const recipient of recipients) {
-    const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
+  const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
 
-    if (response) {
-      await processNotifySuccess(message, recipient, response)
-    } else {
-      await processNotifyError(message, recipient, notifyError)
-    }
+  if (response) {
+    await processNotifySuccess(message, recipient, response)
+  } else {
+    await processNotifyError(message, recipient, notifyError)
   }
 
   return logger.info(`Comms V1 request processed successfully, eventId: ${validated.id}`)
