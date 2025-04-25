@@ -66,9 +66,24 @@ describe('Publish Status', () => {
     ['validation-failure', 'uk.gov.fcp.sfd.notification.failure.validation']
   ])('should publish %s event for error status %s', async (status, expectedType) => {
     const recipient = 'test@example.com'
-    const error = { status_code: 400, errors: ['Bad Request'] }
+    
+    const mockError = {
+      response: {
+        status: 400,
+        data: {
+          error: {
+            status_code: 400,
+            errors: [
+              {
+                error: 'mock-error'
+              }
+            ]
+          }
+        }
+      }
+    }
 
-    await publishStatus(mockCommsRequest, recipient, status, error)
+    await publishStatus(mockCommsRequest, recipient, status, mockError)
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
