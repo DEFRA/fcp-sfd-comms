@@ -5,30 +5,30 @@ info:
   description: Publish communications to users via the Single Front Door
 
 channels:
-  fcp-fd-comms:
-    address: fcp-fd-comms
+  fcp-sfd-comms-request:
+    address: fcp_sfd_comms_request
     description: |
-      Accepts requests for communication notifications via Azure service bus.
+      Accepts requests for communication notifications via SQS
     messages:
       commsMessage:
         $ref: '#/components/messages/commsMessage'
-  fcp-fd-data:
-    address: fcp-fd-data
+  fcp-sfd-data:
+    address: fcp_sfd_data
     description: |
-      Accepts updates to the status of communication notifications via Azure service bus.
+      Accepts updates to the status of communication notifications via SNS
     messages:
       commsEventMessage:
         $ref: '#/components/messages/commsEventMessage'
       
 operations:
-  fcp-fd-comms.subscribe:
+  fcp-sfd-comms.subscribe:
     action: receive
     channel:
-      $ref: '#/channels/fcp-fd-comms'
-  fcp-fd-data.publish:
+      $ref: '#/channels/fcp-sfd-comms'
+  fcp-sfd-data.publish:
     action: send
     channel:
-      $ref: '#/channels/fcp-fd-data'
+      $ref: '#/channels/fcp-sfd-data'
 
 components:
   messages:
@@ -123,8 +123,8 @@ components:
           $ref: "#/components/schemas/notifyTemplateId"
         commsType:
           $ref: "#/components/schemas/commsType"
-        commsAddress:
-          $ref: "#/components/schemas/commsAddress"
+        commsAddresses:
+          $ref: "#/components/schemas/commsAddresses"
         personalisation:
           $ref: "#/components/schemas/personalisation"
         reference:
@@ -155,8 +155,8 @@ components:
           $ref: '#/components/schemas/notifyTemplateId'
         commsType:
           $ref: '#/components/schemas/commsType'
-        commsAddress:
-          $ref: '#/components/schemas/commsAddress'
+        commsAddresses:
+          $ref: '#/components/schemas/commsAddresses'
         personalisation:
           $ref: '#/components/schemas/personalisation'
         reference:
@@ -205,7 +205,7 @@ components:
       example: "email"
       enum: ["email"]
 
-    commsAddress:
+    commsAddresses:
       type: string
       description: Contact email address
       example: "example-customer1@example.com"
@@ -257,7 +257,7 @@ components:
           example: 400
         errors:
           type: array
-          description: A list of error messages returned either from Notify or the fd-comms. Only present if status is 'internal-failure' or 'validation-failure'
+          description: A list of error messages returned either from Notify or sfd-comms. Only present if status is 'internal-failure' or 'validation-failure'
           required:
             - error
             - message
