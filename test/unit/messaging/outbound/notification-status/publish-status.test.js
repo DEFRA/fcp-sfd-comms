@@ -66,21 +66,14 @@ describe('Publish Status', () => {
     ['validation-failure', 'uk.gov.fcp.sfd.notification.failure.validation']
   ])('should publish %s event for error status %s', async (status, expectedType) => {
     const recipient = 'test@example.com'
-    
+
     const mockError = {
-      response: {
-        status: 400,
-        data: {
-          error: {
-            status_code: 400,
-            errors: [
-              {
-                error: 'mock-error'
-              }
-            ]
-          }
+      status_code: 400,
+      errors: [
+        {
+          error: 'mock-error'
         }
-      }
+      ]
     }
 
     await publishStatus(mockCommsRequest, recipient, status, mockError)
@@ -99,7 +92,11 @@ describe('Publish Status', () => {
           statusDetails: {
             status,
             errorCode: 400,
-            errors: ['Bad Request']
+            errors: [
+              {
+                error: 'mock-error'
+              }
+            ]
           }
         },
         datacontenttype: 'application/json',
