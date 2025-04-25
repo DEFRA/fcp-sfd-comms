@@ -6,7 +6,6 @@ import { createLogger } from '../../../../../src/logging/logger.js'
 import { snsClient } from '../../../../../src/messaging/sns/client.js'
 import { publish } from '../../../../../src/messaging/sns/publish.js'
 import { publishStatus } from '../../../../../src/messaging/outbound/notification-status/publish-status.js'
-import { statusToEventMap } from '../../../../../src/constants/comms-events.js'
 
 vi.mock('../../../../../src/messaging/sns/publish.js')
 
@@ -27,12 +26,17 @@ describe('Publish Status', () => {
     vi.setSystemTime(new Date('2025-01-08T11:00:00.000Z'))
   })
 
-  test('should publish a status message with correct type and details', async () => {
+  test.each([
+    ['created', 'uk.gov.fcp.sfd.notification.sending'],
+    ['sending', 'uk.gov.fcp.sfd.notification.sending'],
+    ['permanent-failure', 'uk.gov.fcp.sfd.notification.failure.provider'],
+    ['temporary-failure', 'uk.gov.fcp.sfd.notification.failure.provider'],
+    ['technical-failure', 'uk.gov.fcp.sfd.notification.failure.provider'],
+    ['delivered', 'uk.gov.fcp.sfd.notification.delivered']
+  ])('should publish %s event for non-error status %s', async (status, expectedType) => {
     const recipient = 'test@example.com'
-    const status = 'DELIVERED'
-    const error = null
 
-    await publishStatus(mockCommsRequest, recipient, status, error)
+    await publishStatus(mockCommsRequest, recipient, status)
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
@@ -40,7 +44,7 @@ describe('Publish Status', () => {
       expect.objectContaining({
         id: expect.any(String),
         source: 'fcp-sfd-comms',
-        type: statusToEventMap[status],
+        type: expectedType,
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
@@ -57,10 +61,12 @@ describe('Publish Status', () => {
     )
   })
 
-  test('should publish a status message with error details if error is provided', async () => {
+  test.each([
+    ['internal-failure', 'uk.gov.fcp.sfd.notification.failure.internal'],
+    ['validation-failure', 'uk.gov.fcp.sfd.notification.failure.validation']
+  ])('should publish %s event for error status %s', async (status, expectedType) => {
     const recipient = 'test@example.com'
-    const status = 'FAILED'
-    const error = { status_code: 500, errors: ['Internal Server Error'] }
+    const error = { status_code: 400, errors: ['Bad Request'] }
 
     await publishStatus(mockCommsRequest, recipient, status, error)
 
@@ -70,15 +76,15 @@ describe('Publish Status', () => {
       expect.objectContaining({
         id: expect.any(String),
         source: 'fcp-sfd-comms',
-        type: statusToEventMap[status],
+        type: expectedType,
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
           recipient,
           statusDetails: {
             status,
-            errorCode: 500,
-            errors: ['Internal Server Error']
+            errorCode: 400,
+            errors: ['Bad Request']
           }
         },
         datacontenttype: 'application/json',
@@ -89,12 +95,10 @@ describe('Publish Status', () => {
 
   test('should log an error if publish fails', async () => {
     const recipient = 'test@example.com'
-    const status = 'DELIVERED'
-    const error = null
 
     publish.mockRejectedValue(new Error('Publish error'))
 
-    await publishStatus(mockCommsRequest, recipient, status, error)
+    await publishStatus(mockCommsRequest, recipient, 'delivered')
 
     expect(mockLogger.error).toHaveBeenCalledWith(
       'Error publishing comms event status details to SNS:',

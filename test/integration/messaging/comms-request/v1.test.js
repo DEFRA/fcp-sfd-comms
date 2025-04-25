@@ -107,7 +107,7 @@ describe('v1 comms request processing integration', () => {
           type: 'uk.gov.fcp.sfd.notification.sending',
           data: {
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
-            commsAddresses: 'test@example.com',
+            recipient: 'test@example.com',
             statusDetails: {
               status: 'sending'
             }
