@@ -23,7 +23,7 @@ describe('sqs message parser', () => {
         sourceSystem: 'source',
         notifyTemplateId: 'd29257ce-974f-4214-8bbe-69ce5f2bb7f3',
         commsType: 'email',
-        commsAddresses: 'test@example.com',
+        recipient: 'test@example.com',
         personalisation: {
           reference: 'test-reference'
         },

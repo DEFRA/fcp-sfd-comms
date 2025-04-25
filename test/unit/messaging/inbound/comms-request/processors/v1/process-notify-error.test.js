@@ -1,11 +1,11 @@
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-import v3CommsRequest from '../../../../../../mocks/comms-request/v3.js'
+import v1CommsRequest from '../../../../../../mocks/comms-request/v1.js'
 
 import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { updateNotificationStatus } from '../../../../../../../src/repos/notification-log.js'
 import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
-import { processNotifyError } from '../../../../../../../src/messaging/inbound/comms-request/processors/v3/process-notify-error.js'
+import { processNotifyError } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-error.js'
 
 vi.mock('../../../../../../../src/repos/notification-log.js')
 vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
@@ -21,7 +21,7 @@ vi.mock('../../../../../../../src/logging/logger.js', () => ({
 
 const mockLogger = createLogger()
 
-describe('comms request v3 notify error', () => {
+describe('comms request v1 notify error', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -41,9 +41,9 @@ describe('comms request v3 notify error', () => {
       }
     }
 
-    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
-    expect(updateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'internal-failure', mockError.data)
+    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, expect.any(String), 'internal-failure', mockError.data)
   })
 
   test('should update notification status to TECHNICAL_FAILURE if request fails with server error', async () => {
@@ -61,9 +61,9 @@ describe('comms request v3 notify error', () => {
       }
     }
 
-    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
-    expect(updateNotificationStatus).toHaveBeenCalledWith(v3CommsRequest, expect.any(String), 'technical-failure', mockError.data)
+    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, expect.any(String), 'technical-failure', mockError.data)
   })
 
   test('should call publish retry if error code is in 5xx range', async () => {
@@ -81,9 +81,9 @@ describe('comms request v3 notify error', () => {
       }
     }
 
-    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
-    expect(publishRetryRequest).toHaveBeenCalledWith(v3CommsRequest, 'test@example.com', 15)
+    expect(publishRetryRequest).toHaveBeenCalledWith(v1CommsRequest, 'test@example.com', 15)
   })
 
   test.each([
@@ -104,7 +104,7 @@ describe('comms request v3 notify error', () => {
       }
     }
 
-    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
     expect(publishRetryRequest).not.toHaveBeenCalled()
   })
@@ -126,7 +126,7 @@ describe('comms request v3 notify error', () => {
 
     updateNotificationStatus.mockRejectedValue(new Error('Test error'))
 
-    await processNotifyError(v3CommsRequest, 'test@example.com', mockError)
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
     expect(mockLogger.error).toHaveBeenCalledWith('Error handling failed notification: Test error')
   })

@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import v3 from '../../../mocks/comms-request/v3.js'
+import v1 from '../../../mocks/comms-request/v1.js'
 
 import { getAllEntities, clearCollection } from '../../../helpers/mongo.js'
 import { getMessages, parseSqsMessage, resetQueue, sendMessage } from '../../../helpers/sqs.js'
@@ -31,7 +31,7 @@ const dataIngestQueueUrl = process.env.DAL_INGEST_QUEUE_URL
 
 const mockLogger = createLogger('test')
 
-describe('v3 comms request processing integration', () => {
+describe('v1 comms request processing integration', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
 
@@ -44,7 +44,7 @@ describe('v3 comms request processing integration', () => {
     startMessaging()
   })
 
-  test('should process a valid V3 comms request', async () => {
+  test('should process a valid v1 comms request', async () => {
     notifyClient.sendEmail.mockResolvedValue({
       data: {
         id: '79389915-7275-457a-b8ca-8bf206b2e67b'
@@ -58,13 +58,11 @@ describe('v3 comms request processing integration', () => {
     })
 
     const mockMessage = {
-      ...v3,
+      ...v1,
       id: '15df79e7-806e-4c85-9372-a2e256a1d597',
       data: {
-        ...v3.data,
-        commsAddresses: [
-          'test@example.com'
-        ]
+        ...v1.data,
+        recipient: 'test@example.com'
       }
     }
 
@@ -124,7 +122,7 @@ describe('v3 comms request processing integration', () => {
           type: 'uk.gov.fcp.sfd.notification.delivered',
           data: {
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
-            commsAddresses: 'test@example.com',
+            recipient: 'test@example.com',
             statusDetails: {
               status: 'delivered'
             }
@@ -135,7 +133,7 @@ describe('v3 comms request processing integration', () => {
       ])
     )
 
-    expect(mockLogger.info).toHaveBeenCalledWith('Comms V3 request processed successfully, eventId: 15df79e7-806e-4c85-9372-a2e256a1d597')
+    expect(mockLogger.info).toHaveBeenCalledWith('Comms V1 request processed successfully, eventId: 15df79e7-806e-4c85-9372-a2e256a1d597')
   })
 
   afterEach(async () => {

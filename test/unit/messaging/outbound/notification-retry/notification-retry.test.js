@@ -1,6 +1,8 @@
 import { afterAll, beforeEach, describe, expect, vi, test } from 'vitest'
+
+import mockCommsRequest from '../../../../mocks/comms-request/v1.js'
+
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
-import mockCommsRequest from '../../../../mocks/comms-request/v3.js'
 import { sqsClient } from '../../../../../src/messaging/sqs/client.js'
 import { publishRetryRequest } from '../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 
@@ -57,7 +59,7 @@ describe('notification retry publish', () => {
         data: {
           ...mockCommsRequest.data,
           correlationId: mockCommsRequest.id,
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       })
     }))
@@ -89,7 +91,7 @@ describe('notification retry publish', () => {
         data: {
           ...mockCommsRequest.data,
           correlationId: 'c5adb509-a25f-430e-a439-e22dc3e7e166',
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       })
     }))

@@ -2,7 +2,7 @@ import Joi from 'joi'
 
 import { sbi, crn, recipient } from '../common/index.js'
 
-const v3 = Joi.object({
+const v1 = Joi.object({
   id: Joi.string().uuid().required(),
   source: Joi.string().required(),
   specversion: Joi.string().required(),
@@ -16,10 +16,7 @@ const v3 = Joi.object({
     sourceSystem: Joi.string().regex(/^[a-z0-9-_]+$/).required(),
     notifyTemplateId: Joi.string().uuid().required(),
     commsType: Joi.string().valid('email').required(),
-    commsAddresses: Joi.alternatives().conditional(Joi.array(), {
-      then: Joi.array().items(recipient).min(1).max(10).required(),
-      otherwise: recipient.required()
-    }).required(),
+    recipient: recipient.required(),
     personalisation: Joi.object().unknown().required(),
     reference: Joi.string().required(),
     oneClickUnsubscribeUrl: Joi.string().uri().optional(),
@@ -27,4 +24,4 @@ const v3 = Joi.object({
   }).required()
 }).label('body').required()
 
-export default v3
+export default v1
