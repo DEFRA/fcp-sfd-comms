@@ -236,7 +236,7 @@ describe('comms request v1 notify success', () => {
       data: {
         ...v1CommsRequest.data,
         correlationId: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
-        commsAddresses: 'test@example.com'
+        recipient: 'test@example.com'
       }
     }
 

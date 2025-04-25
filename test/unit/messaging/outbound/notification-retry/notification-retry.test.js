@@ -59,7 +59,7 @@ describe('notification retry publish', () => {
         data: {
           ...mockCommsRequest.data,
           correlationId: mockCommsRequest.id,
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       })
     }))
@@ -91,7 +91,7 @@ describe('notification retry publish', () => {
         data: {
           ...mockCommsRequest.data,
           correlationId: 'c5adb509-a25f-430e-a439-e22dc3e7e166',
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       })
     }))

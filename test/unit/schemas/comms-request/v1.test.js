@@ -70,7 +70,7 @@ describe('comms request schema v1 validation', () => {
       ['sbi'],
       ['notifyTemplateId'],
       ['commsType'],
-      ['commsAddresses'],
+      ['recipient'],
       ['personalisation'],
       ['reference'],
       ['emailReplyToId']
@@ -234,21 +234,21 @@ describe('comms request schema v1 validation', () => {
     })
   })
 
-  describe('commsAddresses', () => {
-    test('missing commsAddresses should return error', async () => {
-      delete mockV1Message.data.commsAddresses
+  describe('recipient', () => {
+    test('missing recipient should return error', async () => {
+      delete mockV1Message.data.recipient
 
       const [value, error] = await validate(v1, mockV1Message)
 
       expect(value).toBeNull()
       expect(error).toBeTruthy()
       expect(error.details).toContainEqual(expect.objectContaining({
-        message: '"data.commsAddresses" is required'
+        message: '"data.recipient" is required'
       }))
     })
 
     test('email array should return error', async () => {
-      mockV1Message.data.commsAddresses = ['test@example.com']
+      mockV1Message.data.recipient = ['test@example.com']
 
       const [value, error] = await validate(v1, mockV1Message)
 
@@ -257,7 +257,7 @@ describe('comms request schema v1 validation', () => {
     })
 
     test('valid email should return message', async () => {
-      mockV1Message.data.commsAddresses = 'test@example.com'
+      mockV1Message.data.recipient = 'test@example.com'
 
       const [value, error] = await validate(v1, mockV1Message)
 
@@ -266,14 +266,14 @@ describe('comms request schema v1 validation', () => {
     })
 
     test('invalid email should return error', async () => {
-      mockV1Message.data.commsAddresses = 'test@example'
+      mockV1Message.data.recipient = 'test@example'
 
       const [value, error] = await validate(v1, mockV1Message)
 
       expect(value).toBeNull()
       expect(error).toBeTruthy()
       expect(error.details).toContainEqual(expect.objectContaining({
-        message: '"data.commsAddresses" must be a valid email'
+        message: '"data.recipient" must be a valid email'
       }))
     })
 
@@ -296,7 +296,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: 'temp-fail@simulator.notify'
+            recipient: 'temp-fail@simulator.notify'
           }
         }
 
@@ -318,7 +318,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: 'perm-fail@simulator.notify'
+            recipient: 'perm-fail@simulator.notify'
           }
         }
 
@@ -337,7 +337,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: 'temp-fail@simulator.notify'
+            recipient: 'temp-fail@simulator.notify'
           }
         }
 
@@ -359,7 +359,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: 'perm-fail@simulator.notify'
+            recipient: 'perm-fail@simulator.notify'
           }
         }
 
@@ -385,7 +385,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: 'test@example.com'
+            recipient: 'test@example.com'
           }
         }
 
@@ -407,7 +407,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: [
+            recipient: [
               'test@example.com'
             ]
           }
@@ -418,7 +418,7 @@ describe('comms request schema v1 validation', () => {
         expect(value).toBeNull()
         expect(error).toBeTruthy()
         expect(error.details).toContainEqual(expect.objectContaining({
-          message: '"data.commsAddresses" does not match any of the allowed types'
+          message: '"data.recipient" does not match any of the allowed types'
         }))
       })
 
@@ -431,7 +431,7 @@ describe('comms request schema v1 validation', () => {
           ...mockV1Message,
           data: {
             ...mockV1Message.data,
-            commsAddresses: [
+            recipient: [
               'test@example.com'
             ]
           }
@@ -442,7 +442,7 @@ describe('comms request schema v1 validation', () => {
         expect(value).toBeNull()
         expect(error).toBeTruthy()
         expect(error.details).toContainEqual(expect.objectContaining({
-          message: '"data.commsAddresses" must be a string'
+          message: '"data.recipient" must be a string'
         }))
       })
 

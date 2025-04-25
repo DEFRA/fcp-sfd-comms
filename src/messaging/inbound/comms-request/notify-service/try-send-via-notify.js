@@ -3,11 +3,11 @@ import { createLogger } from '../../../../logging/logger.js'
 
 const logger = createLogger()
 
-const trySendViaNotify = async (templateId, emailAddress, params = {}) => {
+const trySendViaNotify = async (templateId, recipient, params = {}) => {
   try {
     const response = await notifyClient.sendEmail(
       templateId,
-      emailAddress,
+      recipient,
       params
     )
 

@@ -41,7 +41,7 @@ const processV1CommsRequest = async (message) => {
     emailReplyToId: data.emailReplyToId
   }
 
-  const recipient = data.commsAddresses
+  const recipient = data.recipient
 
   const [response, notifyError] = await trySendViaNotify(data.notifyTemplateId, recipient, params)
 

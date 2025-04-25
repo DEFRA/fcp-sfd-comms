@@ -31,7 +31,7 @@ describe('Publish retry expired', () => {
       ...mockCommsRequest,
       data: {
         ...mockCommsRequest.data,
-        commsAddresses: 'test@example.com',
+        recipient: 'test@example.com',
         correlationId: '92145216-a3de-45a3-86e6-09cbece4c6a8'
       }
     }
@@ -48,7 +48,7 @@ describe('Publish retry expired', () => {
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: '92145216-a3de-45a3-86e6-09cbece4c6a8',
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         },
         datacontenttype: 'application/json',
         specversion: '1.0'

@@ -44,7 +44,7 @@ describe('Publish Status', () => {
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
-          commsAddresses: recipient,
+          recipient,
           statusDetails: {
             status,
             errorCode: undefined,
@@ -74,7 +74,7 @@ describe('Publish Status', () => {
         time: new Date('2025-01-08T11:00:00.000Z'),
         data: {
           correlationId: mockCommsRequest.id,
-          commsAddresses: recipient,
+          recipient,
           statusDetails: {
             status,
             errorCode: 500,

@@ -123,8 +123,8 @@ components:
           $ref: "#/components/schemas/notifyTemplateId"
         commsType:
           $ref: "#/components/schemas/commsType"
-        commsAddresses:
-          $ref: "#/components/schemas/commsAddresses"
+        recipient:
+          $ref: "#/components/schemas/recipient"
         personalisation:
           $ref: "#/components/schemas/personalisation"
         reference:
@@ -155,8 +155,8 @@ components:
           $ref: '#/components/schemas/notifyTemplateId'
         commsType:
           $ref: '#/components/schemas/commsType'
-        commsAddresses:
-          $ref: '#/components/schemas/commsAddresses'
+        recipient:
+          $ref: '#/components/schemas/recipient'
         personalisation:
           $ref: '#/components/schemas/personalisation'
         reference:
@@ -205,7 +205,7 @@ components:
       example: "email"
       enum: ["email"]
 
-    commsAddresses:
+    recipient:
       type: string
       description: Contact email address
       example: "example-customer1@example.com"

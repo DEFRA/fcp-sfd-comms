@@ -47,10 +47,10 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    const status = await checkNotificationStatus(data.message, data.commsAddresses, notifyId)
+    const status = await checkNotificationStatus(data.message, data.recipient, notifyId)
 
     expect(notifyClient.getNotificationById).toHaveBeenCalledWith(notifyId)
-    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, data.commsAddresses, 'delivered')
+    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, data.recipient, 'delivered')
     expect(status).toEqual('delivered')
   })
 
@@ -59,7 +59,7 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    await expect(checkNotificationStatus(data.message, data.commsAddresses, notifyId))
+    await expect(checkNotificationStatus(data.message, data.recipient, notifyId))
       .rejects.toThrow(`Status check for notification ${notifyId} timed out after 3 attempts`)
 
     expect(notifyClient.getNotificationById).toHaveBeenCalledTimes(3)
@@ -72,7 +72,7 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    await expect(checkNotificationStatus(data.message, data.commsAddresses, notifyId))
+    await expect(checkNotificationStatus(data.message, data.recipient, notifyId))
       .rejects.toThrow(`Status check for notification ${notifyId} timed out after 3 attempts`)
 
     expect(mockLogger.error).toHaveBeenCalledWith(

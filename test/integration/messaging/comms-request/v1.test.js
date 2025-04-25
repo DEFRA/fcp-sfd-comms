@@ -62,7 +62,7 @@ describe('v1 comms request processing integration', () => {
       id: '15df79e7-806e-4c85-9372-a2e256a1d597',
       data: {
         ...v1.data,
-        commsAddresses: 'test@example.com'
+        recipient: 'test@example.com'
       }
     }
 
@@ -107,7 +107,7 @@ describe('v1 comms request processing integration', () => {
           type: 'uk.gov.fcp.sfd.notification.delivered',
           data: {
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
-            commsAddresses: 'test@example.com',
+            recipient: 'test@example.com',
             statusDetails: {
               status: 'delivered'
             }

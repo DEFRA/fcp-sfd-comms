@@ -109,7 +109,7 @@ describe('mongo notification request repository', () => {
         id: '15df79e7-806e-4c85-9372-a2e256a1d597',
         data: {
           ...v1.data,
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       }
 
@@ -132,7 +132,7 @@ describe('mongo notification request repository', () => {
         id: '1096a0cb-5ccd-41ff-973e-36ec0e69d1ed',
         data: {
           ...v1.data,
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       }
 
@@ -172,7 +172,7 @@ describe('mongo notification request repository', () => {
         id: '79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
         data: {
           ...v1.data,
-          commsAddresses: 'test@example.com'
+          recipient: 'test@example.com'
         }
       }
 

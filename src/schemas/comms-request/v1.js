@@ -16,7 +16,7 @@ const v1 = Joi.object({
     sourceSystem: Joi.string().regex(/^[a-z0-9-_]+$/).required(),
     notifyTemplateId: Joi.string().uuid().required(),
     commsType: Joi.string().valid('email').required(),
-    commsAddresses: recipient.required(),
+    recipient: recipient.required(),
     personalisation: Joi.object().unknown().required(),
     reference: Joi.string().required(),
     oneClickUnsubscribeUrl: Joi.string().uri().optional(),

@@ -82,7 +82,7 @@ describe('comms request v1 processor', () => {
         ...v1CommsRequest,
         data: {
           ...v1CommsRequest.data,
-          commsAddresses: 'single@example.com'
+          recipient: 'single@example.com'
         }
       }
 
@@ -107,7 +107,7 @@ describe('comms request v1 processor', () => {
         ...v1CommsRequest,
         data: {
           ...v1CommsRequest.data,
-          commsAddresses: 'single@example.com'
+          recipient: 'single@example.com'
         }
       }
 
@@ -138,7 +138,7 @@ describe('comms request v1 processor', () => {
         ...v1CommsRequest,
         data: {
           ...v1CommsRequest.data,
-          commsAddresses: 'single@example.com'
+          recipient: 'single@example.com'
         }
       }
 

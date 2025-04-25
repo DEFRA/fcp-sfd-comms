@@ -30,14 +30,14 @@ describe('Try sending emails via GOV.UK Notify', () => {
     notifyClient.sendEmail.mockResolvedValue(mockResponse)
     const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.recipient, {
       personalisation: data.personalisation,
       reference: data.reference
     })
 
     expect(notifyClient.sendEmail).toHaveBeenCalledWith(
       data.notifyTemplateId,
-      data.commsAddresses,
+      data.recipient,
       {
         personalisation: data.personalisation,
         reference: data.reference
@@ -68,14 +68,14 @@ describe('Try sending emails via GOV.UK Notify', () => {
 
     const data = mockCommsRequest.data
 
-    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.commsAddresses, {
+    const [response, error] = await trySendViaNotify(data.notifyTemplateId, data.recipient, {
       personalisation: data.personalisation,
       reference: data.reference
     })
 
     expect(notifyClient.sendEmail).toHaveBeenCalledWith(
       data.notifyTemplateId,
-      data.commsAddresses,
+      data.recipient,
       {
         personalisation: data.personalisation,
         reference: data.reference
