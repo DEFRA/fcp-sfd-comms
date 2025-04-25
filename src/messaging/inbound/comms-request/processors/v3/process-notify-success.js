@@ -4,9 +4,9 @@ import { retryableStatus } from '../../../../../constants/notify-statuses.js'
 
 import { createLogger } from '../../../../../logging/logger.js'
 
-import { checkNotificationStatus } from '../../notify-service/check-notification-status.js'
+import { checkNotifyStatusHandler } from '../../../../../services/notify-service/check-notification-status.js'
 import { getOriginalNotificationRequest } from '../../../../../repos/notification-log.js'
-import { checkRetryWindow } from '../../../../../utils/errors.js'
+import { checkRetryable } from '../../../../../utils/errors.js'
 import { publishRetryRequest } from '../../../../outbound/notification-retry/notification-retry.js'
 import { publishStatus } from '../../../../outbound/notification-status/publish-status.js'
 import { publishRetryExpired } from '../../../../outbound/retry-expired/publish-expired.js'
@@ -15,7 +15,7 @@ const logger = createLogger()
 
 const processNotifySuccess = async (message, recipient, response) => {
   try {
-    const status = await checkNotificationStatus(message, recipient, response.data.id)
+    const status = await checkNotifyStatusHandler(message, recipient, response.data.id)
 
     await publishStatus(message, recipient, status)
 
@@ -33,7 +33,7 @@ const processNotifySuccess = async (message, recipient, response) => {
       initialCreation = createdAt
     }
 
-    if (checkRetryWindow(status, initialCreation)) {
+    if (checkRetryable(status, initialCreation)) {
       logger.info(`Scheduling notification retry for message: ${message.id}`)
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     } else {

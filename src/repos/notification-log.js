@@ -36,7 +36,8 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
   try {
     await dbClient.collection(collection).updateOne(
       {
-        'message.id': message.id
+        'message.id': message.id,
+        'message.source' : message.source 
       },
       [
         {
@@ -47,6 +48,9 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
                   {
                     recipient,
                     status,
+                    completed: (status !== notifyStatus.CREATED && status !== notifyStatus.SENDING) 
+                      ? new Date() 
+                      : null,
                     updatedAt: new Date(),
                     ...(error && { error })
                   }
@@ -97,10 +101,38 @@ const getOriginalNotificationRequest = async (correlationId) => {
     })
   }
 }
+const getPendingNotifications = async () => {
+  try {
+    const cursor = dbClient.collection(collection)
+      .find({ 'recipients.completed': null })
+    
+    const pendingNotifications = []
+    
+    for await (const notification of cursor) {
+      pendingNotifications.push(
+        ...(notification.recipients?.filter(r => r.completed === null) || [])
+          .map(recipient => ({
+            id: notification.message.id,
+            message: notification.message,
+            createdAt: notification.createdAt,
+            recipient: recipient.recipient,
+            status: recipient.status
+          }))
+      )
+    }
+    
+    return pendingNotifications
+  } catch (err) {
+    throw new Error(`Error fetching pending notifications: ${err.message}`, {
+      cause: err
+    })
+  }
+}
 
 export {
   addNotificationRequest,
   checkNotificationIdempotency,
   updateNotificationStatus,
-  getOriginalNotificationRequest
+  getOriginalNotificationRequest,
+  getPendingNotifications
 }

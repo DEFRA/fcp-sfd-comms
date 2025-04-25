@@ -35,7 +35,9 @@
     "aws-embedded-metrics": "4.2.0",
     "aws4": "1.13.2",
     "convict": "6.2.4",
+    "cron": "^4.3.0",
     "date-fns": "4.1.0",
+    "exponential-backoff": "^3.1.2",
     "global-agent": "3.0.0",
     "hapi-pino": "12.1.0",
     "hapi-pulse": "3.0.1",
@@ -49,6 +51,7 @@
     "notifications-node-client": "8.2.1",
     "pino": "9.5.0",
     "pino-pretty": "13.0.0",
+    "semaphore": "^1.1.0",
     "sqs-consumer": "11.6.0",
     "undici": "6.21.1"
   },
