@@ -8,6 +8,6 @@ export const buildRetryMessage = (message, recipient) => ({
   data: {
     ...message.data,
     correlationId: message.data.correlationId ?? message.id,
-    commsAddresses: recipient
+    recipient
   }
 })
