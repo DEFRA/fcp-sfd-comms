@@ -5,7 +5,12 @@ import v1 from '../../../mocks/comms-request/v1.js'
 import dbClient from '../../../../src/db/db-client.js'
 
 import { clearCollection, getAllEntities } from '../../../helpers/mongo.js'
-import { addNotificationRequest, checkNotificationIdempotency, getOriginalNotificationRequest, updateNotificationStatus } from '../../../../src/repos/notification-log.js'
+import {
+  addNotificationRequest,
+  checkNotificationIdempotency,
+  getOriginalNotificationRequest,
+  updateNotificationStatus
+} from '../../../../src/repos/notification-log.js'
 
 describe('mongo notification request repository', () => {
   beforeEach(async () => {
@@ -30,6 +35,7 @@ describe('mongo notification request repository', () => {
 
     expect(notificationRequests).toHaveLength(1)
     expect(notificationRequests[0].message).toEqual(mockMessage)
+    expect(notificationRequests[0].statusDetails.status).toEqual('created')
   })
 
   test('should return date of original notification request creation', async () => {
@@ -48,7 +54,7 @@ describe('mongo notification request repository', () => {
       }
     })
 
-    const request = await getOriginalNotificationRequest('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
+    const request = await getOriginalNotificationRequest('source-system', 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
 
     expect(request.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
   })
@@ -115,7 +121,10 @@ describe('mongo notification request repository', () => {
 
       await addNotificationRequest(mockMessage)
 
-      await updateNotificationStatus(mockMessage, 'test@example.com', 'delivered')
+      await updateNotificationStatus(mockMessage, {
+        notificationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
+        status: 'delivered'
+      })
 
       const notificationRequests = await getAllEntities('notificationRequests', {
         'message.id': mockMessage.id
@@ -123,7 +132,7 @@ describe('mongo notification request repository', () => {
 
       expect(notificationRequests).toHaveLength(1)
       expect(notificationRequests[0].message).toEqual(mockMessage)
-      expect(notificationRequests[0].recipients[0].status).toBe('delivered')
+      expect(notificationRequests[0].statusDetails.status).toBe('delivered')
     })
 
     test('update should include error object if provided', async () => {
@@ -137,24 +146,26 @@ describe('mongo notification request repository', () => {
       }
 
       const mockError = {
-        response: {
-          status: 400,
-          data: {
-            error: {
-              status_code: 400,
-              errors: [
-                {
-                  error: 'mock-error'
-                }
-              ]
-            }
+        status: 400,
+        data: {
+          error: {
+            status_code: 400,
+            errors: [
+              {
+                error: 'mock-error'
+              }
+            ]
           }
         }
       }
 
       await addNotificationRequest(mockMessage)
 
-      await updateNotificationStatus(mockMessage, 'test@example.com', 'internal-failure', mockError)
+      await updateNotificationStatus(mockMessage, {
+        notificationId: '1096a0cb-5ccd-41ff-973e-36ec0e69d1ed',
+        status: 'internal-failure',
+        error: mockError.data
+      })
 
       const notificationRequests = await getAllEntities('notificationRequests', {
         'message.id': mockMessage.id
@@ -162,8 +173,8 @@ describe('mongo notification request repository', () => {
 
       expect(notificationRequests).toHaveLength(1)
       expect(notificationRequests[0].message).toEqual(mockMessage)
-      expect(notificationRequests[0].recipients[0].status).toBe('internal-failure')
-      expect(notificationRequests[0].recipients[0].error).toEqual(mockError)
+      expect(notificationRequests[0].statusDetails.status).toBe('internal-failure')
+      expect(notificationRequests[0].statusDetails.error).toEqual(mockError.data)
     })
 
     test('should throw error if connection fails', async () => {
@@ -178,12 +189,13 @@ describe('mongo notification request repository', () => {
 
       await dbClient.client.close()
 
-      await expect(updateNotificationStatus(mockMessage, 'test@example.com', 'delivered'))
-        .rejects
-        .toMatchObject({
-          message: 'Error updating notification status for message id: 79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
-          cause: expect.any(Error)
-        })
+      await expect(updateNotificationStatus(mockMessage, 'test@example.com', {
+        notificationId: '79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
+        status: 'delivered'
+      })).rejects.toMatchObject({
+        message: 'Error updating notification status for message id: 79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
+        cause: expect.any(Error)
+      })
     })
   })
 

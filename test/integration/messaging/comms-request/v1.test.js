@@ -80,7 +80,7 @@ describe('v1 comms request processing integration', () => {
     })
 
     expect(requests).toHaveLength(1)
-    expect(requests[0].recipients[0].status).toBe('delivered')
+    expect(requests[0].statusDetails.status).toBe('delivered')
     expect(requests[0].message).toEqual(mockMessage)
 
     const events = await getMessages(dataIngestQueueUrl)

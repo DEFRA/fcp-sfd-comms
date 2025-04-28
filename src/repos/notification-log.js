@@ -1,12 +1,17 @@
 import dbClient from '../db/db-client.js'
 
+import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
+
 const collection = 'notificationRequests'
 
 const addNotificationRequest = async (message) => {
   try {
     const notification = {
       message,
-      createdAt: new Date()
+      createdAt: new Date(),
+      statusDetails: {
+        status: notifyStatuses.CREATED
+      }
     }
 
     await dbClient.collection(collection).insertOne(notification)
@@ -32,47 +37,37 @@ const checkNotificationIdempotency = async (message) => {
   }
 }
 
-const updateNotificationStatus = async (message, recipient, status, error) => {
+const updateNotificationStatus = async (message, statusDetails) => {
   try {
+    const notification = await dbClient.collection(collection).findOne({
+      'message.source': message.source,
+      'message.id': message.id
+    })
+
+    if (!notification) {
+      throw new Error(`Notification not found for message id: ${message.id}`)
+    }
+
+    const existingStatus = notification.statusDetails
+
+    const { status, error, notificationId } = statusDetails
+
     await dbClient.collection(collection).updateOne(
       {
+        'message.source': message.source,
         'message.id': message.id
       },
-      [
-        {
-          $set: {
-            recipients: {
-              $concatArrays: [
-                [
-                  {
-                    recipient,
-                    status,
-                    updatedAt: new Date(),
-                    ...(error && { error })
-                  }
-                ],
-                {
-                  $ifNull: [
-                    {
-                      $filter: {
-                        input: '$recipients',
-                        as: 'r',
-                        cond: {
-                          $ne: [
-                            '$$r.recipient',
-                            recipient
-                          ]
-                        }
-                      }
-                    },
-                    []
-                  ]
-                }
-              ]
-            }
-          }
+      {
+        $set: {
+          statusDetails: {
+            notificationId: notificationId ?? existingStatus.notificationId,
+            status: status ?? existingStatus.status,
+            error: error ?? existingStatus.error
+          },
+          updatedAt: new Date(),
+          completedAt: finishedStatus.includes(status) ? new Date() : null
         }
-      ]
+      }
     )
   } catch (err) {
     throw new Error(`Error updating notification status for message id: ${message.id}`, {
@@ -81,9 +76,10 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
   }
 }
 
-const getOriginalNotificationRequest = async (correlationId) => {
+const getOriginalNotificationRequest = async (source, correlationId) => {
   try {
     const notification = await dbClient.collection(collection).findOne({
+      'message.source': source,
       'message.id': correlationId
     })
 

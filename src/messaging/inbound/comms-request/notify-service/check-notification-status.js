@@ -9,7 +9,7 @@ const logger = createLogger()
 const maxStatusPollingAttempts = config.get('notify.statusCheckMaxAttempts')
 const statusPollingInterval = config.get('notify.statusCheckInterval')
 
-const checkNotificationStatus = async (message, recipient, notifyId) => {
+const checkNotificationStatus = async (message, notifyId) => {
   let status = null
   let attempts = 0
 
@@ -17,7 +17,9 @@ const checkNotificationStatus = async (message, recipient, notifyId) => {
     try {
       status = await getNotifyStatus(notifyId)
 
-      await updateNotificationStatus(message, recipient, status)
+      await updateNotificationStatus(message, {
+        status
+      })
     } catch (err) {
       logger.error(`Failed checking notification ${notifyId}: ${err.message}`)
     }
