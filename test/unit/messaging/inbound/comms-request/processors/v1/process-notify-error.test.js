@@ -43,7 +43,10 @@ describe('comms request v1 notify error', () => {
 
     await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
-    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, expect.any(String), 'internal-failure', mockError.data)
+    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, {
+      status: 'internal-failure',
+      error: mockError.data
+    })
   })
 
   test('should update notification status to TECHNICAL_FAILURE if request fails with server error', async () => {
@@ -63,7 +66,10 @@ describe('comms request v1 notify error', () => {
 
     await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
 
-    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, expect.any(String), 'technical-failure', mockError.data)
+    expect(updateNotificationStatus).toHaveBeenCalledWith(v1CommsRequest, {
+      status: 'technical-failure',
+      error: mockError.data
+    })
   })
 
   test('should call publish retry if error code is in 5xx range', async () => {

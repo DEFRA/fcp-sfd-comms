@@ -6,7 +6,7 @@ import notifyClient from '../../../../../../src/notify/notify-client.js'
 
 import { createLogger } from '../../../../../../src/logging/logger.js'
 import { updateNotificationStatus } from '../../../../../../src/repos/notification-log.js'
-import { checkNotificationStatus } from '../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
+import { checkNotificationStatus } from '../../../../../../src/services/notify-service/check-notification-status.js'
 
 vi.mock('../../../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({
@@ -47,10 +47,12 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    const status = await checkNotificationStatus(data.message, data.recipient, notifyId)
+    const status = await checkNotificationStatus(data.message, notifyId)
 
     expect(notifyClient.getNotificationById).toHaveBeenCalledWith(notifyId)
-    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, data.recipient, 'delivered')
+    expect(updateNotificationStatus).toHaveBeenCalledWith(data.message, {
+      status: 'delivered'
+    })
     expect(status).toEqual('delivered')
   })
 
@@ -59,7 +61,7 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    await expect(checkNotificationStatus(data.message, data.recipient, notifyId))
+    await expect(checkNotificationStatus(data.message, notifyId))
       .rejects.toThrow(`Status check for notification ${notifyId} timed out after 3 attempts`)
 
     expect(notifyClient.getNotificationById).toHaveBeenCalledTimes(3)
@@ -72,7 +74,7 @@ describe('Check notification status', () => {
     const data = mockCommsRequest.data
     const notifyId = 'mock-notify-id'
 
-    await expect(checkNotificationStatus(data.message, data.recipient, notifyId))
+    await expect(checkNotificationStatus(data.message, notifyId))
       .rejects.toThrow(`Status check for notification ${notifyId} timed out after 3 attempts`)
 
     expect(mockLogger.error).toHaveBeenCalledWith(

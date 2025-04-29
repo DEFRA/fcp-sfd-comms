@@ -4,7 +4,7 @@ import v1CommsRequest from '../../../../../../mocks/comms-request/v1.js'
 
 import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { getOriginalNotificationRequest } from '../../../../../../../src/repos/notification-log.js'
-import { checkNotificationStatus } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js'
+import { checkNotificationStatus } from '../../../../../../../src/services/notify-service/check-notification-status.js'
 import { publishRetryRequest } from '../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 import { publishRetryExpired } from '../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js'
 import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-success.js'
@@ -22,11 +22,8 @@ vi.mock('../../../../../../../src/logging/logger.js', () => ({
 const mockLogger = createLogger()
 
 vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
-
 vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notification-retry.js')
-
 vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js')
-
 vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
 describe('comms request v1 notify success', () => {

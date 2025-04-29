@@ -1,16 +1,20 @@
-import { createLogger } from '../../logging/logger.js'
+import { config } from '../../config/index.js'
+
 import { finishedStatus, retryableStatus } from '../../constants/notify-statuses.js'
-import { 
+
+import { createLogger } from '../../logging/logger.js'
+
+import {
   getOriginalNotificationRequest,
   getPendingNotifications,
   updateNotificationStatus
 } from '../../repos/notification-log.js'
+
 import { getNotifyStatus } from './get-notify-status.js'
 import { publishStatus } from '../../messaging/outbound/notification-status/publish-status.js'
 import { publishRetryExpired } from '../../messaging/outbound/retry-expired/publish-expired.js'
 import { checkRetryable } from '../../utils/errors.js'
 import { publishRetryRequest } from '../../messaging/outbound/notification-retry/notification-retry.js'
-import { config } from '../../config/index.js'
 
 const logger = createLogger()
 

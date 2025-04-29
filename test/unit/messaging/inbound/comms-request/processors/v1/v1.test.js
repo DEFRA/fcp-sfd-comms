@@ -7,7 +7,7 @@ import { createLogger } from '../../../../../../../src/logging/logger.js'
 import { checkNotificationIdempotency } from '../../../../../../../src/repos/notification-log.js'
 import { processNotifySuccess } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-success.js'
 import { processNotifyError } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-error.js'
-import { trySendViaNotify } from '../../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
+import { trySendViaNotify } from '../../../../../../../src/services/notify-service/try-send-via-notify.js'
 import { processV1CommsRequest } from '../../../../../../../src/messaging/inbound/comms-request/processors/v1/v1.js'
 
 vi.mock('../../../../../../../src/logging/logger.js', () => ({
@@ -20,7 +20,7 @@ vi.mock('../../../../../../../src/logging/logger.js', () => ({
 
 vi.mock('../../../../../../../src/repos/notification-log.js')
 
-vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js')
+vi.mock('../../../../../../../src/services/notify-service/try-send-via-notify.js')
 vi.mock('../../../../../../../src/messaging/inbound/comms-request/notify-service/check-notification-status.js')
 vi.mock('../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-success.js')
 vi.mock('../../../../../../../src/messaging/inbound/comms-request/processors/v1/process-notify-error.js')

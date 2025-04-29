@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, vi, test } from 'vitest'
 
-import { checkRetryWindow } from '../../../src/utils/errors.js'
+import { checkRetryable } from '../../../src/utils/errors.js'
 
 describe('error utils', () => {
   beforeAll(() => {
@@ -11,7 +11,7 @@ describe('error utils', () => {
     test('technical failure should return true', () => {
       vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
 
-      const retry = checkRetryWindow('technical-failure', new Date('2025-01-01T11:00:00.000Z'))
+      const retry = checkRetryable('technical-failure', new Date('2025-01-01T11:00:00.000Z'))
 
       expect(retry).toBe(true)
     })
@@ -24,7 +24,7 @@ describe('error utils', () => {
     )('should schedule retry on temporary-failure within retry window (%s)', (time) => {
       vi.setSystemTime(new Date(time))
 
-      const retry = checkRetryWindow('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
+      const retry = checkRetryable('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
 
       expect(retry).toBe(true)
     })
@@ -37,7 +37,7 @@ describe('error utils', () => {
     )('should not schedule retry on temporary-failure outside retry window (%s)', (time) => {
       vi.setSystemTime(new Date(time))
 
-      const retry = checkRetryWindow('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
+      const retry = checkRetryable('temporary-failure', new Date('2025-01-01T11:00:00.000Z'))
 
       expect(retry).toBe(false)
     })

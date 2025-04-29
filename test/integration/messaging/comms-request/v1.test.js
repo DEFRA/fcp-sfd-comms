@@ -80,7 +80,7 @@ describe('v1 comms request processing integration', () => {
     })
 
     expect(requests).toHaveLength(1)
-    expect(requests[0].recipients[0].status).toBe('delivered')
+    expect(requests[0].statusDetails.status).toBe('delivered')
     expect(requests[0].message).toEqual(mockMessage)
 
     const events = await getMessages(dataIngestQueueUrl)
@@ -96,6 +96,21 @@ describe('v1 comms request processing integration', () => {
           type: 'uk.gov.fcp.sfd.notification.received',
           data: {
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
+          },
+          datacontenttype: 'application/json',
+          specversion: '1.0'
+        }),
+        expect.objectContaining({
+          id: expect.any(String),
+          source: 'fcp-sfd-comms',
+          time: expect.any(String),
+          type: 'uk.gov.fcp.sfd.notification.sending',
+          data: {
+            correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
+            recipient: 'test@example.com',
+            statusDetails: {
+              status: 'sending'
+            }
           },
           datacontenttype: 'application/json',
           specversion: '1.0'

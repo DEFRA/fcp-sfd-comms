@@ -1,7 +1,12 @@
-import { config } from '../config/index.js'
-import { checkNotifyStatusHandler } from '../services/notify-service/check-notification-status.js'
 import { CronJob } from 'cron'
 import semaphore from 'semaphore'
+
+import { config } from '../config/index.js'
+
+import { createLogger } from '../logging/logger.js'
+import { checkNotifyStatusHandler } from '../services/notify-service/check-notification-status.js'
+
+const logger = createLogger()
 
 const statusCheckMutex = semaphore(1)
 
