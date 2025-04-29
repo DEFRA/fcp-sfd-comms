@@ -1,12 +1,21 @@
 import dbClient from '../db/db-client.js'
+import { notifyStatuses } from '../constants/notify-statuses.js'
 
 const collection = 'notificationRequests'
 
 const addNotificationRequest = async (message) => {
   try {
+    const recipient = message.data.recipient;
+    
     const notification = {
       message,
-      createdAt: new Date()
+      createdAt: new Date(),
+      recipients: [{
+        recipient,
+        status: notifyStatuses.CREATED,
+        completed: null,
+        updatedAt: new Date()
+      }]
     }
 
     await dbClient.collection(collection).insertOne(notification)
@@ -32,7 +41,7 @@ const checkNotificationIdempotency = async (message) => {
   }
 }
 
-const updateNotificationStatus = async (message, recipient, status, error) => {
+const updateNotificationStatus = async (message, recipient, status, error, notificationId) => {
   try {
     await dbClient.collection(collection).updateOne(
       {
@@ -48,11 +57,12 @@ const updateNotificationStatus = async (message, recipient, status, error) => {
                   {
                     recipient,
                     status,
-                    completed: (status !== notifyStatus.CREATED && status !== notifyStatus.SENDING) 
+                    completed: (status !== notifyStatuses.CREATED && status !== notifyStatuses.SENDING) 
                       ? new Date() 
                       : null,
                     updatedAt: new Date(),
-                    ...(error && { error })
+                    ...(error && { error }),
+                    notificationId
                   }
                 ],
                 {
@@ -103,24 +113,21 @@ const getOriginalNotificationRequest = async (correlationId) => {
 }
 const getPendingNotifications = async () => {
   try {
-    const cursor = dbClient.collection(collection)
-      .find({ 'recipients.completed': null })
-    
-    const pendingNotifications = []
-    
-    for await (const notification of cursor) {
-      pendingNotifications.push(
-        ...(notification.recipients?.filter(r => r.completed === null) || [])
-          .map(recipient => ({
-            id: notification.message.id,
-            message: notification.message,
-            createdAt: notification.createdAt,
-            recipient: recipient.recipient,
-            status: recipient.status
-          }))
-      )
-    }
-    
+    const pendingNotifications = await dbClient.collection(collection)
+      .aggregate([
+        { $match: { 'recipients.completed': null } },
+        { $unwind: '$recipients' },
+        { $project: {
+          _id: 0,
+          id: '$message.id',
+          message: '$message',
+          createdAt: 1,
+          recipient: '$recipients.recipient',
+          status: '$recipients.status',
+          notificationId: '$recipients.notificationId'
+        }}
+      ])
+      .toArray()
     return pendingNotifications
   } catch (err) {
     throw new Error(`Error fetching pending notifications: ${err.message}`, {

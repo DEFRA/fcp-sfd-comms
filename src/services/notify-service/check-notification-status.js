@@ -59,12 +59,11 @@ const checkNotifyStatusHandler = async () => {
 
   for (const notification of pending) {
     try {
-      const status = await getNotifyStatus(notification.id)
+      const status = await getNotifyStatus(notification.notificationId)
 
       if (status === notification.status) {
         continue
       }
-      console.log('status', status)
       await processStatusUpdate(notification, status)
 
       updates += 1
