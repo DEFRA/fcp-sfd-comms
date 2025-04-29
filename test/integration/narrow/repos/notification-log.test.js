@@ -39,9 +39,11 @@ describe('mongo notification request repository', () => {
   })
 
   test('should return date of original notification request creation', async () => {
+    const id = 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+
     await addNotificationRequest({
       ...v1,
-      id: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+      id
     })
 
     await addNotificationRequest({
@@ -50,13 +52,13 @@ describe('mongo notification request repository', () => {
       timestamp: new Date().toISOString(),
       data: {
         ...v1.data,
-        correlationId: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+        correlationId: id
       }
     })
 
-    const request = await getOriginalNotificationRequest('source-system', 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
+    const request = await getOriginalNotificationRequest('source-system', id)
 
-    expect(request.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
+    expect(request.id).toEqual(id)
   })
 
   describe('idempotency check', () => {
@@ -122,7 +124,7 @@ describe('mongo notification request repository', () => {
       await addNotificationRequest(mockMessage)
 
       await updateNotificationStatus(mockMessage, {
-        notificationId: '15df79e7-806e-4c85-9372-a2e256a1d597',
+        notificationId: 'e0cc0e3e-a54c-4372-a8fe-9436111d933e',
         status: 'delivered'
       })
 
@@ -175,6 +177,74 @@ describe('mongo notification request repository', () => {
       expect(notificationRequests[0].message).toEqual(mockMessage)
       expect(notificationRequests[0].statusDetails.status).toBe('internal-failure')
       expect(notificationRequests[0].statusDetails.error).toEqual(mockError.data)
+    })
+
+    test.each([
+      ['notificationId'],
+      ['status'],
+      ['error']
+    ])('should not delete fields if not provided in update', async (field) => {
+      const mockMessage = {
+        ...v1,
+        id: '1096a0cb-5ccd-41ff-973e-36ec0e69d1ed',
+        data: {
+          ...v1.data,
+          recipient: 'test@example.com'
+        }
+      }
+
+      const mockError = {
+        status: 400,
+        data: {
+          error: {
+            status_code: 400,
+            errors: [
+              {
+                error: 'mock-error'
+              }
+            ]
+          }
+        }
+      }
+
+      const notificationId = 'e0cc0e3e-a54c-4372-a8fe-9436111d933e'
+
+      await addNotificationRequest(mockMessage)
+
+      await updateNotificationStatus(mockMessage, {
+        notificationId,
+        status: 'sending',
+        error: mockError.data
+      })
+
+      const update = {
+        notificationId,
+        status: 'internal-failure',
+        error: {
+          status: 400,
+          data: {
+            error: {
+              status_code: 400,
+              errors: [
+                {
+                  error: 'mock-error'
+                }
+              ]
+            }
+          }
+        }
+      }
+
+      delete update[field]
+
+      await updateNotificationStatus(mockMessage, update)
+
+      const notificationRequests = await getAllEntities('notificationRequests', {
+        'message.id': mockMessage.id
+      })
+
+      expect(notificationRequests).toHaveLength(1)
+      expect(notificationRequests[0].statusDetails[field]).toBeTruthy()
     })
 
     test('should throw error if connection fails', async () => {
