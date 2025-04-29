@@ -19,7 +19,11 @@ const processNotifyError = async (message, recipient, notifyError) => {
       ? notifyStatuses.TECHNICAL_FAILURE
       : notifyStatuses.INTERNAL_FAILURE
 
-    await updateNotificationStatus(message, { status, error: notifyError.data })
+    await updateNotificationStatus(message, {
+      status,
+      error: notifyError.data
+    })
+
     await publishStatus(message, recipient, status, notifyError.data)
 
     if (technicalFailure) {

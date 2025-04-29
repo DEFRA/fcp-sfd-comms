@@ -39,18 +39,15 @@ const checkNotificationIdempotency = async (message) => {
 
 const updateNotificationStatus = async (message, statusDetails) => {
   try {
-    const notification = await dbClient.collection(collection).findOne({
-      'message.source': message.source,
-      'message.id': message.id
-    })
+    const statusFields = ['status', 'error', 'notificationId']
 
-    if (!notification) {
-      throw new Error(`Notification not found for message id: ${message.id}`)
+    const update = {}
+
+    for (const field of statusFields) {
+      if (statusDetails[field]) {
+        update[`statusDetails.${field}`] = statusDetails[field]
+      }
     }
-
-    const existingStatus = notification.statusDetails
-
-    const { status, error, notificationId } = statusDetails
 
     await dbClient.collection(collection).updateOne(
       {
@@ -59,13 +56,9 @@ const updateNotificationStatus = async (message, statusDetails) => {
       },
       {
         $set: {
-          statusDetails: {
-            notificationId: notificationId ?? existingStatus.notificationId,
-            status: status ?? existingStatus.status,
-            error: error ?? existingStatus.error
-          },
+          ...update,
           updatedAt: new Date(),
-          completedAt: finishedStatus.includes(status) ? new Date() : null
+          completedAt: finishedStatus.includes(statusDetails.status) ? new Date() : null
         }
       }
     )
