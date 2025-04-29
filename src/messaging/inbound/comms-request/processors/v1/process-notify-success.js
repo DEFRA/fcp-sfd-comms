@@ -20,6 +20,8 @@ const processNotifySuccess = async (message, recipient, response) => {
       status: notifyStatuses.SENDING
     })
 
+    await publishStatus(message, recipient, notifyStatuses.SENDING)
+
     const status = await checkNotificationStatus(message, response.data.id)
 
     await publishStatus(message, recipient, status)
