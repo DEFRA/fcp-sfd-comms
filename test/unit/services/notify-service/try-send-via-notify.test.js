@@ -6,7 +6,7 @@ import notifyClient from '../../../../src/notify/notify-client.js'
 
 import { createLogger } from '../../../../src/logging/logger.js'
 
-import { trySendViaNotify } from '../../../../src/services/notify-service/try-send-via-notify.js'
+import { trySendViaNotify } from '../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {

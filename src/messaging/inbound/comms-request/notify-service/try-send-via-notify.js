@@ -1,5 +1,5 @@
-import notifyClient from '../../notify/notify-client.js'
-import { createLogger } from '../../logging/logger.js'
+import notifyClient from '../../../../notify/notify-client.js'
+import { createLogger } from '../../../../logging/logger.js'
 
 const logger = createLogger()
 

@@ -8,7 +8,7 @@ import {
   addNotificationRequest
 } from '../../../../../repos/notification-log.js'
 
-import { trySendViaNotify } from '../../../../../services/notify-service/try-send-via-notify.js'
+import { trySendViaNotify } from '../../notify-service/try-send-via-notify.js'
 
 import { publishReceivedMessage } from '../../../../outbound/received-request/publish-received.js'
 import { publishInvalidRequest } from '../../../../outbound/invalid-request/publish-invalid.js'
