@@ -9,7 +9,7 @@ import notifyClient from '../../../../src/notify/notify-client.js'
 
 import { createLogger } from '../../../../src/logging/logger.js'
 import { startMessaging, stopMessaging } from '../../../../src/messaging/inbound/inbound.js'
-import { checkNotifyStatusHandler } from '../../../../src/services/notify-service/check-notification-status.js'
+import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {

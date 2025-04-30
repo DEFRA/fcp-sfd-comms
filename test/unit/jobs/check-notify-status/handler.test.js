@@ -8,7 +8,7 @@ import { createLogger } from '../../../../src/logging/logger.js'
 
 import { getPendingNotifications, updateNotificationStatus } from '../../../../src/repos/notification-log.js'
 import { publishStatus } from '../../../../src/messaging/outbound/notification-status/publish-status.js'
-import { checkNotifyStatusHandler } from '../../../../src/services/notify-service/check-notification-status.js'
+import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
 
 vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({
