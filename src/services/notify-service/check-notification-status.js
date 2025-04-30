@@ -19,9 +19,13 @@ import { publishRetryRequest } from '../../messaging/outbound/notification-retry
 const logger = createLogger()
 
 const processStatusUpdate = async (notification, status) => {
-  const { message, createdAt, recipient } = notification
+  const { message, createdAt } = notification
 
-  await updateNotificationStatus(message, recipient, status)
+  const recipient = message.data.recipient
+
+  await updateNotificationStatus(message, {
+    status
+  })
 
   if (finishedStatus.includes(status)) {
     await publishStatus(message, recipient, status)
@@ -50,12 +54,9 @@ const processStatusUpdate = async (notification, status) => {
 }
 
 const checkNotifyStatusHandler = async () => {
-  logger.info('Checking notify status')
-
   const pending = await getPendingNotifications()
 
   if (pending.length === 0) {
-    logger.info('No pending notifications')
     return
   }
 
@@ -63,16 +64,19 @@ const checkNotifyStatusHandler = async () => {
 
   for (const notification of pending) {
     try {
-      const status = await getNotifyStatus(notification.notificationId)
+      const { notificationId } = notification.statusDetails
 
-      if (status === notification.status) {
+      const status = await getNotifyStatus(notificationId)
+
+      if (status === notification.statusDetails.status) {
         continue
       }
+
       await processStatusUpdate(notification, status)
 
       updates += 1
     } catch (error) {
-      logger.error(`Error checking notification ${notification.id}: ${error.message}`)
+      logger.error(`Error checking notification: ${error.message}`)
     }
   }
 

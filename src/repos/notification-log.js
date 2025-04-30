@@ -88,23 +88,19 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
 }
 const getPendingNotifications = async () => {
   try {
-    const pendingNotifications = await dbClient.collection(collection)
-      .aggregate([
-        { $match: { 'recipients.completed': null } },
-        { $unwind: '$recipients' },
-        {
-          $project: {
-            _id: 0,
-            id: '$message.id',
-            message: '$message',
-            createdAt: 1,
-            recipient: '$recipients.recipient',
-            status: '$recipients.status',
-            notificationId: '$recipients.notificationId'
-          }
+    const pendingNotifications = []
+
+    const result = dbClient.collection(collection)
+      .find({
+        'statusDetails.status': {
+          $nin: finishedStatus
         }
-      ])
-      .toArray()
+      })
+
+    for await (const doc of result) {
+      pendingNotifications.push(doc)
+    }
+
     return pendingNotifications
   } catch (err) {
     throw new Error(`Error fetching pending notifications: ${err.message}`, {
