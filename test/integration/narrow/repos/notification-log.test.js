@@ -38,27 +38,51 @@ describe('mongo notification request repository', () => {
     expect(notificationRequests[0].statusDetails.status).toEqual('created')
   })
 
-  test('should return date of original notification request creation', async () => {
-    const id = 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
-
-    await addNotificationRequest({
-      ...v1,
-      id
-    })
-
-    await addNotificationRequest({
-      ...v1,
-      id: '1563596c-a62d-4a7e-b797-04f8c3522a3b',
-      timestamp: new Date().toISOString(),
-      data: {
-        ...v1.data,
-        correlationId: id
+  describe('get original notification request', () => {
+    beforeEach(async () => {
+      if (!dbClient.client.topology?.isConnected()) {
+        await dbClient.client.connect()
       }
+
+      await clearCollection('notificationRequests')
     })
 
-    const request = await getOriginalNotificationRequest('source-system', id)
+    test('should return date of original notification request creation', async () => {
+      const id = 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
 
-    expect(request.id).toEqual(id)
+      await addNotificationRequest({
+        ...v1,
+        id
+      })
+
+      await addNotificationRequest({
+        ...v1,
+        id: '1563596c-a62d-4a7e-b797-04f8c3522a3b',
+        timestamp: new Date().toISOString(),
+        data: {
+          ...v1.data,
+          correlationId: id
+        }
+      })
+
+      const request = await getOriginalNotificationRequest('source-system', id)
+
+      expect(request.id).toEqual(id)
+    })
+
+    test('should return null if no original notification request found', async () => {
+      const request = await getOriginalNotificationRequest('source-system', 'non-existing-id')
+
+      expect(request).toBeNull()
+    })
+
+    test('should throw error if connection fails', async () => {
+      await dbClient.client.close()
+
+      await expect(getOriginalNotificationRequest('source-system', 'non-existing-id'))
+        .rejects
+        .toThrow()
+    })
   })
 
   describe('idempotency check', () => {

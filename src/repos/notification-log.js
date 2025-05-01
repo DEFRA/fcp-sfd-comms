@@ -76,6 +76,10 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
       'message.id': correlationId
     })
 
+    if (!notification) {
+      return null
+    }
+
     return {
       id: notification.message.id,
       createdAt: notification.createdAt

@@ -1,21 +1,21 @@
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 
-import mockCommsRequest from '../../../mocks/comms-request/v1.js'
+import mockCommsRequest from '../../../../../mocks/comms-request/v1.js'
 
-import notifyClient from '../../../../src/notify/notify-client.js'
+import notifyClient from '../../../../../../src/notify/notify-client.js'
 
-import { createLogger } from '../../../../src/logging/logger.js'
+import { createLogger } from '../../../../../../src/logging/logger.js'
 
-import { trySendViaNotify } from '../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
+import { trySendViaNotify } from '../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
 
-vi.mock('../../../../src/notify/notify-client.js', () => ({
+vi.mock('../../../../../../src/notify/notify-client.js', () => ({
   default: {
     sendEmail: vi.fn(),
     getNotificationById: vi.fn()
   }
 }))
 
-vi.mock('../../../../src/logging/logger.js', () => ({
+vi.mock('../../../../../../src/logging/logger.js', () => ({
   createLogger: vi.fn().mockReturnValue({
     info: vi.fn(),
     warn: vi.fn(),

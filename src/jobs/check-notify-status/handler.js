@@ -1,20 +1,15 @@
-import { config } from '../../config/index.js'
-
 import { finishedStatus, retryableStatus } from '../../constants/notify-statuses.js'
 
 import { createLogger } from '../../logging/logger.js'
 
 import {
-  getOriginalNotificationRequest,
   getPendingNotifications,
   updateNotificationStatus
 } from '../../repos/notification-log.js'
 
 import { getNotifyStatus } from './get-notify-status.js'
 import { publishStatus } from '../../messaging/outbound/notification-status/publish-status.js'
-import { publishRetryExpired } from '../../messaging/outbound/retry-expired/publish-expired.js'
-import { checkRetryable } from '../../utils/errors.js'
-import { publishRetryRequest } from '../../messaging/outbound/notification-retry/notification-retry.js'
+import { checkRetry } from './check-retry.js'
 
 const logger = createLogger()
 
@@ -35,22 +30,7 @@ const processStatusUpdate = async (notification, status) => {
     return
   }
 
-  const correlationId = message.data.correlationId
-
-  let intialCreation = new Date(createdAt)
-
-  if (correlationId) {
-    const original = await getOriginalNotificationRequest(correlationId)
-    intialCreation = new Date(original.createdAt)
-  }
-
-  if (checkRetryable(status, intialCreation)) {
-    logger.info(`Scheduling notification retry for request: ${correlationId || message.id}`)
-    await publishRetryRequest(message, recipient, config.get('notify.messageRetries.retryDelay'))
-  } else {
-    logger.info(`Retry window expired for request: ${correlationId || message.id}`)
-    await publishRetryExpired(message, recipient)
-  }
+  await checkRetry(message, createdAt, status)
 }
 
 const checkNotifyStatusHandler = async () => {
