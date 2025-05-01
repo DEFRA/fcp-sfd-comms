@@ -5,8 +5,9 @@ import { publish } from '../../sns/publish.js'
 import { buildReceivedMessage } from './received-message.js'
 import { commsEvents } from '../../../constants/comms-events.js'
 
+const snsTopic = config.get('messaging.commEvents.topicArn')
+
 const logger = createLogger()
-const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
 
 const publishReceivedMessage = async (message) => {
   const type = message.type !== commsEvents.RETRY

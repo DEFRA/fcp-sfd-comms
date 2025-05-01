@@ -1,6 +1,6 @@
 {
   "name": "fcp-sfd-comms",
-  "version": "0.13.0",
+  "version": "0.15.0",
   "description": "Comms Service for Single Front Door",
   "main": "src/index.js",
   "type": "module",
@@ -9,8 +9,8 @@
   },
   "scripts": {
     "pretest": "npm run test:lint",
-    "docker:test": "docker compose down -v && docker compose -f compose.yaml -f compose.test.yaml run  --build --rm 'fcp-sfd-comms'",
-    "docker:test:watch": "docker compose down -v && docker compose -f compose.yaml -f compose.test.yaml -f compose.test.watch.yaml run  --build --rm 'fcp-sfd-comms'",
+    "docker:test": "docker compose -f compose.yaml -f compose.test.yaml run  --build --rm 'fcp-sfd-comms'",
+    "docker:test:watch": "docker compose -f compose.yaml -f compose.test.yaml -f compose.test.watch.yaml run  --build --rm 'fcp-sfd-comms' && docker compose down",
     "test": "rm -rf ./coverage/** && vitest run --coverage",
     "test:watch": "vitest watch",
     "test:lint": "standard",

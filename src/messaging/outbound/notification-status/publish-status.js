@@ -5,8 +5,9 @@ import { config } from '../../../config/index.js'
 import { statusToEventMap } from '../../../constants/comms-events.js'
 import { buildUpdateMessage } from './update-message.js'
 
+const snsTopic = config.get('messaging.commEvents.topicArn')
+
 const logger = createLogger()
-const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
 
 const publishStatus = async (message, recipient, status, error) => {
   const type = statusToEventMap[status]
