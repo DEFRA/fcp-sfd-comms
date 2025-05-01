@@ -36,13 +36,13 @@ describe('mongo notification request repository', () => {
         ...v1,
         id: '94449000-2b17-4f57-847a-66662e074f9f'
       }
-  
+
       await addNotificationRequest(mockMessage)
-  
+
       const notificationRequests = await getAllEntities('notificationRequests', {
         'message.id': mockMessage.id
       })
-  
+
       expect(notificationRequests).toHaveLength(1)
       expect(notificationRequests[0].message).toEqual(mockMessage)
       expect(notificationRequests[0].statusDetails.status).toEqual('created')
