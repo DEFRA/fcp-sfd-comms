@@ -9,7 +9,8 @@ import {
   addNotificationRequest,
   checkNotificationIdempotency,
   getOriginalNotificationRequest,
-  updateNotificationStatus
+  updateNotificationStatus,
+  getPendingNotifications
 } from '../../../../src/repos/notification-log.js'
 
 describe('mongo notification request repository', () => {
@@ -21,21 +22,102 @@ describe('mongo notification request repository', () => {
     await clearCollection('notificationRequests')
   })
 
-  test('should log a notification request', async () => {
-    const mockMessage = {
-      ...v1,
-      id: '94449000-2b17-4f57-847a-66662e074f9f'
-    }
+  describe('add notification request', () => {
+    beforeEach(async () => {
+      if (!dbClient.client.topology?.isConnected()) {
+        await dbClient.client.connect()
+      }
 
-    await addNotificationRequest(mockMessage)
-
-    const notificationRequests = await getAllEntities('notificationRequests', {
-      'message.id': mockMessage.id
+      await clearCollection('notificationRequests')
     })
 
-    expect(notificationRequests).toHaveLength(1)
-    expect(notificationRequests[0].message).toEqual(mockMessage)
-    expect(notificationRequests[0].statusDetails.status).toEqual('created')
+    test('should log a notification request', async () => {
+      const mockMessage = {
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      }
+  
+      await addNotificationRequest(mockMessage)
+  
+      const notificationRequests = await getAllEntities('notificationRequests', {
+        'message.id': mockMessage.id
+      })
+  
+      expect(notificationRequests).toHaveLength(1)
+      expect(notificationRequests[0].message).toEqual(mockMessage)
+      expect(notificationRequests[0].statusDetails.status).toEqual('created')
+    })
+
+    test('should throw error if connection fails', async () => {
+      await dbClient.client.close()
+
+      await expect(addNotificationRequest(v1))
+        .rejects
+        .toThrow()
+    })
+  })
+
+  describe('get pending notifications', () => {
+    beforeEach(async () => {
+      if (!dbClient.client.topology?.isConnected()) {
+        await dbClient.client.connect()
+      }
+
+      await clearCollection('notificationRequests')
+    })
+
+    test('should return notifications where completedAt is null', async () => {
+      await addNotificationRequest({
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      })
+
+      await addNotificationRequest({
+        ...v1,
+        id: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+      })
+
+      await updateNotificationStatus({
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      }, {
+        notificationId: '94449000-2b17-4f57-847a-66662e074f9f',
+        status: 'delivered'
+      })
+
+      const pendingNotifications = await getPendingNotifications()
+
+      expect(pendingNotifications).toHaveLength(1)
+      expect(pendingNotifications[0].message.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
+      expect(pendingNotifications[0].statusDetails.status).toEqual('created')
+    })
+
+    test('should return empty array if no pending notifications', async () => {
+      await addNotificationRequest({
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      })
+
+      await updateNotificationStatus({
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      }, {
+        notificationId: '94449000-2b17-4f57-847a-66662e074f9f',
+        status: 'delivered'
+      })
+
+      const pendingNotifications = await getPendingNotifications()
+
+      expect(pendingNotifications).toHaveLength(0)
+    })
+
+    test('should throw error if connection fails', async () => {
+      await dbClient.client.close()
+
+      await expect(getPendingNotifications())
+        .rejects
+        .toThrow()
+    })
   })
 
   describe('get original notification request', () => {
