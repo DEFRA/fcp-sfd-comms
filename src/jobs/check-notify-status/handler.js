@@ -14,7 +14,7 @@ import { checkRetry } from './check-retry.js'
 const logger = createLogger()
 
 const processStatusUpdate = async (notification, status) => {
-  const { message, createdAt } = notification
+  const { message } = notification
 
   const recipient = message.data.recipient
 
@@ -30,7 +30,7 @@ const processStatusUpdate = async (notification, status) => {
     return
   }
 
-  await checkRetry(message, createdAt, status)
+  await checkRetry(notification, status)
 }
 
 const checkNotifyStatusHandler = async () => {

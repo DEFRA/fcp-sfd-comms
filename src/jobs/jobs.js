@@ -21,7 +21,7 @@ const notifyStatusJob = new CronJob(
 
     statusCheckMutex.take(async () => {
       try {
-        console.log('Running check notify status job')
+        logger.info('Running check notify status job')
         await checkNotifyStatusHandler()
       } catch (error) {
         logger.error('Error running check notify status job:', error.message)

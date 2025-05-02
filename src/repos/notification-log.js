@@ -2,11 +2,14 @@ import dbClient from '../db/db-client.js'
 
 import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
 
+import { UUID } from 'mongodb'
+
 const collection = 'notificationRequests'
 
 const addNotificationRequest = async (message) => {
   try {
     const notification = {
+      _id: new UUID(),
       message,
       createdAt: new Date(),
       statusDetails: {
@@ -105,7 +108,13 @@ const getPendingNotifications = async () => {
       pendingNotifications.push(doc)
     }
 
-    return pendingNotifications
+    return pendingNotifications.map((n) => ({
+      id: n._id,
+      message: n.message,
+      statusDetails: n.statusDetails,
+      createdAt: n.createdAt,
+      updatedAt: n.updatedAt
+    }))
   } catch (err) {
     throw new Error(`Error fetching pending notifications: ${err.message}`, {
       cause: err

@@ -25,14 +25,16 @@ const calculateRequestDate = async (message, createdAt) => {
   return new Date(original.createdAt)
 }
 
-const checkRetry = async (message, createdAt, status) => {
+const checkRetry = async (notification, status) => {
+  const { id: retryId, message, createdAt } = notification
+
   const intialCreation = await calculateRequestDate(message, createdAt)
 
   const { correlationId, recipient } = message.data
 
   if (checkRetryable(status, intialCreation)) {
     logger.info(`Scheduling notification retry for request: ${correlationId || message.id}`)
-    await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
+    await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'), retryId)
   } else {
     logger.info(`Retry window expired for request: ${correlationId || message.id}`)
     await publishRetryExpired(message, recipient)

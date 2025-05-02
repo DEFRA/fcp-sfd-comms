@@ -303,16 +303,16 @@ describe('Check notification status', () => {
     ])('should check for possible retry if status is %s', async (status) => {
       const createdAt = new Date()
 
-      getPendingNotifications.mockResolvedValue([
-        {
-          message: mockCommsRequest,
-          createdAt,
-          statusDetails: {
-            notificationId: '9b80b2ea-a663-4726-bd76-81d301a28b18',
-            status: 'sending'
-          }
+      const mockNotification = {
+        message: mockCommsRequest,
+        createdAt,
+        statusDetails: {
+          notificationId: '9b80b2ea-a663-4726-bd76-81d301a28b18',
+          status: 'sending'
         }
-      ])
+      }
+
+      getPendingNotifications.mockResolvedValue([mockNotification])
 
       notifyClient.getNotificationById.mockResolvedValue({
         data: {
@@ -323,7 +323,7 @@ describe('Check notification status', () => {
       await checkNotifyStatusHandler()
 
       expect(checkRetry).toHaveBeenCalledOnce()
-      expect(checkRetry).toHaveBeenCalledWith(mockCommsRequest, createdAt, status)
+      expect(checkRetry).toHaveBeenCalledWith(mockNotification, status)
     })
 
     test.each([

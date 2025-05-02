@@ -95,8 +95,6 @@ describe('cron job setup', () => {
 
     await import('../../../src/jobs/jobs.js')
 
-    console.log(CronJob.mock.calls)
-
     await CronJob.mock.calls[0][1]()
 
     expect(mockLogger.error).toHaveBeenCalledWith('Error running check notify status job:', 'Error connecting to database')

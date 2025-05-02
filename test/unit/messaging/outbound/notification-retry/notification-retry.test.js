@@ -22,21 +22,17 @@ describe('notification retry publish', () => {
   })
 
   test('should send retry request with minutes delay converted to seconds', async () => {
-    const cryptoSpy = vi.spyOn(crypto, 'randomUUID').mockReturnValue('a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf')
-
-    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15)
+    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15, 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a')
 
     expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
       DelaySeconds: 900
     }))
 
     expect(sqsClient.send).toHaveBeenCalledTimes(1)
-
-    cryptoSpy.mockRestore()
   })
 
   test('should send retry request to correct queue', async () => {
-    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15)
+    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15, 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a')
 
     expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
       QueueUrl: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
@@ -46,15 +42,14 @@ describe('notification retry publish', () => {
   })
 
   test('should send retry correct using message id as correlation id', async () => {
-    const cryptoSpy = vi.spyOn(crypto, 'randomUUID').mockReturnValue('a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf')
-
-    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15)
+    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15, 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a')
 
     expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
       MessageBody: JSON.stringify({
         ...mockCommsRequest,
-        id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
+        id: 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a',
         type: 'uk.gov.fcp.sfd.notification.retry',
+        source: 'fcp-sfd-comms',
         time: new Date('2024-11-18T15:00:00.000Z'),
         data: {
           ...mockCommsRequest.data,
@@ -65,13 +60,9 @@ describe('notification retry publish', () => {
     }))
 
     expect(sqsClient.send).toHaveBeenCalledTimes(1)
-
-    cryptoSpy.mockRestore()
   })
 
   test('should send retry request with correlation id', async () => {
-    const cryptoSpy = vi.spyOn(crypto, 'randomUUID').mockReturnValue('a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf')
-
     const mockMessage = {
       ...mockCommsRequest,
       data: {
@@ -80,13 +71,14 @@ describe('notification retry publish', () => {
       }
     }
 
-    await publishRetryRequest(mockMessage, 'test@example.com', 15)
+    await publishRetryRequest(mockMessage, 'test@example.com', 15, 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf')
 
     expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
       MessageBody: JSON.stringify({
         ...mockCommsRequest,
         id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
         type: 'uk.gov.fcp.sfd.notification.retry',
+        source: 'fcp-sfd-comms',
         time: new Date('2024-11-18T15:00:00.000Z'),
         data: {
           ...mockCommsRequest.data,
@@ -97,8 +89,38 @@ describe('notification retry publish', () => {
     }))
 
     expect(sqsClient.send).toHaveBeenCalledTimes(1)
+  })
 
-    cryptoSpy.mockRestore()
+  test('should send retry request with retry id as message id', async () => {
+    const mockRetryId = 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a'
+
+    const mockMessage = {
+      ...mockCommsRequest,
+      id: mockRetryId,
+      data: {
+        ...mockCommsRequest.data,
+        correlationId: 'c5adb509-a25f-430e-a439-e22dc3e7e166'
+      }
+    }
+
+    await publishRetryRequest(mockMessage, 'test@example.com', 15, mockRetryId)
+
+    expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
+      MessageBody: JSON.stringify({
+        ...mockCommsRequest,
+        id: mockRetryId,
+        type: 'uk.gov.fcp.sfd.notification.retry',
+        source: 'fcp-sfd-comms',
+        time: new Date('2024-11-18T15:00:00.000Z'),
+        data: {
+          ...mockCommsRequest.data,
+          correlationId: 'c5adb509-a25f-430e-a439-e22dc3e7e166',
+          recipient: 'test@example.com'
+        }
+      })
+    }))
+
+    expect(sqsClient.send).toHaveBeenCalledTimes(1)
   })
 
   test('should wrap error on sqs failure', async () => {
