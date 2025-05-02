@@ -3,7 +3,7 @@ import process from 'node:process'
 import { createLogger } from './logging/logger.js'
 import { startServer } from './api/common/helpers/start-server.js'
 import { startMessaging, stopMessaging } from './messaging/inbound/inbound.js'
-import { startJobs } from './jobs/jobs.js'
+import { startJobs, stopJobs } from './jobs/jobs.js'
 
 const server = await startServer()
 
@@ -12,6 +12,7 @@ startJobs()
 
 server.events.on('stop', () => {
   stopMessaging()
+  stopJobs()
 })
 
 process.on('unhandledRejection', (error) => {
