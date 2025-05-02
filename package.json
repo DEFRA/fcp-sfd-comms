@@ -9,8 +9,8 @@
   },
   "scripts": {
     "pretest": "npm run test:lint",
-    "docker:test": "docker compose -f compose.yaml -f compose.test.yaml run  --build --rm 'fcp-sfd-comms' && docker compose down",
-    "docker:test:watch": "docker compose -f compose.yaml -f compose.test.yaml -f compose.test.watch.yaml run  --build --rm 'fcp-sfd-comms' && docker compose down",
+    "docker:test": "docker compose down && docker compose -f compose.yaml -f compose.test.yaml run  --build --rm 'fcp-sfd-comms'",
+    "docker:test:watch": "docker compose down && docker compose -f compose.yaml -f compose.test.yaml -f compose.test.watch.yaml run  --build --rm 'fcp-sfd-comms'",
     "test": "rm -rf ./coverage/** && vitest run --coverage",
     "test:watch": "vitest watch",
     "test:lint": "standard",
