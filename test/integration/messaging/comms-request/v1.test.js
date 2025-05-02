@@ -95,6 +95,7 @@ describe('v1 comms request processing integration', () => {
           time: expect.any(String),
           type: 'uk.gov.fcp.sfd.notification.received',
           data: {
+            ...mockMessage.data,
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
           },
           datacontenttype: 'application/json',

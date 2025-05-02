@@ -33,15 +33,7 @@ describe('Publish Received Message', () => {
       snsClient,
       'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
       expect.objectContaining({
-        id: expect.any(String),
-        source: 'fcp-sfd-comms',
-        type: 'uk.gov.fcp.sfd.notification.received',
-        time: new Date('2025-01-08T11:00:00.000Z'),
-        data: {
-          correlationId: mockCommsRequest.id
-        },
-        datacontenttype: 'application/json',
-        specversion: '1.0'
+        type: 'uk.gov.fcp.sfd.notification.received'
       })
     )
   })
@@ -55,15 +47,22 @@ describe('Publish Received Message', () => {
       snsClient,
       'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
       expect.objectContaining({
-        id: expect.any(String),
-        source: 'fcp-sfd-comms',
-        type: 'uk.gov.fcp.sfd.notification.retry',
-        time: new Date('2025-01-08T11:00:00.000Z'),
+        type: 'uk.gov.fcp.sfd.notification.retry'
+      })
+    )
+  })
+
+  test('should publish include all original message data in event', async () => {
+    await publishReceivedMessage(mockCommsRequest)
+
+    expect(publish).toHaveBeenCalledWith(
+      snsClient,
+      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
+      expect.objectContaining({
         data: {
+          ...mockCommsRequest.data,
           correlationId: mockCommsRequest.id
-        },
-        datacontenttype: 'application/json',
-        specversion: '1.0'
+        }
       })
     )
   })
