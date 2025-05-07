@@ -7,12 +7,11 @@ info:
 channels:
   commsRequestQueue:
     address: fcp_sfd_comms_request
-    description: |
-      Accepts requests for communication notifications via SQS queue.
     messages:
-      commsRequestMessage:
-        $ref: '#/components/messages/commsRequestMessage'
-        contentType: application/json
+      commsRequest:
+        $ref: '#/components/messages/commsRequest'
+      commsRetry:
+        $ref: '#/components/messages/commsRetryRequest'
     bindings:
       sqs:
         queue:
@@ -27,8 +26,6 @@ channels:
           contentBasedDeduplication: false
   commEventsTopic:
     address: fcp_sfd_comm_events
-    description: |
-      Publishes events related to communication notifications via SQS queue.
     messages:
       receivedCommsEvent:
         $ref: '#/components/messages/receivedCommsEvent'
@@ -43,24 +40,40 @@ channels:
 operations:
   processCommsRequest:
     action: receive
+    description: |
+      Process communication request from the SQS queue.
     channel:
       $ref: '#/channels/commsRequestQueue'
     messages:
-      - $ref: '#/channels/commsRequestQueue/messages/commsRequestMessage'
+      - $ref: '#/channels/commsRequestQueue/messages/commsRequest'
+  triggerCommsRetry:
+    action: send
+    description: |
+      Trigger retry for a failed communication request to the SQS queue.
+    channel:
+      $ref: '#/channels/commsRequestQueue'
+    messages:
+      - $ref: '#/channels/commsRequestQueue/messages/commsRetry'
   publishReceivedComms:
     action: send
+    description: |
+      Publish an event when a communication request is received or retried to the SNS topic.
     channel:
       $ref: '#/channels/commEventsTopic'
     messages:
       - $ref: '#/channels/commEventsTopic/messages/receivedCommsEvent'
   publishCommsStatusUpdate:
     action: send
+    description: |
+      Publish an event when the status of a communication request changes to the SNS topic.
     channel:
       $ref: '#/channels/commEventsTopic'
     messages:
       - $ref: '#/channels/commEventsTopic/messages/commsStatusUpdateEvent'
   publishCommsRetryExpired:
     action: send
+    description: |
+      Publish an event when a communication request has exhausted all retry attempts to the SNS topic.
     channel:
       $ref: '#/channels/commEventsTopic'
     messages:
@@ -68,7 +81,7 @@ operations:
 
 components:
   messages:
-    commsRequestMessage:
+    commsRequest:
       name: SFD Comms Request Message
       contentType: application/json
       payload:
@@ -90,7 +103,6 @@ components:
             $ref: '#/components/schemas/specversion'
           type:
             type: string
-            description: Notification request event type
             enum:
               - uk.gov.fcp.sfd.notification.request
           datacontenttype:
@@ -102,6 +114,7 @@ components:
             required:
               - sourceSystem
               - notifyTemplateId
+              - recipient
               - personalisation
               - sbi
               - reference
@@ -128,6 +141,69 @@ components:
               emailReplyToId:
                 $ref: '#/components/schemas/emailReplyToId'
     
+    commsRetryRequest:
+      name: SFD Comms Request Message
+      contentType: application/json
+      payload:
+        type: object
+        required:
+          - id
+          - source
+          - specversion
+          - type
+          - datacontenttype
+          - time
+          - data
+        properties:
+          id:
+            $ref: '#/components/schemas/id'
+          source:
+            $ref: '#/components/schemas/source'
+          specversion:
+            $ref: '#/components/schemas/specversion'
+          type:
+            type: string
+            enum:
+              - uk.gov.fcp.sfd.notification.retry
+          datacontenttype:
+            $ref: '#/components/schemas/datacontenttype'
+          time:
+            $ref: '#/components/schemas/time'
+          data:
+            type: object
+            required:
+              - correlationId
+              - sourceSystem
+              - notifyTemplateId
+              - recipient
+              - personalisation
+              - sbi
+              - reference
+              - emailReplyToId
+            properties:
+              correlationId:
+                $ref: '#/components/schemas/correlationId'
+              crn:
+                $ref: '#/components/schemas/crn'
+              sbi:
+                $ref: '#/components/schemas/sbi'
+              sourceSystem:
+                $ref: '#/components/schemas/sourceSystem'
+              notifyTemplateId:
+                $ref: '#/components/schemas/notifyTemplateId'
+              commsType:
+                $ref: '#/components/schemas/commsType'
+              recipient:
+                $ref: '#/components/schemas/recipient'
+              personalisation:
+                $ref: '#/components/schemas/personalisation'
+              reference:
+                $ref: '#/components/schemas/reference'
+              oneClickUnsubscribeUrl:
+                $ref: '#/components/schemas/oneClickUnsubscribeUrl'
+              emailReplyToId:
+                $ref: '#/components/schemas/emailReplyToId'
+
     receivedCommsEvent:
       contentType: application/json
       payload:
@@ -149,7 +225,6 @@ components:
             $ref: '#/components/schemas/specversion'
           type:
             type: string
-            description: Notification request event type
             enum:
               - uk.gov.fcp.sfd.notification.received
               - uk.gov.fcp.sfd.notification.retry
@@ -212,7 +287,6 @@ components:
             $ref: '#/components/schemas/specversion'
           type:
             type: string
-            description: Status update event types
             enum:
               - uk.gov.fcp.sfd.notification.notfication.sending
               - uk.gov.fcp.sfd.notification.notfication.delivered
@@ -258,7 +332,6 @@ components:
             $ref: '#/components/schemas/specversion'
           type:
             type: string
-            description: Retry expired event type
             enum:
               - uk.gov.fcp.sfd.notification.retry.expired
           datacontenttype:
