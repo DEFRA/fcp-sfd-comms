@@ -6,8 +6,8 @@ import { buildRetryMessage } from './retry-message.js'
 
 const logger = createLogger()
 
-const publishRetryRequest = async (message, recipient, delay) => {
-  const retryMessage = buildRetryMessage(message, recipient)
+const publishRetryRequest = async (message, recipient, delay, retryId) => {
+  const retryMessage = buildRetryMessage(message, recipient, retryId)
 
   const command = new SendMessageCommand({
     QueueUrl: config.get('messaging.commsRequest.queueUrl'),

@@ -1,8 +1,8 @@
 import { commsEvents } from '../../../constants/comms-events.js'
 
-export const buildRetryMessage = (message, recipient) => ({
+export const buildRetryMessage = (message, recipient, retryId) => ({
   ...message,
-  id: crypto.randomUUID(),
+  id: retryId,
   type: commsEvents.RETRY,
   time: new Date(),
   data: {

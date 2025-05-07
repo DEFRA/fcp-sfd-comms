@@ -2,11 +2,14 @@ import dbClient from '../db/db-client.js'
 
 import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
 
+import { UUID } from 'mongodb'
+
 const collection = 'notificationRequests'
 
 const addNotificationRequest = async (message) => {
   try {
     const notification = {
+      _id: new UUID(),
       message,
       createdAt: new Date(),
       statusDetails: {
@@ -76,6 +79,10 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
       'message.id': correlationId
     })
 
+    if (!notification) {
+      return null
+    }
+
     return {
       id: notification.message.id,
       createdAt: notification.createdAt
@@ -86,10 +93,39 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
     })
   }
 }
+const getPendingNotifications = async () => {
+  try {
+    const pendingNotifications = []
+
+    const result = dbClient.collection(collection)
+      .find({
+        'statusDetails.status': {
+          $nin: finishedStatus
+        }
+      })
+
+    for await (const doc of result) {
+      pendingNotifications.push(doc)
+    }
+
+    return pendingNotifications.map((n) => ({
+      id: n._id,
+      message: n.message,
+      statusDetails: n.statusDetails,
+      createdAt: n.createdAt,
+      updatedAt: n.updatedAt
+    }))
+  } catch (err) {
+    throw new Error(`Error fetching pending notifications: ${err.message}`, {
+      cause: err
+    })
+  }
+}
 
 export {
   addNotificationRequest,
   checkNotificationIdempotency,
   updateNotificationStatus,
-  getOriginalNotificationRequest
+  getOriginalNotificationRequest,
+  getPendingNotifications
 }

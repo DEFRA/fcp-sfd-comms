@@ -9,6 +9,7 @@ import notifyClient from '../../../../src/notify/notify-client.js'
 
 import { createLogger } from '../../../../src/logging/logger.js'
 import { startMessaging, stopMessaging } from '../../../../src/messaging/inbound/inbound.js'
+import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {
@@ -74,6 +75,8 @@ describe('v1 comms request processing integration', () => {
     await new Promise((resolve) => {
       setTimeout(resolve, 5000)
     })
+
+    await checkNotifyStatusHandler()
 
     const requests = await getAllEntities('notificationRequests', {
       'message.id': mockMessage.id
