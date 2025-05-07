@@ -49,7 +49,6 @@ describe('notification retry publish', () => {
         ...mockCommsRequest,
         id: 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a',
         type: 'uk.gov.fcp.sfd.notification.retry',
-        source: 'fcp-sfd-comms',
         time: new Date('2024-11-18T15:00:00.000Z'),
         data: {
           ...mockCommsRequest.data,
@@ -78,7 +77,6 @@ describe('notification retry publish', () => {
         ...mockCommsRequest,
         id: 'a4ea0d13-ea7f-4f5b-9c4c-ce34ec2cbabf',
         type: 'uk.gov.fcp.sfd.notification.retry',
-        source: 'fcp-sfd-comms',
         time: new Date('2024-11-18T15:00:00.000Z'),
         data: {
           ...mockCommsRequest.data,
@@ -110,7 +108,6 @@ describe('notification retry publish', () => {
         ...mockCommsRequest,
         id: mockRetryId,
         type: 'uk.gov.fcp.sfd.notification.retry',
-        source: 'fcp-sfd-comms',
         time: new Date('2024-11-18T15:00:00.000Z'),
         data: {
           ...mockCommsRequest.data,

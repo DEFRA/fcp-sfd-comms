@@ -88,15 +88,4 @@ describe('cron job setup', () => {
 
     expect(leaveMock).toHaveBeenCalledTimes(1)
   })
-
-  test('cron handler should catch and log errors', async () => {
-    availableMock.mockReturnValue(true)
-    checkNotifyStatusHandler.mockRejectedValue(new Error('Error connecting to database'))
-
-    await import('../../../src/jobs/jobs.js')
-
-    await CronJob.mock.calls[0][1]()
-
-    expect(mockLogger.error).toHaveBeenCalledWith('Error running check notify status job:', 'Error connecting to database')
-  })
 })

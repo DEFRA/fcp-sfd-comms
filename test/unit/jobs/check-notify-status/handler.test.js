@@ -82,6 +82,24 @@ describe('Check notification status', () => {
       expect(notifyClient.getNotificationById).toHaveBeenCalledWith('9b80b2ea-a663-4726-bd76-81d301a28b18')
       expect(notifyClient.getNotificationById).toHaveBeenCalledWith('65b2ca19-5450-48fe-911a-746bd80c5899')
     })
+
+    test('should log error if get pending notifications fails', async () => {
+      getPendingNotifications.mockRejectedValue(new Error('Database error'))
+
+      await checkNotifyStatusHandler()
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Error fetching pending notifications: Database error'
+      )
+    })
+
+    test('should not log info if no pending notifications', async () => {
+      getPendingNotifications.mockResolvedValue([])
+
+      await checkNotifyStatusHandler()
+
+      expect(mockLogger.info).not.toHaveBeenCalled()
+    })
   })
 
   describe('db status updates', () => {

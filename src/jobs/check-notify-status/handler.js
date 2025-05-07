@@ -34,7 +34,13 @@ const processStatusUpdate = async (notification, status) => {
 }
 
 const checkNotifyStatusHandler = async () => {
-  const pending = await getPendingNotifications()
+  let pending = []
+
+  try {
+    pending = await getPendingNotifications()
+  } catch (error) {
+    logger.error(`Error fetching pending notifications: ${error.message}`)
+  }
 
   if (pending.length === 0) {
     return
