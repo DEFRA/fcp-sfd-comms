@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { CronJob } from 'cron'
 
-import { createLogger } from '../../../src/logging/logger.js'
 import { checkNotifyStatusHandler } from '../../../src/jobs/check-notify-status/handler.js'
 
 const availableMock = vi.fn()
@@ -26,16 +25,6 @@ vi.mock('cron', () => ({
     stop: mockStopJob
   }))
 }))
-
-vi.mock('../../../src/logging/logger.js', () => ({
-  createLogger: vi.fn().mockReturnValue({
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn()
-  })
-}))
-
-const mockLogger = createLogger()
 
 vi.mock('../../../src/jobs/check-notify-status/handler.js')
 
