@@ -31,6 +31,12 @@ export const notifyConfig = {
         default: 15,
         env: 'MESSAGE_RETRY_DELAY'
       }
+    },
+    allowSimulatorEmails: {
+      doc: 'Allow use of GOV Notify simulator emails.',
+      format: Boolean,
+      default: process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development',
+      env: 'ALLOW_SIMULATOR_EMAILS'
     }
   }
 }
