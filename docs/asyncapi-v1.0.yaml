@@ -288,11 +288,11 @@ components:
           type:
             type: string
             enum:
-              - uk.gov.fcp.sfd.notification.notfication.sending
-              - uk.gov.fcp.sfd.notification.notfication.delivered
-              - uk.gov.fcp.sfd.notification.notfication.failure.validation
-              - uk.gov.fcp.sfd.notification.notfication.failure.internal
-              - uk.gov.fcp.sfd.notification.notfication.failure.provider
+              - uk.gov.fcp.sfd.notfication.sending
+              - uk.gov.fcp.sfd.notfication.delivered
+              - uk.gov.fcp.sfd.notfication.failure.validation
+              - uk.gov.fcp.sfd.notfication.failure.internal
+              - uk.gov.fcp.sfd.notfication.failure.provider
           datacontenttype:
             $ref: '#/components/schemas/datacontenttype'
           time:
