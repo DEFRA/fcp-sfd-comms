@@ -6,9 +6,9 @@ import { snsClient } from '../../sns/client.js'
 import { publish } from '../../sns/publish.js'
 import { buildExpiredMessage } from './expired-message.js'
 
-const logger = createLogger()
+const snsTopic = config.get('messaging.commEvents.topicArn')
 
-const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
+const logger = createLogger()
 
 const publishRetryExpired = async (message, recipient) => {
   const expiryMessage = buildExpiredMessage(message, recipient)

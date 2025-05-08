@@ -8,7 +8,7 @@ const isServerErrorCode = (code) => {
   return code >= 500 && code <= 599
 }
 
-const checkRetryWindow = (status, requestTime) => {
+const checkRetryable = (status, requestTime) => {
   if (status === notifyStatuses.TECHNICAL_FAILURE) {
     return true
   }
@@ -28,5 +28,5 @@ const checkRetryWindow = (status, requestTime) => {
 
 export {
   isServerErrorCode,
-  checkRetryWindow
+  checkRetryable
 }

@@ -31,7 +31,7 @@ describe('Publish Received Message', () => {
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
-      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
+      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events',
       expect.objectContaining({
         type: 'uk.gov.fcp.sfd.notification.received'
       })
@@ -45,7 +45,7 @@ describe('Publish Received Message', () => {
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
-      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data.fifo',
+      'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events',
       expect.objectContaining({
         type: 'uk.gov.fcp.sfd.notification.retry'
       })

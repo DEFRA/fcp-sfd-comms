@@ -21,6 +21,12 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 | AWS_ACCESS_KEY_ID         | test                                                   | No                        | AWS Access Key ID.                                                          |
 | AWS_SECRET_ACCESS_KEY     | test                                                   | No                        | AWS Secret Access Key.                                                      |
 | NOTIFY_API_KEY            | n/a - sensitive                                        | Yes                       | Notify API key to perform API requests to GOV.UK Notify. Generate a test one for local development and testing on the [GOV.UK Notify portal](https://www.notifications.service.gov.uk/). API keys used in CDP environments are saved as secrets on the CDP portal. |                                           | Yes                       | Boolean to determine whether to use mock Notify server.                     |
+| MONGO_URI            | mongodb://mongo:27017/                    | No                        | MongoDB connection string.                                                  |
+| SQS_ENDPOINT            | http://localstack:4566                                     | No                        | SQS endpoint to.                                           |
+| SNS_ENDPOINT            | http://localstack:4566                                     | No                        | SNS endpoint to.                                           |
+| COMMS_REQUEST_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request | No                        | SQS queue URL to send comm requests.                       |
+| COMMS_REQUEST_DEAD_LETTER_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter | No                        | Comms Request SQS dead letter queue.                       |
+| COMM_EVENTS_TOPIC_ARN | arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events | No                        | SNS topic ARN to publish comm events to.                                         |
 
 ### Configuration
 
@@ -69,11 +75,6 @@ using a combination of `compose.yaml` and `compose.test.yaml`.
 To run the tests:
 ```
 npm run docker:test
-```
-
-You can also run the tests directly using docker compose:
-```
-docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
 ```
 
 ## Licence
