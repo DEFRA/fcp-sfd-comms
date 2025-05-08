@@ -6,7 +6,8 @@ import { commsEvents } from '../../../constants/comms-events.js'
 import { notifyStatuses } from '../../../constants/notify-statuses.js'
 import { buildInvalidMessage } from './invalid-message.js'
 
-const snsTopic = config.get('messaging.dataAccessLayer.topicArn')
+const snsTopic = config.get('messaging.commEvents.topicArn')
+
 const logger = createLogger()
 
 const publishInvalidRequest = async (message, errors) => {
