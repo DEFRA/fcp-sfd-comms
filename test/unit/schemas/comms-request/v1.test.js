@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import mockV1CommsRequest from '../../../mocks/comms-request/v1.js'
 import environments from '../../../../src/constants/environments.js'
@@ -372,6 +372,46 @@ describe('comms request schema v1 validation', () => {
         }))
       })
 
+      test('should allow temp fail simulator email in production environment if overridden', async () => {
+        process.env.NODE_ENV = environments.PRODUCTION
+        process.env.ALLOW_SIMULATOR_EMAILS = true
+
+        const { v1: mockedV1 } = await import('../../../../src/schemas/comms-request/index.js')
+
+        const message = {
+          ...mockV1Message,
+          data: {
+            ...mockV1Message.data,
+            recipient: 'temp-fail@simulator.notify'
+          }
+        }
+
+        const [value, error] = await validate(mockedV1, message)
+
+        expect(value).toBeTruthy()
+        expect(error).toBeNull()
+      })
+
+      test('should allow perm fail simulator email in production environment if overridden', async () => {
+        process.env.NODE_ENV = environments.PRODUCTION
+        process.env.ALLOW_SIMULATOR_EMAILS = true
+
+        const { v1: mockedV1 } = await import('../../../../src/schemas/comms-request/index.js')
+
+        const message = {
+          ...mockV1Message,
+          data: {
+            ...mockV1Message.data,
+            recipient: 'temp-fail@simulator.notify'
+          }
+        }
+
+        const [value, error] = await validate(mockedV1, message)
+
+        expect(value).toBeTruthy()
+        expect(error).toBeNull()
+      })
+
       test.each([
         environments.DEVELOPMENT,
         environments.TEST,
@@ -422,7 +462,7 @@ describe('comms request schema v1 validation', () => {
         }))
       })
 
-      test('should reject array of emails in production environment with string error', async (env) => {
+      test('should reject array of emails in production environment with string error', async () => {
         process.env.NODE_ENV = environments.PRODUCTION
 
         const { v1: mockedV1 } = await import('../../../../src/schemas/comms-request/index.js')
@@ -446,8 +486,10 @@ describe('comms request schema v1 validation', () => {
         }))
       })
 
-      afterAll(() => {
-        process.env = originalEnv
+      afterEach(() => {
+        process.env = {
+          ...originalEnv
+        }
       })
     })
   })
