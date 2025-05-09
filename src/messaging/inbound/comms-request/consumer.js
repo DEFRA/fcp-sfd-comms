@@ -12,8 +12,6 @@ const startCommsListener = (sqsClient) => {
   commsRequestConsumer = Consumer.create({
     queueUrl: config.get('messaging.commsRequest.queueUrl'),
     batchSize: config.get('messaging.batchSize'),
-    visibilityTimeout: config.get('messaging.visibilityTimeout'),
-    heartbeatInterval: config.get('messaging.heartbeatInterval'),
     waitTimeSeconds: config.get('messaging.waitTimeSeconds'),
     pollingWaitTime: config.get('messaging.pollingWaitTime'),
     handleMessageBatch: async (messages) => handleCommRequestMessages(messages),
