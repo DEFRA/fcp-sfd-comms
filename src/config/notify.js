@@ -18,6 +18,26 @@ export const notifyConfig = {
       default: 5000,
       env: 'STATUS_CHECK_INTERVAL'
     },
+    apiRetries: {
+      maxRetries: {
+        doc: 'Maximum number of retries for Notify API calls.',
+        format: 'int',
+        default: 10,
+        env: 'NOTIFY_API_MAX_RETRIES'
+      },
+      maxDelay: {
+        doc: 'Maximum delay between retries for Notify API calls in milliseconds.',
+        format: 'int',
+        default: 10000,
+        env: 'NOTIFY_API_MAX_DELAY'
+      },
+      startingDelay: {
+        doc: 'Starting delay between retries for Notify API calls in milliseconds.',
+        format: 'int',
+        default: 500,
+        env: 'NOTIFY_API_STARTING_DELAY'
+      }
+    },
     retries: {
       temporaryFailureTimeout: {
         doc: 'Timeout in hours for temporary failure retries.',

@@ -16,7 +16,7 @@ services:
       NOTIFY_API_KEY: test
       COMMS_REQUEST_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request
       COMMS_REQUEST_DEAD_LETTER_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter
-      DAL_INGEST_QUEUE_URL: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_data_ingest.fifo'
+      DAL_INGEST_QUEUE_URL: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_data_ingest'
     volumes:
       - ./src/:/home/node/src
       - ./test/:/home/node/test

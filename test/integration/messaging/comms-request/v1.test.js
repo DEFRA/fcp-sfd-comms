@@ -9,6 +9,7 @@ import notifyClient from '../../../../src/notify/notify-client.js'
 
 import { createLogger } from '../../../../src/logging/logger.js'
 import { startMessaging, stopMessaging } from '../../../../src/messaging/inbound/inbound.js'
+import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {
@@ -75,6 +76,8 @@ describe('v1 comms request processing integration', () => {
       setTimeout(resolve, 5000)
     })
 
+    await checkNotifyStatusHandler()
+
     const requests = await getAllEntities('notificationRequests', {
       'message.id': mockMessage.id
     })
@@ -95,6 +98,7 @@ describe('v1 comms request processing integration', () => {
           time: expect.any(String),
           type: 'uk.gov.fcp.sfd.notification.received',
           data: {
+            ...mockMessage.data,
             correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
           },
           datacontenttype: 'application/json',
