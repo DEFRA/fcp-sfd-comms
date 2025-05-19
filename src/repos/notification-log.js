@@ -18,9 +18,9 @@ const addNotificationRequest = async (message) => {
     }
 
     await dbClient.collection(collection).insertOne(notification)
-  } catch (err) {
-    throw new Error(`Error logging notification request: ${err.message}`, {
-      cause: err
+  } catch (error) {
+    throw new Error(`Error logging notification request: ${error.message}`, {
+      cause: error
     })
   }
 }
@@ -33,9 +33,9 @@ const checkNotificationIdempotency = async (message) => {
     })
 
     return notification != null
-  } catch (err) {
-    throw new Error(`Error checking idempotency token: ${err.message}`, {
-      cause: err
+  } catch (error) {
+    throw new Error(`Error checking idempotency token: ${error.message}`, {
+      cause: error
     })
   }
 }
@@ -65,9 +65,9 @@ const updateNotificationStatus = async (message, statusDetails) => {
         }
       }
     )
-  } catch (err) {
+  } catch (error) {
     throw new Error(`Error updating notification status for message id: ${message.id}`, {
-      cause: err
+      cause: error
     })
   }
 }
@@ -87,9 +87,9 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
       id: notification.message.id,
       createdAt: notification.createdAt
     }
-  } catch (err) {
+  } catch (error) {
     throw new Error(`Error finding original notification for correlationId: ${correlationId}`, {
-      cause: err
+      cause: error
     })
   }
 }
@@ -115,9 +115,9 @@ const getPendingNotifications = async () => {
       createdAt: n.createdAt,
       updatedAt: n.updatedAt
     }))
-  } catch (err) {
-    throw new Error(`Error fetching pending notifications: ${err.message}`, {
-      cause: err
+  } catch (error) {
+    throw new Error(`Error fetching pending notifications: ${error.message}`, {
+      cause: error
     })
   }
 }

@@ -30,8 +30,8 @@ const processNotifyError = async (message, recipient, notifyError) => {
       logger.info(`Scheduling notification retry for message: ${message.id}`)
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     }
-  } catch (err) {
-    logger.error(`Error handling failed notification: ${err.message}`)
+  } catch (error) {
+    logger.error(`Error handling failed notification: ${error.message}`)
   }
 }
 

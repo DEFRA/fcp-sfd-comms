@@ -18,8 +18,8 @@ const publishReceivedMessage = async (message) => {
 
   try {
     await publish(snsClient, snsTopic, receivedMessage)
-  } catch (err) {
-    logger.error('Error publishing received message to SNS:', { cause: err })
+  } catch (error) {
+    logger.error('Error publishing received message to SNS:', { cause: error })
   }
 }
 

@@ -17,8 +17,8 @@ const publishRetryRequest = async (message, recipient, delay, retryId) => {
 
   try {
     await sqsClient.send(command)
-  } catch (err) {
-    logger.error(`Error publishing retry message: ${err.message}`, { cause: err })
+  } catch (error) {
+    logger.error(`Error publishing retry message: ${error.message}`, { cause: error })
   }
 }
 

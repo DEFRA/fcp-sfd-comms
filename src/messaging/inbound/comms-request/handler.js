@@ -16,8 +16,8 @@ const handleCommRequestMessages = async (messages) => {
       const processor = getCommsProcessor(content)
 
       await processor(content)
-    } catch (err) {
-      logger.error(`Error processing message: ${err.message}`)
+    } catch (error) {
+      logger.error(`Error processing message: ${error.message}`)
     }
 
     completed.push(message)

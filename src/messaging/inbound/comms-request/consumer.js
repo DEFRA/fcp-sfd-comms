@@ -26,16 +26,16 @@ const startCommsListener = (sqsClient) => {
     logger.info('Comms request consumer stopped')
   })
 
-  commsRequestConsumer.on('error', (err) => {
-    logger.error(`Error during comms request message handling: ${err.message}`)
+  commsRequestConsumer.on('error', (error) => {
+    logger.error(`Error during comms request message handling: ${error.message}`)
   })
 
-  commsRequestConsumer.on('processing_error', (err) => {
-    logger.error(`Error during comms request message processing: ${err.message}`)
+  commsRequestConsumer.on('processing_error', (error) => {
+    logger.error(`Error during comms request message processing: ${error.message}`)
   })
 
-  commsRequestConsumer.on('timeout_error', (err) => {
-    logger.error(`Timeout error during comms request message handling: ${err.message}`)
+  commsRequestConsumer.on('timeout_error', (error) => {
+    logger.error(`Timeout error during comms request message handling: ${error.message}`)
   })
 
   commsRequestConsumer.start()
