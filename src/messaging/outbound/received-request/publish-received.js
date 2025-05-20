@@ -19,7 +19,7 @@ const publishReceivedMessage = async (message) => {
   try {
     await publish(snsClient, snsTopic, receivedMessage)
   } catch (error) {
-    logger.error('Error publishing received message to SNS:', { cause: error })
+    logger.error(error, 'Error publishing comms request received event')
   }
 }
 

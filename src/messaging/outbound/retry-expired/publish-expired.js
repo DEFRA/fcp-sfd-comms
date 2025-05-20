@@ -16,7 +16,7 @@ const publishRetryExpired = async (message, recipient) => {
   try {
     await publish(snsClient, snsTopic, expiryMessage)
   } catch (error) {
-    logger.error(`Error publishing retry expiry to SNS: ${error.message}`)
+    logger.error(error, 'Error publishing comms request retry expiry event')
   }
 }
 

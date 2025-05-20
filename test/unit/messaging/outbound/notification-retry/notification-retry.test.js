@@ -3,6 +3,8 @@ import { afterAll, beforeEach, describe, expect, vi, test } from 'vitest'
 import mockCommsRequest from '../../../../mocks/comms-request/v1.js'
 
 import { SendMessageCommand } from '@aws-sdk/client-sqs'
+
+import { createLogger } from '../../../../../src/logging/logger.js'
 import { sqsClient } from '../../../../../src/messaging/sqs/client.js'
 import { publishRetryRequest } from '../../../../../src/messaging/outbound/notification-retry/notification-retry.js'
 
@@ -13,6 +15,16 @@ vi.mock('../../../../../src/messaging/sqs/client.js', () => ({
     send: vi.fn()
   }
 }))
+
+vi.mock('../../../../../src/logging/logger.js', () => ({
+  createLogger: vi.fn().mockReturnValue({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  })
+}))
+
+const mockLogger = createLogger()
 
 describe('notification retry publish', () => {
   beforeEach(() => {
@@ -120,12 +132,19 @@ describe('notification retry publish', () => {
     expect(sqsClient.send).toHaveBeenCalledTimes(1)
   })
 
-  test('should wrap error on sqs failure', async () => {
-    const mockError = new Error('test error')
+  test('should log error if send fails', async () => {
+    const mockRetryId = 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a'
+
+    const mockError = new Error('Publish error')
 
     sqsClient.send.mockRejectedValue(mockError)
 
-    await expect(publishRetryRequest(mockCommsRequest, 'test@example.com', 15)).resolves.toBeUndefined()
+    await publishRetryRequest(mockCommsRequest, 'test@example.com', 15, mockRetryId)
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      mockError,
+      'Error publishing comms retry request'
+    )
   })
 
   afterAll(() => {

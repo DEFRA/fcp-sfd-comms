@@ -31,7 +31,7 @@ const processNotifyError = async (message, recipient, notifyError) => {
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     }
   } catch (error) {
-    logger.error(`Error handling failed notification: ${error.message}`)
+    logger.error(error, `Error processing gov notify error response for message: ${message.source}-${message.id}`)
   }
 }
 

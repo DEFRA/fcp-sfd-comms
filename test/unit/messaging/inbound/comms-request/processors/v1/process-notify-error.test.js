@@ -116,7 +116,7 @@ describe('comms request v1 notify error', () => {
   })
 
   test('should log error if exception thrown', async () => {
-    const mockError = {
+    const mockNotifyError = {
       status: 400,
       data: {
         error: {
@@ -130,10 +130,15 @@ describe('comms request v1 notify error', () => {
       }
     }
 
-    updateNotificationStatus.mockRejectedValue(new Error('Test error'))
+    const mockError = new Error('Test error')
 
-    await processNotifyError(v1CommsRequest, 'test@example.com', mockError)
+    updateNotificationStatus.mockRejectedValue(mockError)
 
-    expect(mockLogger.error).toHaveBeenCalledWith('Error handling failed notification: Test error')
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockNotifyError)
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      mockError,
+      `Error processing gov notify error response for message: ${v1CommsRequest.source}-${v1CommsRequest.id}`
+    )
   })
 })

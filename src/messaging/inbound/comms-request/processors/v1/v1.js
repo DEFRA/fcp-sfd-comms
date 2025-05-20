@@ -23,7 +23,7 @@ const processV1CommsRequest = async (message) => {
 
   if (error) {
     await publishInvalidRequest(message, error)
-    return logger.error(`Invalid comms V1 payload: ${error.details.map(d => d.message)}`)
+    return logger.warn(`Invalid comms V1 payload: ${error.details.map(d => d.message)}`)
   }
 
   if (await checkNotificationIdempotency(validated)) {

@@ -23,7 +23,7 @@ const publishStatus = async (message, recipient, status, error) => {
   try {
     await publish(snsClient, snsTopic, statusMessage)
   } catch (error) {
-    logger.error('Error publishing comms event status details to SNS:', { cause: error })
+    logger.error(error, 'Error publishing comms request status update event')
   }
 }
 

@@ -84,12 +84,15 @@ describe('Check notification status', () => {
     })
 
     test('should log error if get pending notifications fails', async () => {
-      getPendingNotifications.mockRejectedValue(new Error('Database error'))
+      const mockError = new Error('Database error')
+
+      getPendingNotifications.mockRejectedValue(mockError)
 
       await checkNotifyStatusHandler()
 
       expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error fetching pending notifications: Database error'
+        mockError,
+        'Error checking pending notifications'
       )
     })
 
@@ -240,12 +243,15 @@ describe('Check notification status', () => {
       }
     ])
 
-    notifyClient.getNotificationById.mockRejectedValue(new Error('Failed to fetch status'))
+    const mockError = new Error('Failed to fetch status')
+
+    notifyClient.getNotificationById.mockRejectedValue(mockError)
 
     await checkNotifyStatusHandler()
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      'Error checking notification: Failed to fetch status'
+      mockError,
+      'Error checking notification 9b80b2ea-a663-4726-bd76-81d301a28b18'
     )
   })
 

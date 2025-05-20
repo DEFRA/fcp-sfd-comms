@@ -27,15 +27,15 @@ const startCommsListener = (sqsClient) => {
   })
 
   commsRequestConsumer.on('error', (error) => {
-    logger.error(`Error during comms request message handling: ${error.message}`)
+    logger.error(error, 'Unhandled SQS error in comms request consumer')
   })
 
   commsRequestConsumer.on('processing_error', (error) => {
-    logger.error(`Error during comms request message processing: ${error.message}`)
+    logger.error(error, 'Unhandled error during comms request processing')
   })
 
   commsRequestConsumer.on('timeout_error', (error) => {
-    logger.error(`Timeout error during comms request message handling: ${error.message}`)
+    logger.error(error, 'Comms request processing has reached configured timeout')
   })
 
   commsRequestConsumer.start()

@@ -40,6 +40,7 @@ describe('mongo notification request repository', () => {
       await addNotificationRequest(mockMessage)
 
       const notificationRequests = await getAllEntities('notificationRequests', {
+        'message.source': mockMessage.source,
         'message.id': mockMessage.id
       })
 
@@ -49,11 +50,19 @@ describe('mongo notification request repository', () => {
     })
 
     test('should throw error if connection fails', async () => {
+      const mockMessage = {
+        ...v1,
+        id: '94449000-2b17-4f57-847a-66662e074f9f'
+      }
+
       await dbClient.client.close()
 
-      await expect(addNotificationRequest(v1))
+      await expect(addNotificationRequest(mockMessage))
         .rejects
-        .toThrow()
+        .toMatchObject({
+          message: `Error adding notification request for ${mockMessage.source}-${mockMessage.id}`,
+          cause: expect.any(Error)
+        })
     })
   })
 
@@ -116,7 +125,10 @@ describe('mongo notification request repository', () => {
 
       await expect(getPendingNotifications())
         .rejects
-        .toThrow()
+        .toMatchObject({
+          message: 'Error fetching pending notifications',
+          cause: expect.any(Error)
+        })
     })
   })
 
@@ -163,7 +175,10 @@ describe('mongo notification request repository', () => {
 
       await expect(getOriginalNotificationRequest('source-system', 'non-existing-id'))
         .rejects
-        .toThrow()
+        .toMatchObject({
+          message: 'Error finding original notification for correlation id: non-existing-id',
+          cause: expect.any(Error)
+        })
     })
   })
 
@@ -188,23 +203,31 @@ describe('mongo notification request repository', () => {
       ['source-system', '583a2f5b-edb4-4580-bcdb-fb3b312ec4c8'],
       ['another-source-system', '79389915-7275-457a-b8ca-8bf206b2e67b']
     ])('should return false if source/id %s-%s combination does not exist', async (source, id) => {
-      const message = {
+      const mockMessage = {
         ...v1,
         source,
         id
       }
 
-      const idempotencyCheck = await checkNotificationIdempotency(message)
+      const idempotencyCheck = await checkNotificationIdempotency(mockMessage)
 
       expect(idempotencyCheck).toBe(false)
     })
 
     test('should throw error if connection fails', async () => {
+      const mockMessage = {
+        ...v1,
+        id: '583a2f5b-edb4-4580-bcdb-fb3b312ec4c8'
+      }
+
       await dbClient.client.close()
 
-      await expect(checkNotificationIdempotency(v1))
+      await expect(checkNotificationIdempotency(mockMessage))
         .rejects
-        .toThrow()
+        .toMatchObject({
+          message: `Error checking idempotency token ${mockMessage.source}-${mockMessage.id}`,
+          cause: expect.any(Error)
+        })
     })
   })
 
@@ -369,7 +392,7 @@ describe('mongo notification request repository', () => {
         notificationId: '79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
         status: 'delivered'
       })).rejects.toMatchObject({
-        message: 'Error updating notification status for message id: 79a1d125-c8eb-40ec-8b97-ae5c8eb9bcbb',
+        message: `Error updating notification status for ${mockMessage.source}-${mockMessage.id}`,
         cause: expect.any(Error)
       })
     })

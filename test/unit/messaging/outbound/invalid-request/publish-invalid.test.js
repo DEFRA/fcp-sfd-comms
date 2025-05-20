@@ -63,15 +63,20 @@ describe('Publish Invalid Request', () => {
     )
   })
 
-  test('should log an error if publish fails', async () => {
+  test('should log error if publish fails', async () => {
     const message = { id: '9F37DA7E-4422-40C6-983C-85F692477BE6', type: 'some-event' }
     const errors = { details: [{ message: 'Invalid field' }] }
 
-    publish.mockRejectedValue(new Error('Publish error'))
+    const mockError = new Error('Publish error')
+
+    publish.mockRejectedValue(mockError)
 
     await publishInvalidRequest(message, errors)
 
-    expect(mockLogger.error).toHaveBeenCalledWith('Error publishing invalid request to SNS: Publish error')
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      mockError,
+      'Error publishing invalid comms request event'
+    )
   })
 
   afterAll(() => {

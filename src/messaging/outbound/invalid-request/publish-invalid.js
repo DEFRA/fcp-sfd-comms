@@ -24,7 +24,7 @@ const publishInvalidRequest = async (message, errors) => {
   try {
     await publish(snsClient, snsTopic, invalidRequest)
   } catch (error) {
-    logger.error(`Error publishing invalid request to SNS: ${error.message}`)
+    logger.error(error, 'Error publishing invalid comms request event')
   }
 }
 
