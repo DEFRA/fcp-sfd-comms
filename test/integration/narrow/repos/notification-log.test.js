@@ -61,7 +61,7 @@ describe('mongo notification request repository', () => {
         .rejects
         .toMatchObject({
           message: `Error adding notification request for ${mockMessage.source}-${mockMessage.id}`,
-          cause: expect.any(Error)
+          name: 'MongoNotConnectedError'
         })
     })
   })
@@ -127,7 +127,7 @@ describe('mongo notification request repository', () => {
         .rejects
         .toMatchObject({
           message: 'Error fetching pending notifications',
-          cause: expect.any(Error)
+          name: 'MongoNotConnectedError'
         })
     })
   })
@@ -176,8 +176,8 @@ describe('mongo notification request repository', () => {
       await expect(getOriginalNotificationRequest('source-system', 'non-existing-id'))
         .rejects
         .toMatchObject({
-          message: 'Error finding original notification for correlation id: non-existing-id',
-          cause: expect.any(Error)
+          message: 'Error finding original notification for correlation id non-existing-id',
+          name: 'MongoNotConnectedError'
         })
     })
   })
@@ -226,7 +226,7 @@ describe('mongo notification request repository', () => {
         .rejects
         .toMatchObject({
           message: `Error checking idempotency token ${mockMessage.source}-${mockMessage.id}`,
-          cause: expect.any(Error)
+          name: 'MongoNotConnectedError'
         })
     })
   })
@@ -393,7 +393,7 @@ describe('mongo notification request repository', () => {
         status: 'delivered'
       })).rejects.toMatchObject({
         message: `Error updating notification status for ${mockMessage.source}-${mockMessage.id}`,
-        cause: expect.any(Error)
+        name: 'MongoNotConnectedError'
       })
     })
   })

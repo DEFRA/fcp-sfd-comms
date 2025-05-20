@@ -9,13 +9,13 @@ const snsTopic = config.get('messaging.commEvents.topicArn')
 
 const logger = createLogger()
 
-const publishStatus = async (message, recipient, status, error) => {
+const publishStatus = async (message, recipient, status, notifyError) => {
   const type = statusToEventMap[status]
 
   const statusDetails = {
     status,
-    errorCode: error?.status_code,
-    errors: error?.errors
+    errorCode: notifyError?.status_code,
+    errors: notifyError?.errors
   }
 
   const statusMessage = buildUpdateMessage(message, recipient, type, statusDetails)
