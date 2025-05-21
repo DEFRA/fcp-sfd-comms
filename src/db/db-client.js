@@ -11,6 +11,7 @@ const logger = createLogger()
 const secureContext = createSecureContext(logger)
 
 const client = await MongoClient.connect(config.get('mongo.mongoUri'), {
+  connectTimeoutMS: 10000,
   retryWrites: false,
   readPreference: 'secondary',
   ...(secureContext && { secureContext })

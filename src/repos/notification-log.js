@@ -1,8 +1,9 @@
 import dbClient from '../db/db-client.js'
 
-import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
+import { MongoError, UUID } from 'mongodb'
 
-import { UUID } from 'mongodb'
+import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
+import { DatabaseError } from '../errors/database-errors.js'
 
 const collection = 'notificationRequests'
 
@@ -18,10 +19,18 @@ const addNotificationRequest = async (message) => {
     }
 
     await dbClient.collection(collection).insertOne(notification)
-  } catch (err) {
-    throw new Error(`Error logging notification request: ${err.message}`, {
-      cause: err
-    })
+  } catch (error) {
+    if (error instanceof MongoError) {
+      throw new DatabaseError(
+        `Error adding notification request for ${message.source}-${message.id}`,
+        {
+          name: error.name,
+          code: error.code
+        }
+      )
+    }
+
+    throw error
   }
 }
 
@@ -33,10 +42,18 @@ const checkNotificationIdempotency = async (message) => {
     })
 
     return notification != null
-  } catch (err) {
-    throw new Error(`Error checking idempotency token: ${err.message}`, {
-      cause: err
-    })
+  } catch (error) {
+    if (error instanceof MongoError) {
+      throw new DatabaseError(
+        `Error checking idempotency token ${message.source}-${message.id}`,
+        {
+          name: error.name,
+          code: error.code
+        }
+      )
+    }
+
+    throw error
   }
 }
 
@@ -65,10 +82,18 @@ const updateNotificationStatus = async (message, statusDetails) => {
         }
       }
     )
-  } catch (err) {
-    throw new Error(`Error updating notification status for message id: ${message.id}`, {
-      cause: err
-    })
+  } catch (error) {
+    if (error instanceof MongoError) {
+      throw new DatabaseError(
+        `Error updating notification status for ${message.source}-${message.id}`,
+        {
+          name: error.name,
+          code: error.code
+        }
+      )
+    }
+
+    throw error
   }
 }
 
@@ -87,12 +112,21 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
       id: notification.message.id,
       createdAt: notification.createdAt
     }
-  } catch (err) {
-    throw new Error(`Error finding original notification for correlationId: ${correlationId}`, {
-      cause: err
-    })
+  } catch (error) {
+    if (error instanceof MongoError) {
+      throw new DatabaseError(
+        `Error finding original notification for correlation id ${correlationId}`,
+        {
+          name: error.name,
+          code: error.code
+        }
+      )
+    }
+
+    throw error
   }
 }
+
 const getPendingNotifications = async () => {
   try {
     const pendingNotifications = []
@@ -115,10 +149,18 @@ const getPendingNotifications = async () => {
       createdAt: n.createdAt,
       updatedAt: n.updatedAt
     }))
-  } catch (err) {
-    throw new Error(`Error fetching pending notifications: ${err.message}`, {
-      cause: err
-    })
+  } catch (error) {
+    if (error instanceof MongoError) {
+      throw new DatabaseError(
+        'Error fetching pending notifications',
+        {
+          name: error.name,
+          code: error.code
+        }
+      )
+    }
+
+    throw error
   }
 }
 

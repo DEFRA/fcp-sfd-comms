@@ -67,13 +67,18 @@ describe('Publish Received Message', () => {
     )
   })
 
-  test('should log an error if publish fails', async () => {
+  test('should log error if publish fails', async () => {
     const message = { ...mockCommsRequest, type: 'uk.gov.fcp.sfd.notification.failure.validation' }
 
-    publish.mockRejectedValue(new Error('Publish error'))
+    const mockError = new Error('Publish error')
+
+    publish.mockRejectedValue(mockError)
 
     await publishReceivedMessage(message)
 
-    expect(mockLogger.error).toHaveBeenCalledWith('Error publishing received message to SNS:', expect.objectContaining({ cause: expect.any(Error) }))
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      mockError,
+      'Error publishing comms request received event'
+    )
   })
 })

@@ -56,12 +56,17 @@ describe('Publish retry expired', () => {
     )
   })
 
-  test('should log an error if publish fails', async () => {
-    publish.mockRejectedValue(new Error('Publish error'))
+  test('should log error if publish fails', async () => {
+    const mockError = new Error('Publish error')
+
+    publish.mockRejectedValue(mockError)
 
     await publishRetryExpired({}, 'test@example.com')
 
-    expect(mockLogger.error).toHaveBeenCalledWith('Error publishing retry expiry to SNS: Publish error')
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      mockError,
+      'Error publishing comms request retry expiry event'
+    )
   })
 
   afterAll(() => {

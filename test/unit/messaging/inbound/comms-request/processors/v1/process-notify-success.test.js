@@ -71,12 +71,15 @@ describe('comms request v1 notify success', () => {
       }
     }
 
-    publishStatus.mockRejectedValue(new Error('Publish status error'))
+    const mockError = new Error('Publish status error')
+
+    publishStatus.mockRejectedValue(mockError)
 
     await processNotifySuccess(mockMessage, mockMessage.data.recipient, mockResponse)
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      'Failed checking notification status: Publish status error'
+      mockError,
+      `Error processing gov notify success response for message: ${mockMessage.source}-${mockMessage.id}`
     )
   })
 })

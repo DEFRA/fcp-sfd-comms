@@ -13,7 +13,16 @@ const logger = createLogger()
 
 const processNotifyError = async (message, recipient, notifyError) => {
   try {
-    const technicalFailure = isServerErrorCode(notifyError?.status)
+    const errorData = notifyError?.data
+    const statusCode = notifyError?.status
+
+    if (errorData.errors) {
+      const errorMessage = errorData.errors.map((err) => err.message).join(', ')
+
+      logger.warn(`Failed to send via GOV Notify for request ${message.source}-${message.id}. Status code: ${statusCode}, Message: ${errorMessage}`)
+    }
+
+    const technicalFailure = isServerErrorCode(statusCode)
 
     const status = technicalFailure
       ? notifyStatuses.TECHNICAL_FAILURE
@@ -21,17 +30,17 @@ const processNotifyError = async (message, recipient, notifyError) => {
 
     await updateNotificationStatus(message, {
       status,
-      error: notifyError.data
+      error: errorData
     })
 
-    await publishStatus(message, recipient, status, notifyError.data)
+    await publishStatus(message, recipient, status, errorData)
 
     if (technicalFailure) {
       logger.info(`Scheduling notification retry for message: ${message.id}`)
       await publishRetryRequest(message, recipient, config.get('notify.retries.retryDelay'))
     }
-  } catch (err) {
-    logger.error(`Error handling failed notification: ${err.message}`)
+  } catch (error) {
+    logger.error(error, `Error processing gov notify error response for message: ${message.source}-${message.id}`)
   }
 }
 

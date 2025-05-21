@@ -39,7 +39,7 @@ const checkNotifyStatusHandler = async () => {
   try {
     pending = await getPendingNotifications()
   } catch (error) {
-    logger.error(`Error fetching pending notifications: ${error.message}`)
+    logger.error(error, 'Error checking pending notifications')
   }
 
   if (pending.length === 0) {
@@ -49,12 +49,12 @@ const checkNotifyStatusHandler = async () => {
   let updates = 0
 
   for (const notification of pending) {
-    try {
-      const {
-        notificationId,
-        status
-      } = notification.statusDetails
+    const {
+      notificationId,
+      status
+    } = notification.statusDetails
 
+    try {
       const notifyStatus = await getNotifyStatus(notificationId)
 
       if (notifyStatus === status) {
@@ -65,7 +65,7 @@ const checkNotifyStatusHandler = async () => {
 
       updates += 1
     } catch (error) {
-      logger.error(`Error checking notification: ${error.message}`)
+      logger.error(error, `Error checking notification ${notificationId}`)
     }
   }
 
