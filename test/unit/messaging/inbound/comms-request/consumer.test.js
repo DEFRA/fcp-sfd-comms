@@ -73,7 +73,7 @@ describe('comms request sqs consumer', () => {
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         mockError,
-        'Unhandled error during comms request processing'
+        'Unhandled error during comms request message processing'
       )
     })
 

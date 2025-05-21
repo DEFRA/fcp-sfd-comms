@@ -31,7 +31,7 @@ const startCommsListener = (sqsClient) => {
   })
 
   commsRequestConsumer.on('processing_error', (error) => {
-    logger.error(error, 'Unhandled error during comms request processing')
+    logger.error(error, 'Unhandled error during comms request message processing')
   })
 
   commsRequestConsumer.on('timeout_error', (error) => {

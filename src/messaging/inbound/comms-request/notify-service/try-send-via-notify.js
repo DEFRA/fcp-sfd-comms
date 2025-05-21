@@ -1,7 +1,4 @@
 import notifyClient from '../../../../notify/notify-client.js'
-import { createLogger } from '../../../../logging/logger.js'
-
-const logger = createLogger()
 
 const trySendViaNotify = async (templateId, recipient, params = {}) => {
   try {
@@ -13,7 +10,9 @@ const trySendViaNotify = async (templateId, recipient, params = {}) => {
 
     return [response, null]
   } catch (error) {
-    logger.error(`Failed to send email via GOV Notify. Error code: ${error.response?.status}`)
+    if (!error.response) {
+      throw new Error(`Unknown error while attempting to send email via Notify: ${error.message || error.code}`)
+    }
 
     return [null, error.response]
   }

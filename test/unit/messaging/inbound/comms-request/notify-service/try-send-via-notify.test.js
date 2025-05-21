@@ -4,8 +4,6 @@ import mockCommsRequest from '../../../../../mocks/comms-request/v1.js'
 
 import notifyClient from '../../../../../../src/notify/notify-client.js'
 
-import { createLogger } from '../../../../../../src/logging/logger.js'
-
 import { trySendViaNotify } from '../../../../../../src/messaging/inbound/comms-request/notify-service/try-send-via-notify.js'
 
 vi.mock('../../../../../../src/notify/notify-client.js', () => ({
@@ -14,16 +12,6 @@ vi.mock('../../../../../../src/notify/notify-client.js', () => ({
     getNotificationById: vi.fn()
   }
 }))
-
-vi.mock('../../../../../../src/logging/logger.js', () => ({
-  createLogger: vi.fn().mockReturnValue({
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn()
-  })
-}))
-
-const mockLogger = createLogger()
 
 describe('Try sending emails via GOV.UK Notify', () => {
   beforeEach(() => {
@@ -87,10 +75,38 @@ describe('Try sending emails via GOV.UK Notify', () => {
       }
     )
 
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      'Failed to send email via GOV Notify. Error code: 400'
-    )
     expect(response).toBeNull()
     expect(error).toEqual(mockError.response)
+  })
+
+  test('should throw error when sending email fails with no response', async () => {
+    const mockError = new Error('Network error')
+
+    notifyClient.sendEmail.mockRejectedValue(mockError)
+
+    const data = mockCommsRequest.data
+
+    await expect(
+      trySendViaNotify(data.notifyTemplateId, data.recipient, {
+        personalisation: data.personalisation,
+        reference: data.reference
+      })
+    ).rejects.toThrow('Network error')
+  })
+
+  test('should throw error with code when sending email fails with AggregateError', async () => {
+    const mockError = new AggregateError([new Error('Network error')])
+    mockError.code = 'ECONNREFUSED'
+
+    notifyClient.sendEmail.mockRejectedValue(mockError)
+
+    const data = mockCommsRequest.data
+
+    await expect(
+      trySendViaNotify(data.notifyTemplateId, data.recipient, {
+        personalisation: data.personalisation,
+        reference: data.reference
+      })
+    ).rejects.toThrow('Unknown error while attempting to send email via Notify: ECONNREFUSED')
   })
 })

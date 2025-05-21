@@ -141,4 +141,45 @@ describe('comms request v1 notify error', () => {
       `Error processing gov notify error response for message: ${v1CommsRequest.source}-${v1CommsRequest.id}`
     )
   })
+
+  test('should log warning if notify error contains single error', async () => {
+    const mockNotifyError = {
+      status: 400,
+      data: {
+        errors: [
+          {
+            message: 'Missing personalisation'
+          }
+        ]
+      }
+    }
+
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockNotifyError)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      `Failed to send via GOV Notify for request ${v1CommsRequest.source}-${v1CommsRequest.id}. Status code: ${mockNotifyError.status}, Message: Missing personalisation`
+    )
+  })
+
+  test('should log warning if notify error contains single error', async () => {
+    const mockNotifyError = {
+      status: 400,
+      data: {
+        errors: [
+          {
+            message: 'Missing personalisation'
+          },
+          {
+            message: 'Invalid email address'
+          }
+        ]
+      }
+    }
+
+    await processNotifyError(v1CommsRequest, 'test@example.com', mockNotifyError)
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      `Failed to send via GOV Notify for request ${v1CommsRequest.source}-${v1CommsRequest.id}. Status code: ${mockNotifyError.status}, Message: Missing personalisation, Invalid email address`
+    )
+  })
 })
