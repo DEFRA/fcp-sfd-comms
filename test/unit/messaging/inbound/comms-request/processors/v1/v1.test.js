@@ -50,7 +50,7 @@ describe('comms request v1 processor', () => {
     test('should log error if message is invalid', async () => {
       await processV1CommsRequest({})
 
-      expect(mockLogger.error).toHaveBeenCalledWith(
+      expect(mockLogger.warn).toHaveBeenCalledWith(
         'Invalid comms V1 payload: "id" is required,"source" is required,"specversion" is required,"type" is required,"datacontenttype" is required,"time" is required,"data" is required'
       )
     })

@@ -5,10 +5,9 @@ const parseSqsMessage = (message) => {
     const body = JSON.parse(message.Body)
 
     return body
-  } catch (err) {
-    console.log(err)
+  } catch (error) {
     throw new UnprocessableMessageError('Invalid message', {
-      cause: err
+      cause: error
     })
   }
 }

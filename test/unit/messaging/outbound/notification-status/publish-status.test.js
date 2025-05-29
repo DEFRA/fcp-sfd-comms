@@ -50,9 +50,7 @@ describe('Publish Status', () => {
           correlationId: mockCommsRequest.id,
           recipient,
           statusDetails: {
-            status,
-            errorCode: undefined,
-            errors: undefined
+            status
           }
         },
         datacontenttype: 'application/json',
@@ -105,18 +103,18 @@ describe('Publish Status', () => {
     )
   })
 
-  test('should log an error if publish fails', async () => {
+  test('should log error if publish fails', async () => {
     const recipient = 'test@example.com'
 
-    publish.mockRejectedValue(new Error('Publish error'))
+    const mockError = new Error('Publish error')
+
+    publish.mockRejectedValue(mockError)
 
     await publishStatus(mockCommsRequest, recipient, 'delivered')
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      'Error publishing comms event status details to SNS:',
-      {
-        cause: new Error('Publish error')
-      }
+      mockError,
+      'Error publishing comms request status update event'
     )
   })
 

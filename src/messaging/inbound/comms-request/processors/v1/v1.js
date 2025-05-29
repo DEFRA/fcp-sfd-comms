@@ -19,11 +19,11 @@ import { processNotifyError } from './process-notify-error.js'
 const logger = createLogger()
 
 const processV1CommsRequest = async (message) => {
-  const [validated, err] = await validate(v1, message)
+  const [validated, error] = await validate(v1, message)
 
-  if (err) {
-    await publishInvalidRequest(message, err)
-    return logger.error(`Invalid comms V1 payload: ${err.details.map(d => d.message)}`)
+  if (error) {
+    await publishInvalidRequest(message, error)
+    return logger.warn(`Invalid comms V1 payload: ${error.details.map(d => d.message)}`)
   }
 
   if (await checkNotificationIdempotency(validated)) {

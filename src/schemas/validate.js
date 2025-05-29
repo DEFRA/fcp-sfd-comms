@@ -3,8 +3,8 @@ const validate = async (schema, message) => {
     const value = await schema.validateAsync(message, { abortEarly: false })
 
     return [value, null]
-  } catch (err) {
-    return [null, err]
+  } catch (error) {
+    return [null, error]
   }
 }
 
