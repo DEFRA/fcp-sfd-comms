@@ -28,7 +28,7 @@ vi.mock('../../../../src/logging/logger.js', () => ({
 
 const commsRequestQueueUrl = process.env.COMMS_REQUEST_QUEUE_URL
 const commsRequestDlqUrl = process.env.COMMS_REQUEST_DEAD_LETTER_QUEUE_URL
-const dataIngestQueueUrl = process.env.DAL_INGEST_QUEUE_URL
+const fdmIngestQueueUrl = process.env.FDM_QUEUE_URL
 
 const mockLogger = createLogger('test')
 
@@ -40,7 +40,7 @@ describe('v1 comms request processing integration', () => {
 
     await resetQueue(commsRequestQueueUrl)
     await resetQueue(commsRequestDlqUrl)
-    await resetQueue(dataIngestQueueUrl)
+    await resetQueue(fdmIngestQueueUrl)
 
     startMessaging()
   })
@@ -86,7 +86,7 @@ describe('v1 comms request processing integration', () => {
     expect(requests[0].statusDetails.status).toBe('delivered')
     expect(requests[0].message).toEqual(mockMessage)
 
-    const events = await getMessages(dataIngestQueueUrl)
+    const events = await getMessages(fdmIngestQueueUrl)
 
     const parsedEvents = events.map((event) => parseSqsMessage(event))
 

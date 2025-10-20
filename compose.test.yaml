@@ -5,39 +5,6 @@ services:
     image: fcp-sfd-comms-development
     container_name: fcp-sfd-comms-test
     command: npm run test
-    env_file:
-      - path: .env
-        required: false
-    environment:
-      PORT: 3001
-      NODE_ENV: development
-      LOCALSTACK_ENDPOINT: http://localstack:4566
-      MONGO_URI: mongodb://mongodb:27017/
-      NOTIFY_API_KEY: test
-      COMMS_REQUEST_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request
-      COMMS_REQUEST_DEAD_LETTER_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter
-      DAL_INGEST_QUEUE_URL: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_data_ingest'
     volumes:
-      - ./src/:/home/node/src
       - ./test/:/home/node/test
-      - ./package.json:/home/node/package.json
       - ./coverage:/home/node/coverage
-    networks:
-      - cdp-tenant
-  localstack:
-    env_file:
-      - path: .env
-        required: false
-    networks:
-      - cdp-tenant
-
-  mongodb:
-    volumes:
-      - mongodb-data:/data
-
-volumes:
-  mongodb-data:
-
-networks:
-  cdp-tenant:
-    driver: bridge

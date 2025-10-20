@@ -43,7 +43,7 @@ describe('SNS Publish', () => {
   })
 
   test('should receive and execute publish command if SNS topic is not FiFo', async () => {
-    const topicArn = 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data'
+    const topicArn = 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events'
 
     const message = {
       test: 'hello world',
@@ -53,7 +53,7 @@ describe('SNS Publish', () => {
     await publish(mockSnsClient, topicArn, message)
 
     expect(PublishCommand).toHaveBeenCalledWith({
-      TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_data',
+      TopicArn: 'arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events',
       Message: JSON.stringify(message)
     })
 
