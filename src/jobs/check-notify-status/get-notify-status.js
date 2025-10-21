@@ -4,7 +4,11 @@ const getNotifyStatus = async (id) => {
   try {
     const { data } = await notifyClient.getNotificationById(id)
 
-    return data.status
+    return {
+      status: data.status,
+      subject: data.subject,
+      body: data.body
+    }
   } catch (error) {
     const errors = error.response?.data?.errors
 
