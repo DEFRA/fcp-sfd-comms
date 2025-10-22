@@ -14,7 +14,7 @@ const processNotifySuccess = async (message, recipient, response) => {
       status: notifyStatuses.SENDING
     })
 
-    await publishStatus(message, recipient, notifyStatuses.SENDING)
+    await publishStatus(message, recipient, notifyStatuses.SENDING, null)
   } catch (error) {
     logger.error(error, `Error processing gov notify success response for message: ${message.source}-${message.id}`)
   }

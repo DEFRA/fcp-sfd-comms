@@ -13,7 +13,7 @@ import { checkRetry } from './check-retry.js'
 
 const logger = createLogger()
 
-const processStatusUpdate = async (notification, status) => {
+const processStatusUpdate = async (notification, status, content) => {
   const { message } = notification
 
   const recipient = message.data.recipient
@@ -23,7 +23,7 @@ const processStatusUpdate = async (notification, status) => {
   })
 
   if (finishedStatus.includes(status)) {
-    await publishStatus(message, recipient, status)
+    await publishStatus(message, recipient, status, content)
   }
 
   if (!retryableStatus.includes(status)) {
@@ -57,13 +57,11 @@ const checkNotifyStatusHandler = async () => {
     try {
       const notifyResult = await getNotifyResult(notificationId)
       
-      const { status: notifyStatus} = notifyResult
-
-      if (notifyStatus === status) {
+      if (notifyResult.status === status) {
         continue
       }
 
-      await processStatusUpdate(notification, notifyStatus)
+      await processStatusUpdate(notification, notifyResult.status, notifyResult.content)
 
       updates += 1
     } catch (error) {

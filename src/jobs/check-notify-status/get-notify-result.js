@@ -6,8 +6,10 @@ const getNotifyResult = async (id) => {
 
     return {
       status: data.status,
-      subject: data.subject,
-      body: data.body
+      content: {
+        subject: data.subject,
+        body: data.body
+      }
     }
   } catch (error) {
     const errors = error.response?.data?.errors
