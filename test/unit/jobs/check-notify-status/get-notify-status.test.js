@@ -2,7 +2,7 @@ import { vi, describe, test, expect, beforeEach } from 'vitest'
 
 import notifyClient from '../../../../src/notify/notify-client.js'
 
-import { getNotifyStatus } from '../../../../src/jobs/check-notify-status/get-notify-status.js'
+import { getNotifyResult } from '../../../../src/jobs/check-notify-status/get-notify-result.js'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {
@@ -31,25 +31,25 @@ describe('When notify returns successfully', async () => {
 
   
   test('should call notify API with notification ID', async () => {
-    await getNotifyStatus(notificationId)
+    await getNotifyResult(notificationId)
     
     expect(notifyClient.getNotificationById).toHaveBeenCalledWith(notificationId)
   })
   
   test('should return status from notify API', async () => {
-    const result = await getNotifyStatus(notificationId)
+    const result = await getNotifyResult(notificationId)
   
     expect(result.status).toBe(mockNotifyResponse.data.status)
   })
   
   test('should return subject from notify API', async () => {
-    const result = await getNotifyStatus(notificationId)
+    const result = await getNotifyResult(notificationId)
   
     expect(result.subject).toBe(mockNotifyResponse.data.subject)
   })
 
   test('should return body from notify API', async () => {
-    const result = await getNotifyStatus(notificationId)
+    const result = await getNotifyResult(notificationId)
   
     expect(result.body).toBe(mockNotifyResponse.data.body)
   })
@@ -60,7 +60,7 @@ describe('When notify returns an error', () => {
   test('should wrap error on notify API failure', async () => {
     notifyClient.getNotificationById.mockRejectedValue(new Error('Notify API error'))
   
-    await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+    await expect(getNotifyResult(notificationId)).rejects.toThrow(
       'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170: Notify API error'
     )
   })
@@ -82,7 +82,7 @@ describe('When notify returns an error', () => {
     mockError.response = mockNotifyError
     notifyClient.getNotificationById.mockRejectedValue(mockError)
   
-    await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+    await expect(getNotifyResult(notificationId)).rejects.toThrow(
       'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID'
     )
   })
@@ -107,7 +107,7 @@ describe('When notify returns an error', () => {
     mockError.response = mockNotifyError
     notifyClient.getNotificationById.mockRejectedValue(mockError)
   
-    await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+    await expect(getNotifyResult(notificationId)).rejects.toThrow(
       'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID, Missing API key'
     )
   })

@@ -7,7 +7,7 @@ import {
   updateNotificationStatus
 } from '../../repos/notification-log.js'
 
-import { getNotifyStatus } from './get-notify-status.js'
+import { getNotifyResult } from './get-notify-result.js'
 import { publishStatus } from '../../messaging/outbound/notification-status/publish-status.js'
 import { checkRetry } from './check-retry.js'
 
@@ -55,7 +55,9 @@ const checkNotifyStatusHandler = async () => {
     } = notification.statusDetails
 
     try {
-      const notifyStatus = await getNotifyStatus(notificationId)
+      const notifyResult = await getNotifyResult(notificationId)
+      
+      const { status: notifyStatus} = notifyResult
 
       if (notifyStatus === status) {
         continue

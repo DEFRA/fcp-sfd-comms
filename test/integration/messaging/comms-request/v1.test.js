@@ -54,7 +54,9 @@ describe('v1 comms request processing integration', () => {
 
     notifyClient.getNotificationById.mockResolvedValue({
       data: {
-        status: 'delivered'
+        status: 'delivered',
+        subject: 'An update about your application',
+        body: '# The email body in markdown'
       }
     })
 
@@ -84,6 +86,8 @@ describe('v1 comms request processing integration', () => {
 
     expect(requests).toHaveLength(1)
     expect(requests[0].statusDetails.status).toBe('delivered')
+    expect(requests[0].content.subject).toBe('An update about your application')
+    expect(requests[0].content.body).toBe('# The email body in markdown')
     expect(requests[0].message).toEqual(mockMessage)
 
     const events = await getMessages(dataIngestQueueUrl)
@@ -129,6 +133,10 @@ describe('v1 comms request processing integration', () => {
             recipient: 'test@example.com',
             statusDetails: {
               status: 'delivered'
+            },
+            content: {
+              subject: 'An update about your application',
+              body: '# The email body in markdown'
             }
           },
           datacontenttype: 'application/json',
