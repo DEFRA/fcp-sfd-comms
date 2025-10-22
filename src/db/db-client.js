@@ -1,9 +1,6 @@
 import { MongoClient } from 'mongodb'
-
 import { config } from '../config/index.js'
-
 import { createSecureContext } from '../api/common/helpers/secure-context/secure-context.js'
-
 import { createLogger } from '../logging/logger.js'
 
 const logger = createLogger()
