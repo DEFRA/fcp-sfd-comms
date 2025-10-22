@@ -14,6 +14,6 @@ export const createIndex = async (collection, params, indexName) => {
 
     logger.info(`Index has been created: ${indexName}`)
   } catch (error) {
-    logger.error(`Unable to create index ${indexName}: ${error}`)
+    logger.error(`Unable to create index ${indexName}: ${error.message}`)
   }
 }
