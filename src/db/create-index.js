@@ -2,12 +2,12 @@ import { createLogger } from '../logging/logger.js'
 
 const logger = createLogger()
 
-export const createIndex = async (collection, params, indexName) => {
+export const createIndex = async (collection, params, indexName, unique = false) => {
   try {
     await collection.createIndex(
       params,
       {
-        unique: true,
+        unique,
         name: indexName
       }
     )
