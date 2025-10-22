@@ -2,11 +2,13 @@ import process from 'node:process'
 
 import { createLogger } from './logging/logger.js'
 import { startServer } from './api/common/helpers/start-server.js'
+import { setupNotificationIndexes } from './db/indexes/notification.js'
 import { startMessaging, stopMessaging } from './messaging/inbound/inbound.js'
 import { startJobs, stopJobs } from './jobs/jobs.js'
 
 const server = await startServer()
 
+await setupNotificationIndexes()
 startMessaging()
 startJobs()
 
