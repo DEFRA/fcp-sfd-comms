@@ -33,7 +33,7 @@ const processNotifyError = async (message, recipient, notifyError) => {
       error: errorData
     })
 
-    await publishStatus(message, recipient, status, null, errorData) // need to add a content property here or allow it to be null in publish status
+    await publishStatus(message, recipient, status, null, errorData)
 
     if (technicalFailure) {
       logger.info(`Scheduling notification retry for message: ${message.id}`)

@@ -117,7 +117,7 @@ describe('v1 comms request processing integration', () => {
             statusDetails: {
               status: 'sending'
             },
-            content: null // because it doesnt call getNotifyResult for 'sending' events
+            content: null
           },
           datacontenttype: 'application/json',
           specversion: '1.0'

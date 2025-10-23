@@ -11,7 +11,6 @@ const logger = createLogger()
 
 const publishStatus = async (message, recipient, status, content, notifyError) => {
   const type = statusToEventMap[status]
-  // based on the event type include the content or not
 
   const statusDetails = {
     status,
