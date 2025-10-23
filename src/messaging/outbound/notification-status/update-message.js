@@ -10,7 +10,8 @@ export const buildUpdateMessage = (message, recipient, type, statusDetails, cont
   data: {
     correlationId: message.data?.correlationId ?? message.id,
     recipient,
-    statusDetails
+    statusDetails,
+    content
     // ...(content && { content }) only include content property if its truthy, supports only sending content on a certain event type.
   },
   datacontenttype: 'application/json',
