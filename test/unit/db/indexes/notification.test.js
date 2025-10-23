@@ -46,6 +46,17 @@ describe('Set up notification indexes', () => {
       'message_source_index'
     )
 
-    expect(mockCreateIndex).toHaveBeenCalledTimes(2)
+    expect(mockCreateIndex).toHaveBeenNthCalledWith(
+      3,
+      mockCollection,
+      {
+        'message.id': 1,
+        'message.source': 1
+      },
+      'message_id_source_index',
+      true
+    )
+
+    expect(mockCreateIndex).toHaveBeenCalledTimes(3)
   })
 })

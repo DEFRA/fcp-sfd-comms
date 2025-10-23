@@ -6,4 +6,5 @@ export const setupNotificationIndexes = async () => {
 
   await createIndex(notificationRequestsCollection, { 'message.id': 1 }, 'message_id_index', true)
   await createIndex(notificationRequestsCollection, { 'message.source': 1 }, 'message_source_index')
+  await createIndex(notificationRequestsCollection, { 'message.id': 1, 'message.source': 1 }, 'message_id_source_index', true)
 }
