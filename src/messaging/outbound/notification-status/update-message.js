@@ -12,7 +12,6 @@ export const buildUpdateMessage = (message, recipient, type, statusDetails, cont
     recipient,
     statusDetails,
     content
-    // ...(content && { content }) only include content property if its truthy, supports only sending content on a certain event type.
   },
   datacontenttype: 'application/json',
   specversion: '1.0'

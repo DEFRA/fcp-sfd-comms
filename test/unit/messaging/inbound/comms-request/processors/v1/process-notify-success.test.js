@@ -51,7 +51,8 @@ describe('comms request v1 notify success', () => {
     expect(publishStatus).toHaveBeenCalledWith(
       mockMessage,
       mockMessage.data.recipient,
-      'sending'
+      'sending',
+      null
     )
   })
 

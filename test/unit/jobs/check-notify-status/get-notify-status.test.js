@@ -22,8 +22,10 @@ describe('When notify returns successfully', async () => {
     data: {
       id: notificationId,
       status: 'delivered',
-      subject: 'Your application has been successful',
-      body: '# This is the body of the email written in markdown'
+      content: {
+        subject: 'Your application has been successful',
+        body: '# This is the body of the email written in markdown'
+      }
     }
   }
   

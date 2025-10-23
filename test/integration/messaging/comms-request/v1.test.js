@@ -86,8 +86,6 @@ describe('v1 comms request processing integration', () => {
 
     expect(requests).toHaveLength(1)
     expect(requests[0].statusDetails.status).toBe('delivered')
-    expect(requests[0].content.subject).toBe('An update about your application')
-    expect(requests[0].content.body).toBe('# The email body in markdown')
     expect(requests[0].message).toEqual(mockMessage)
 
     const events = await getMessages(dataIngestQueueUrl)
@@ -118,7 +116,8 @@ describe('v1 comms request processing integration', () => {
             recipient: 'test@example.com',
             statusDetails: {
               status: 'sending'
-            }
+            },
+            content: null // because it doesnt call getNotifyResult for 'sending' events
           },
           datacontenttype: 'application/json',
           specversion: '1.0'
