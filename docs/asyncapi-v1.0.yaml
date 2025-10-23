@@ -303,6 +303,7 @@ components:
               - correlationId
               - recipient
               - statusDetails
+              - content
             properties: 
               correlationId:
                 $ref: '#/components/schemas/correlationId'
@@ -310,6 +311,8 @@ components:
                 $ref: '#/components/schemas/recipient'
               statusDetails:
                 $ref: '#/components/schemas/statusDetails'
+              content:
+                $ref: '#/components/schemas/content'
 
     commsRetryExpiredEvent:
       contentType: application/json
@@ -450,6 +453,19 @@ components:
               message:
                 type: string
                 description: "Missing personalisation key: 'caseNumber'"
+
+    content: 
+      type: object
+      description: Details of the notification content sent to the recipient
+      properties:
+        subject:
+          type: string
+          description: The subject line from the email sent to the recipient
+          example: "An update about your application"
+        body:
+          type: string
+          description: The text body from the email sent to the recipient in markdown format
+          example: "# Your application has been successfully processed"
 
     correlationId:
       type: string
