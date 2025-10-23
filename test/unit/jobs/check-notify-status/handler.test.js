@@ -29,7 +29,7 @@ vi.mock('../../../../src/jobs/check-notify-status/check-retry.js')
 vi.mock('../../../../src/jobs/check-notify-status/get-notify-result.js')
 
 const mockLogger = createLogger()
-const mockContent = 
+const mockContent =
       {
         subject: 'Subject line from notification',
         body: '# Body for notification in markdown'
@@ -261,7 +261,7 @@ describe('Check notification status', () => {
       'temporary-failure',
       'internal-failure'
     ])('should call publish event if status has changed to %s', async (status) => {
-        getPendingNotifications.mockResolvedValue([
+      getPendingNotifications.mockResolvedValue([
         {
           message: mockCommsRequest,
           createdAt: new Date(),
@@ -274,7 +274,7 @@ describe('Check notification status', () => {
 
       getNotifyResult.mockResolvedValue({
         status,
-        content: mockContent   
+        content: mockContent
       })
 
       await checkNotifyStatusHandler()

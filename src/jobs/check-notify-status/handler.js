@@ -56,7 +56,7 @@ const checkNotifyStatusHandler = async () => {
 
     try {
       const notifyResult = await getNotifyResult(notificationId)
-      
+
       if (notifyResult.status === status) {
         continue
       }
