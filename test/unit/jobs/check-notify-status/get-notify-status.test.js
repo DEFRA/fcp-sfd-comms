@@ -22,10 +22,8 @@ describe('Get status from notify API', () => {
       data: {
         id: notificationId,
         status: 'delivered',
-        content: {
-          subject: 'Your application has been successful',
-          body: '# This is the body of the email written in markdown'
-        }
+        subject: 'Your application has been successful',
+        body: '# This is the body of the email written in markdown'
       }
     }
 
@@ -46,13 +44,13 @@ describe('Get status from notify API', () => {
     test('should return subject from notify API', async () => {
       const result = await getNotifyResult(notificationId)
 
-      expect(result.subject).toBe(mockNotifyResponse.data.subject)
+      expect(result.content.subject).toBe(mockNotifyResponse.data.subject)
     })
 
     test('should return body from notify API', async () => {
       const result = await getNotifyResult(notificationId)
 
-      expect(result.body).toBe(mockNotifyResponse.data.body)
+      expect(result.content.body).toBe(mockNotifyResponse.data.body)
     })
   })
 
