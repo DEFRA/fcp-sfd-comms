@@ -1,6 +1,6 @@
 import notifyClient from '../../notify/notify-client.js'
 
-const getNotifyResult = async (id) => {
+const getNotifyResponse = async (id) => {
   try {
     const { data } = await notifyClient.getNotificationById(id)
 
@@ -26,4 +26,4 @@ const getNotifyResult = async (id) => {
   }
 }
 
-export { getNotifyResult }
+export { getNotifyResponse }
