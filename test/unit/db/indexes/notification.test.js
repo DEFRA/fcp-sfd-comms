@@ -27,27 +27,7 @@ describe('Set up notification indexes', () => {
 
     expect(mockDbClient.collection).toHaveBeenCalledWith('notificationRequests')
 
-    expect(mockCreateIndex).toHaveBeenNthCalledWith(
-      1,
-      mockCollection,
-      {
-        'message.id': 1
-      },
-      'message_id_index',
-      true
-    )
-
-    expect(mockCreateIndex).toHaveBeenNthCalledWith(
-      2,
-      mockCollection,
-      {
-        'message.source': 1
-      },
-      'message_source_index'
-    )
-
-    expect(mockCreateIndex).toHaveBeenNthCalledWith(
-      3,
+    expect(mockCreateIndex).toHaveBeenCalledWith(
       mockCollection,
       {
         'message.id': 1,
@@ -57,6 +37,6 @@ describe('Set up notification indexes', () => {
       true
     )
 
-    expect(mockCreateIndex).toHaveBeenCalledTimes(3)
+    expect(mockCreateIndex).toHaveBeenCalledTimes(1)
   })
 })
