@@ -5,7 +5,7 @@ import mockCommsRequest from '../../../mocks/comms-request/v1.js'
 import { createLogger } from '../../../../src/logging/logger.js'
 
 import { getPendingNotifications, updateNotificationStatus } from '../../../../src/repos/notification-log.js'
-import { getNotifyResponse } from '../../../../src/jobs/check-notify-status/get-notify-response.js'
+import { getNotifyStatus } from '../../../../src/jobs/check-notify-status/get-notify-status.js'
 import { publishStatus } from '../../../../src/messaging/outbound/notification-status/publish-status.js'
 import { checkRetry } from '../../../../src/jobs/check-notify-status/check-retry.js'
 import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
@@ -26,14 +26,9 @@ vi.mock('../../../../src/repos/notification-log.js', () => ({
 
 vi.mock('../../../../src/messaging/outbound/notification-status/publish-status.js')
 vi.mock('../../../../src/jobs/check-notify-status/check-retry.js')
-vi.mock('../../../../src/jobs/check-notify-status/get-notify-response.js')
+vi.mock('../../../../src/jobs/check-notify-status/get-notify-status.js')
 
 const mockLogger = createLogger()
-const mockContent =
-      {
-        subject: 'Subject line from notification',
-        body: '# Body for notification in markdown'
-      }
 
 describe('Check notification status', () => {
   beforeEach(() => {
@@ -46,7 +41,7 @@ describe('Check notification status', () => {
 
       await checkNotifyStatusHandler()
 
-      expect(getNotifyResponse).not.toHaveBeenCalled()
+      expect(getNotifyStatus).not.toHaveBeenCalled()
     })
 
     test('should get notify status for each pending notification', async () => {
@@ -69,16 +64,13 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status: 'delivered',
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue('delivered')
 
       await checkNotifyStatusHandler()
 
-      expect(getNotifyResponse).toHaveBeenCalledTimes(2)
-      expect(getNotifyResponse).toHaveBeenCalledWith('9b80b2ea-a663-4726-bd76-81d301a28b18')
-      expect(getNotifyResponse).toHaveBeenCalledWith('65b2ca19-5450-48fe-911a-746bd80c5899')
+      expect(getNotifyStatus).toHaveBeenCalledTimes(2)
+      expect(getNotifyStatus).toHaveBeenCalledWith('9b80b2ea-a663-4726-bd76-81d301a28b18')
+      expect(getNotifyStatus).toHaveBeenCalledWith('65b2ca19-5450-48fe-911a-746bd80c5899')
     })
 
     test('should log error if get pending notifications fails', async () => {
@@ -120,10 +112,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status: 'delivered',
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue('delivered')
 
       await checkNotifyStatusHandler()
 
@@ -148,10 +137,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status: 'sending',
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue('sending')
 
       await checkNotifyStatusHandler()
 
@@ -184,10 +170,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status: 'delivered',
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue('delivered')
 
       await checkNotifyStatusHandler()
 
@@ -214,10 +197,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status: 'delivered',
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue('delivered')
 
       await checkNotifyStatusHandler()
 
@@ -239,7 +219,7 @@ describe('Check notification status', () => {
 
     const mockError = new Error('Failed to fetch status')
 
-    getNotifyResponse.mockRejectedValue(mockError)
+    getNotifyStatus.mockRejectedValue(mockError)
 
     await checkNotifyStatusHandler()
 
@@ -272,18 +252,14 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status,
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue(status)
 
       await checkNotifyStatusHandler()
 
       expect(publishStatus).toHaveBeenCalledWith(
         mockCommsRequest,
         mockCommsRequest.data.recipient,
-        status,
-        mockContent
+        status
       )
     })
 
@@ -302,10 +278,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status,
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue(status)
 
       await checkNotifyStatusHandler()
 
@@ -331,10 +304,7 @@ describe('Check notification status', () => {
 
       getPendingNotifications.mockResolvedValue([mockNotification])
 
-      getNotifyResponse.mockResolvedValue({
-        status,
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue(status)
 
       await checkNotifyStatusHandler()
 
@@ -360,10 +330,7 @@ describe('Check notification status', () => {
         }
       ])
 
-      getNotifyResponse.mockResolvedValue({
-        status,
-        content: mockContent
-      })
+      getNotifyStatus.mockResolvedValue(status)
 
       await checkNotifyStatusHandler()
 

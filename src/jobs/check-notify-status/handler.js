@@ -7,13 +7,13 @@ import {
   updateNotificationStatus
 } from '../../repos/notification-log.js'
 
-import { getNotifyResponse } from './get-notify-response.js'
+import { getNotifyStatus } from './get-notify-status.js'
 import { publishStatus } from '../../messaging/outbound/notification-status/publish-status.js'
 import { checkRetry } from './check-retry.js'
 
 const logger = createLogger()
 
-const processStatusUpdate = async (notification, status, content) => {
+const processStatusUpdate = async (notification, status) => {
   const { message } = notification
 
   const recipient = message.data.recipient
@@ -23,7 +23,7 @@ const processStatusUpdate = async (notification, status, content) => {
   })
 
   if (finishedStatus.includes(status)) {
-    await publishStatus(message, recipient, status, content)
+    await publishStatus(message, recipient, status)
   }
 
   if (!retryableStatus.includes(status)) {
@@ -55,13 +55,13 @@ const checkNotifyStatusHandler = async () => {
     } = notification.statusDetails
 
     try {
-      const notifyResult = await getNotifyResponse(notificationId)
+      const notifyStatus = await getNotifyStatus(notificationId)
 
-      if (notifyResult.status === status) {
+      if (notifyStatus === status) {
         continue
       }
 
-      await processStatusUpdate(notification, notifyResult.status, notifyResult.content)
+      await processStatusUpdate(notification, notifyStatus)
 
       updates += 1
     } catch (error) {

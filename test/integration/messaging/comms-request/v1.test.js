@@ -58,9 +58,7 @@ describe('v1 comms request processing integration', () => {
 
     notifyClient.getNotificationById.mockResolvedValue({
       data: {
-        status: 'delivered',
-        subject: 'An update about your application',
-        body: '# The email body in markdown'
+        status: 'delivered'
       }
     })
 
@@ -139,10 +137,6 @@ describe('v1 comms request processing integration', () => {
             recipient: 'test@example.com',
             statusDetails: {
               status: 'delivered'
-            },
-            content: {
-              subject: 'An update about your application',
-              body: '# The email body in markdown'
             }
           },
           datacontenttype: 'application/json',
