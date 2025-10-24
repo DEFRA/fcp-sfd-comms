@@ -24,34 +24,42 @@ vi.mock('../../../../../../../src/messaging/outbound/notification-retry/notifica
 vi.mock('../../../../../../../src/messaging/outbound/retry-expired/publish-expired.js')
 vi.mock('../../../../../../../src/messaging/outbound/notification-status/publish-status.js')
 
+const mockResponse = {
+  status: 200,
+  data: {
+    id: '9b80b2ea-a663-4726-bd76-81d301a28b18',
+    content: {
+      subject: 'The subject line from an email',
+      body: '# The body of an email in markdown'
+    }
+  }
+}
+
+const mockMessage = {
+  ...v1CommsRequest,
+  data: {
+    ...v1CommsRequest.data,
+    recipient: 'test@example.com'
+  }
+}
+
 describe('comms request v1 notify success', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   test('should publish sending event', async () => {
-    const mockMessage = {
-      ...v1CommsRequest,
-      data: {
-        ...v1CommsRequest.data,
-        recipient: 'test@example.com'
-      }
-    }
-
-    const mockResponse = {
-      status: 200,
-      data: {
-        id: '9b80b2ea-a663-4726-bd76-81d301a28b18'
-      }
-    }
-
     await processNotifySuccess(mockMessage, mockMessage.data.recipient, mockResponse)
 
     expect(publishStatus).toHaveBeenCalledTimes(1)
     expect(publishStatus).toHaveBeenCalledWith(
       mockMessage,
       mockMessage.data.recipient,
-      'sending'
+      'sending',
+      {
+        subject: 'The subject line from an email',
+        body: '# The body of an email in markdown'
+      }
     )
   })
 
@@ -61,13 +69,6 @@ describe('comms request v1 notify success', () => {
       data: {
         ...v1CommsRequest.data,
         recipient: 'test@example.com'
-      }
-    }
-
-    const mockResponse = {
-      status: 200,
-      data: {
-        id: '9b80b2ea-a663-4726-bd76-81d301a28b18'
       }
     }
 

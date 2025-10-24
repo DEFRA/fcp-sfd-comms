@@ -9,7 +9,7 @@ const snsTopic = config.get('messaging.commEvents.topicArn')
 
 const logger = createLogger()
 
-const publishStatus = async (message, recipient, status, notifyError) => {
+const publishStatus = async (message, recipient, status, content, notifyError) => {
   const type = statusToEventMap[status]
 
   const statusDetails = {
@@ -18,7 +18,7 @@ const publishStatus = async (message, recipient, status, notifyError) => {
     errors: notifyError?.errors
   }
 
-  const statusMessage = buildUpdateMessage(message, recipient, type, statusDetails)
+  const statusMessage = buildUpdateMessage(message, recipient, type, statusDetails, content)
 
   try {
     await publish(snsClient, snsTopic, statusMessage)

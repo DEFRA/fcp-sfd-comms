@@ -48,7 +48,11 @@ describe('v1 comms request processing integration', () => {
   test('should process a valid v1 comms request', async () => {
     notifyClient.sendEmail.mockResolvedValue({
       data: {
-        id: '79389915-7275-457a-b8ca-8bf206b2e67b'
+        id: '79389915-7275-457a-b8ca-8bf206b2e67b',
+        content: {
+          subject: 'An update about your application',
+          body: '# The email body in markdown'
+        }
       }
     })
 
@@ -114,6 +118,10 @@ describe('v1 comms request processing integration', () => {
             recipient: 'test@example.com',
             statusDetails: {
               status: 'sending'
+            },
+            content: {
+              subject: 'An update about your application',
+              body: '# The email body in markdown'
             }
           },
           datacontenttype: 'application/json',

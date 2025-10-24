@@ -10,89 +10,90 @@ vi.mock('../../../../src/notify/notify-client.js', () => ({
   }
 }))
 
+const notificationId = '3da604f4-fad9-4ed0-a99f-1e3c7bca8170'
+
 describe('Get status from notify API', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  test('should call notify API with notification ID', async () => {
-    notifyClient.getNotificationById.mockResolvedValue({
+  describe('When notify returns successfully', async () => {
+    const mockNotifyResponse = {
       data: {
-        id: '3da604f4-fad9-4ed0-a99f-1e3c7bca8170',
+        id: notificationId,
         status: 'delivered'
-      }
-    })
-
-    await getNotifyStatus('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')
-
-    expect(notifyClient.getNotificationById).toHaveBeenCalledWith('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')
-  })
-
-  test('should return status from notify API', async () => {
-    notifyClient.getNotificationById.mockResolvedValue({
-      data: {
-        id: '3da604f4-fad9-4ed0-a99f-1e3c7bca8170',
-        status: 'delivered'
-      }
-    })
-
-    const status = await getNotifyStatus('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')
-
-    expect(status).toBe('delivered')
-  })
-
-  test('should wrap error on notify API failure', async () => {
-    notifyClient.getNotificationById.mockRejectedValue(new Error('Notify API error'))
-
-    await expect(getNotifyStatus('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')).rejects.toThrow(
-      'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170: Notify API error'
-    )
-  })
-
-  test('should wrap error if notify error contains single error', async () => {
-    const mockNotifyError = {
-      status: 400,
-      data: {
-        errors: [
-          {
-            message: 'Invalid notification ID'
-          }
-        ]
       }
     }
 
-    const mockError = new Error('Notify API error')
+    notifyClient.getNotificationById.mockResolvedValue(mockNotifyResponse)
 
-    mockError.response = mockNotifyError
-    notifyClient.getNotificationById.mockRejectedValue(mockError)
+    test('should call notify API with notification ID', async () => {
+      await getNotifyStatus(notificationId)
 
-    await expect(getNotifyStatus('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')).rejects.toThrow(
-      'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID'
-    )
+      expect(notifyClient.getNotificationById).toHaveBeenCalledWith(notificationId)
+    })
+
+    test('should return status from notify API', async () => {
+      const result = await getNotifyStatus(notificationId)
+
+      expect(result).toBe(mockNotifyResponse.data.status)
+    })
   })
 
-  test('should wrap error if notify error contains multiple errors', async () => {
-    const mockNotifyError = {
-      status: 400,
-      data: {
-        errors: [
-          {
-            message: 'Invalid notification ID'
-          },
-          {
-            message: 'Missing API key'
-          }
-        ]
+  describe('When notify returns an error', () => {
+    test('should wrap error on notify API failure', async () => {
+      notifyClient.getNotificationById.mockRejectedValue(new Error('Notify API error'))
+
+      await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+        'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170: Notify API error'
+      )
+    })
+
+    test('should wrap error if notify error contains single error', async () => {
+      const mockNotifyError = {
+        status: 400,
+        data: {
+          errors: [
+            {
+              message: 'Invalid notification ID'
+            }
+          ]
+        }
       }
-    }
 
-    const mockError = new Error('Notify API error')
+      const mockError = new Error('Notify API error')
 
-    mockError.response = mockNotifyError
-    notifyClient.getNotificationById.mockRejectedValue(mockError)
+      mockError.response = mockNotifyError
+      notifyClient.getNotificationById.mockRejectedValue(mockError)
 
-    await expect(getNotifyStatus('3da604f4-fad9-4ed0-a99f-1e3c7bca8170')).rejects.toThrow(
-      'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID, Missing API key'
-    )
+      await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+        'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID'
+      )
+    })
+
+    test('should wrap error if notify error contains multiple errors', async () => {
+      const mockNotifyError = {
+        status: 400,
+        data: {
+          errors: [
+            {
+              message: 'Invalid notification ID'
+            },
+            {
+              message: 'Missing API key'
+            }
+          ]
+        }
+      }
+
+      const mockError = new Error('Notify API error')
+
+      mockError.response = mockNotifyError
+      notifyClient.getNotificationById.mockRejectedValue(mockError)
+
+      await expect(getNotifyStatus(notificationId)).rejects.toThrow(
+        'Error getting status from GOV Notify for 3da604f4-fad9-4ed0-a99f-1e3c7bca8170. Status code: 400, Message: Invalid notification ID, Missing API key'
+      )
+    })
   })
 })

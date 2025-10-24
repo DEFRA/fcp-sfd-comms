@@ -18,6 +18,10 @@ vi.mock('../../../../../src/logging/logger.js', () => ({
 }))
 
 const mockLogger = createLogger()
+const mockContent = {
+  subject: 'subject of notification',
+  body: 'body of notification'
+}
 
 describe('Publish Status', () => {
   beforeEach(() => {
@@ -36,7 +40,7 @@ describe('Publish Status', () => {
   ])('should publish %s event for non-error status %s', async (status, expectedType) => {
     const recipient = 'test@example.com'
 
-    await publishStatus(mockCommsRequest, recipient, status)
+    await publishStatus(mockCommsRequest, recipient, status, mockContent)
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
@@ -51,7 +55,8 @@ describe('Publish Status', () => {
           recipient,
           statusDetails: {
             status
-          }
+          },
+          content: mockContent
         },
         datacontenttype: 'application/json',
         specversion: '1.0'
@@ -74,7 +79,7 @@ describe('Publish Status', () => {
       ]
     }
 
-    await publishStatus(mockCommsRequest, recipient, status, mockError)
+    await publishStatus(mockCommsRequest, recipient, status, mockContent, mockError)
 
     expect(publish).toHaveBeenCalledWith(
       snsClient,
@@ -95,7 +100,8 @@ describe('Publish Status', () => {
                 error: 'mock-error'
               }
             ]
-          }
+          },
+          content: mockContent
         },
         datacontenttype: 'application/json',
         specversion: '1.0'
@@ -110,7 +116,7 @@ describe('Publish Status', () => {
 
     publish.mockRejectedValue(mockError)
 
-    await publishStatus(mockCommsRequest, recipient, 'delivered')
+    await publishStatus(mockCommsRequest, recipient, 'delivered', mockContent)
 
     expect(mockLogger.error).toHaveBeenCalledWith(
       mockError,
