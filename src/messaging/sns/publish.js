@@ -8,7 +8,7 @@ const publish = async (snsClient, topicArn, message) => {
   }
 
   debugLog(message)
-  
+
   const command = new PublishCommand(params)
 
   await snsClient.send(command)

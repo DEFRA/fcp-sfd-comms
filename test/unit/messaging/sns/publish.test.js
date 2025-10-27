@@ -13,7 +13,9 @@ const mockLoggerError = vi.fn()
 
 vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
-    error: (...args) => mockLoggerError(...args)
+    error: (...args) => mockLoggerError(...args),
+    warn: vi.fn(),
+    debug: vi.fn()
   })
 }))
 
