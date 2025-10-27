@@ -48,4 +48,3 @@ describe('SNS Publish', () => {
     expect(debugLog).toHaveBeenCalledTimes(1)
   })
 })
-
