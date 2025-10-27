@@ -1,13 +1,13 @@
 import { createLogger } from '../logging/logger.js'
 
 const logger = createLogger()
-const protectedKeys = ['recipient', 'personalisation', 'content']
+const protectedKeys = new Set(['recipient', 'personalisation', 'content'])
 
 const sanitiseMessage = (message) => {
   const { data } = message
 
   for (const key of Object.keys(data)) {
-    if (protectedKeys.includes(key)) {
+    if (protectedKeys.has(key)) {
       data[key] = 'redacted'
     }
   }
