@@ -11,6 +11,9 @@ const server = await startServer()
 await setupNotificationIndexes()
 startMessaging()
 startJobs()
+const logger = createLogger()
+logger.debug('DEBUG 123')
+logger.info('INFO 123')
 
 server.events.on('stop', () => {
   stopMessaging()
