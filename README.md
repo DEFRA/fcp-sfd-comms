@@ -24,7 +24,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 | MONGO_URI | mongodb://mongo:27017/ | No | MongoDB connection string. |
 | SQS_ENDPOINT | http://localstack:4566 | No | SQS endpoint. |
 | SNS_ENDPOINT | http://localstack:4566 | No | SNS endpoint. |
-| COMMS_REQUEST_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request | No | SQS queue URL to send comms requests. |
+| COMMS_REQUEST_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566<br>/000000000000/fcp_sfd_comms_request | No | SQS queue URL to send comms requests. |
 | COMMS_REQUEST_DEAD_LETTER_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter | No | Comms Request SQS dead letter queue. |
 | COMM_EVENTS_TOPIC_ARN | arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events | No | SNS topic ARN to publish comm events to. |
 | FDM_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_fdm_events | No | SQS queue that is subscribed to the events SNS topic. |
