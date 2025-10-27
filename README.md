@@ -13,7 +13,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 - Docker Compose
 - Node.js (v22 LTS)
 
-## Setup
+## Environment variables
 | Name | Default value | Required | Description |
 |-|-|-|-|
 | AWS_REGION | eu-west-2 | No | AWS region to access resources in. |
