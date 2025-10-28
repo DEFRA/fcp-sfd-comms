@@ -8,6 +8,56 @@ Communications service for the Single Front Door.
 
 This service is part of the [Single Front Door (SFD) service](https://github.com/DEFRA/fcp-sfd-core).
 
+## Architecture overview
+
+```mermaid
+graph TB
+    subgraph "External Systems"
+        SFD[SFD Comms Service]
+        FUTURE[Future Event Sources]
+    end
+    
+    subgraph "AWS Infrastructure"
+        SNS[SNS Topic]
+        SQS[SQS Queue: fcp_fdm_events]
+        DLQ[Dead Letter Queue: fcp_fdm_events-deadletter]
+    end
+    
+    subgraph "FDM Service"
+        POLLER[Event Poller]
+        CONSUMER[SQS Consumer]
+        PROCESSOR[Event Processor]
+        VALIDATOR[Schema Validator]
+        SAVER[Event Saver]
+        API[REST API]
+    end
+    
+    subgraph "Data Storage"
+        MONGO[(MongoDB)]
+        EVENTS[events collection]
+        MESSAGES[messages collection]
+    end
+    
+    SFD -->|Publish Events| SNS
+    FUTURE -->|Publish Events| SNS
+    SNS -->|Route to Queue| SQS
+    SQS -->|Failed Messages| DLQ
+    
+    POLLER -->|Poll Messages| SQS
+    SQS -->|Return Batch| CONSUMER
+    CONSUMER -->|Process Each| PROCESSOR
+    PROCESSOR -->|Parse & Validate| VALIDATOR
+    VALIDATOR -->|Save Valid Events| SAVER
+    SAVER -->|Store Events| EVENTS
+    SAVER -->|Aggregate Messages| MESSAGES
+    
+    API -->|Query Data| MONGO
+    
+    style SQS fill:#e1f5fe
+    style DLQ fill:#ffecb3
+    style MONGO fill:#e8f5e8
+```
+
 ## Prerequisites
 - Docker
 - Docker Compose
