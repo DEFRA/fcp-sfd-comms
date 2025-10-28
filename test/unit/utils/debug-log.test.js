@@ -48,7 +48,10 @@ const mockSendingMessage = {
   datacontenttype: 'application/json',
   time: '2023-10-17T14:48:00Z',
   data: {
-    statusDetails: '',
+    correlationId: '123e4567-e89b-12d3-a456-426655440000',
+    statusDetails: {
+      status: 'not-redacted'
+    },
     content: {
       subject: 'subject',
       body: 'body'
@@ -63,7 +66,7 @@ describe('When using the debug logger util', () => {
 
       const result = JSON.parse(mockLogger.debug.mock.calls[0][0])
 
-      expect(result.data.recipient).toBe('redacted')
+      expect(result.data.recipient).toBe('ex*****')
     })
 
     test('it should redact personalisation keys if present', () => {
@@ -71,9 +74,9 @@ describe('When using the debug logger util', () => {
 
       const result = JSON.parse(mockLogger.debug.mock.calls[1][0])
 
-      expect(result.data.personalisation).toBe('redacted')
-      expect(result.data.personalisation.expectedPaymentDate).toBe(undefined)
-      expect(result.data.personalisation.adminName).toBe(undefined)
+      expect(result.data.personalisation).toBeDefined()
+      expect(result.data.personalisation.expectedPaymentDate).toBe('21*****')
+      expect(result.data.personalisation.adminName).toBe('Je*****')
     })
 
     test('it should redact content keys if present', () => {
@@ -81,9 +84,18 @@ describe('When using the debug logger util', () => {
 
       const result = JSON.parse(mockLogger.debug.mock.calls[2][0])
 
-      expect(result.data.content).toBe('redacted')
-      expect(result.data.content.subject).toBe(undefined)
-      expect(result.data.content.body).toBe(undefined)
+      expect(result.data.content).toBeDefined()
+      expect(result.data.content.subject).toBe('su*****')
+      expect(result.data.content.body).toBe('bo*****')
+    })
+
+    test('it should not redact content for non sensitive data', () => {
+      debugLog(mockSendingMessage)
+
+      const result = JSON.parse(mockLogger.debug.mock.calls[2][0])
+
+      expect(result.data.correlationId).toBe(mockSendingMessage.data.correlationId)
+      expect(result.data.statusDetails.status).toBe('not-redacted')
     })
   })
 
