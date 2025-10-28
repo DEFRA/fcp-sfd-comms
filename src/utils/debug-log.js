@@ -7,11 +7,10 @@ let nestedObject = false
 const redactObjectsProperties = (sensitiveObject) => {
   for (const key of Object.keys(sensitiveObject)) {
     if (protectedKeys.has(key) || nestedObject) {
-
       if (typeof sensitiveObject[key] === 'string') {
         // if the value is a string overwrite it to redact the data
         const val = sensitiveObject[key]
-        sensitiveObject[key] = `${val.slice(0,2)}*****`
+        sensitiveObject[key] = `${val.slice(0, 2)}*****`
       }
 
       if (typeof sensitiveObject[key] === 'object') {
@@ -42,7 +41,7 @@ const debugLog = (message) => {
     return
   }
 
-  logger.info(JSON.stringify(sanitiseMessage(message)))
+  logger.debug(JSON.stringify(sanitiseMessage(message)))
 }
 
 export { debugLog }
