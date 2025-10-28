@@ -18,10 +18,15 @@ graph TB
     end
     
     subgraph "Schema validation"
-        VALIDATION[Check message from consumer aligns with message contract.]
+        VALIDATION[Check message from consumer aligns with message contract]
+    end
+
+    subgraph "Idempotency check"
+        IDEMPOTENCY_CHECK[Check message is idempotent to avoid duplicate messages being sent]
     end
     
-    subgraph "FDM Service"
+    subgraph "AWS infrastructure"
+        SNS[SNS topic: fcp_sfd_comm_events]
     end
     
     subgraph "Data Storage"
@@ -30,6 +35,8 @@ graph TB
     
     IAHW -->|Send message| VALIDATION
     FUTURE -->|Send message| VALIDATION
+    VALIDATION -->|Message validated| IDEMPOTENCY_CHECK
+    IDEMPOTENCY_CHECK -->|Publish event| SNS
     
 ```
 
