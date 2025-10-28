@@ -24,7 +24,7 @@ const debugLog = (message) => {
     return
   }
 
-  logger.debug(sanitiseMessage(message))
+  logger.debug(JSON.stringify(sanitiseMessage(message)))
 }
 
 export { debugLog }
