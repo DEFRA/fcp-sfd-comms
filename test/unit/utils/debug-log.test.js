@@ -61,7 +61,7 @@ describe('When using the debug logger util', () => {
     test('it should redact the recipient', () => {
       debugLog(mockReceivedMessage)
 
-      const result = mockLogger.debug.mock.calls[0][0]
+      const result = JSON.parse(mockLogger.debug.mock.calls[0][0])
 
       expect(result.data.recipient).toBe('redacted')
     })
@@ -69,7 +69,7 @@ describe('When using the debug logger util', () => {
     test('it should redact personalisation keys if present', () => {
       debugLog(mockReceivedMessage)
 
-      const result = mockLogger.debug.mock.calls[1][0]
+      const result = JSON.parse(mockLogger.debug.mock.calls[1][0])
 
       expect(result.data.personalisation).toBe('redacted')
       expect(result.data.personalisation.expectedPaymentDate).toBe(undefined)
@@ -79,7 +79,7 @@ describe('When using the debug logger util', () => {
     test('it should redact content keys if present', () => {
       debugLog(mockSendingMessage)
 
-      const result = mockLogger.debug.mock.calls[2][0]
+      const result = JSON.parse(mockLogger.debug.mock.calls[2][0])
 
       expect(result.data.content).toBe('redacted')
       expect(result.data.content.subject).toBe(undefined)
