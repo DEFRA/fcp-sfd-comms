@@ -36,12 +36,13 @@ const sanitiseMessage = (message) => {
 }
 
 const debugLog = (message) => {
-  if (!message.data) {
+  const debugMessage = structuredClone(message)
+  if (!debugMessage.data) {
     logger.warn('Invalid message format for debug logger. Debug log not executed.')
     return
   }
 
-  logger.debug(JSON.stringify(sanitiseMessage(message)))
+  logger.debug(JSON.stringify(sanitiseMessage(debugMessage)))
 }
 
 export { debugLog }
