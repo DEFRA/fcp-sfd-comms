@@ -19,53 +19,69 @@ graph
     end
     
     subgraph "Single Front Door (SFD) comms"
-        PARSE[Parse request from consumer]
-        VALIDATION[Check message is valid and aligns with message contract]
-        IDEMPOTENCY_CHECK[Check message is idempotent to avoid duplicate requests]
-        SNS[SNS topic: fcp_sfd_comm_events]
-        UPDATE[Retrieve status update from Notify API]
-        RETRY[Handle retries for failed deliveries]
-    end
-
-    subgraph "Farming Data Model (FDM)"
-        SQS[SQS queue: fcp_fdm_events]
+        PARSE[Parse message]
+        VALIDATION[Validate message against schema]
+        IDEMPOTENCY_CHECK[Check message is idempotent]
+        SNS[SNS topic]
+        UPDATE[Retrieve status update]
+        RETRY[Handle retries for failed message delivery]
     end
 
     subgraph "GOV.UK Notify API"
-        NOTIFY[Send message to recipient using template ID provided in consumer's original request]
-        STATUS[Current status of request e.g. sending, delivered etc.]
+        NOTIFY[Request delivery]
+        STATUS[Current message status]
+    end
+
+    subgraph "Farming Data Model (FDM)"
+        SQS[SQS queue]
     end
 
     subgraph "Data Storage"
         MONGO[(MongoDB)]
     end
 
+
     subgraph "RECIPIENT"
-        DELIVERY[Deliver message to recipient's inbox]
+        DELIVERY[Recipient's inbox]
     end
     
     IAHW -->|Send message| PARSE
     FUTURE -->|Send message| PARSE
     PARSE -->|Validate| VALIDATION
-    VALIDATION -->|Idempotency check| IDEMPOTENCY_CHECK
+    VALIDATION --> IDEMPOTENCY_CHECK
     IDEMPOTENCY_CHECK -->|Build and publish message| SNS
-    IDEMPOTENCY_CHECK -->|Store request| MONGO
-    IDEMPOTENCY_CHECK --> UPDATE
-    SNS -->|Subscriber consumes request| SQS
-    SNS -->|Send via Notify| NOTIFY
+    IDEMPOTENCY_CHECK -->|Store message| MONGO
+    SNS -->|Subscriber receives message| SQS
+    SNS -->|Send request to Notify| NOTIFY
     NOTIFY -->|Deliver message| DELIVERY
-    STATUS -->|Retrieve status| UPDATE
+    IDEMPOTENCY_CHECK --> UPDATE
+    UPDATE <-.->|Retrieve and return status update| STATUS
     UPDATE -->|Store status update| MONGO
+    UPDATE -->|Re-build and publish|SNS
+    SNS --> SQS
     UPDATE --> RETRY
-    RETRY -->|Re-build and publish message| SNS
-    SNS -->|Subscriber consumes updated request| SQS
+    RETRY -->|Re-build and publish retry| SNS
+    SNS --> NOTIFY
+    NOTIFY --> DELIVERY
 
-    linkStyle 6 stroke:#fcdedc
-    linkStyle 10 stroke:#fcdedc
-    linkStyle 11 stroke:#fcdedc
-    linkStyle 12 stroke:#fcdedc
-    linkStyle 13 stroke:#fcdedc
-    linkStyle 14 stroke:#fcdedc
+    linkStyle 0 stroke:#aadee3
+    linkStyle 1 stroke:#aadee3
+    linkStyle 2 stroke:#aadee3
+    linkStyle 3 stroke:#aadee3
+    linkStyle 4 stroke:#aadee3
+    linkStyle 5 stroke:#aadee3
+    linkStyle 6 stroke:#aadee3
+    linkStyle 7 stroke:#aadee3
+    linkStyle 8 stroke:#aadee3
+    linkStyle 9 stroke:#e6c19c
+    linkStyle 10 stroke:#e6c19c
+    linkStyle 11 stroke:#e6c19c
+    linkStyle 12 stroke:#e6c19c
+    linkStyle 13 stroke:#e6c19c
+    linkStyle 14 stroke:#db9393
+    linkStyle 15 stroke:#db9393
+    linkStyle 16 stroke:#db9393
+    linkStyle 17 stroke:#db9393
 
     style MONGO fill:#e8f5e8,color:#0E0E0E
     style SNS fill:#e1f5fe,color:#0E0E0E
@@ -75,16 +91,16 @@ graph
 ### Cron jobs
 ```mermaid
 graph
+    subgraph "GOV.UK Notify API"
+        NOTIFY_STATUS[Check latest status update]
+    end
+
     subgraph "Single Front Door (SFD) comms"
         CRON[Cron job runs every 30 seconds to prevent overlapping execution]
         CHECK_DB[Check messages with 'pending' status in MongoDB]
         UPDATE_DB[Retrieve status update from Notify API]
         RETRY[Handle retries for failed deliveries]
         SNS[SNS topic: fcp_sfd_comm_events]
-    end
-
-    subgraph "GOV.UK Notify API"
-        NOTIFY_STATUS[Check latest status update]
     end
 
     subgraph "Data Storage"
@@ -133,16 +149,18 @@ sequenceDiagram
     SNS->>NOTIFY: Send request to Notify
     NOTIFY->>RECIPIENT: Deliver message
 
-    SFD-->>NOTIFY: Retrieve status update
+    SFD->>NOTIFY: Retrieve status update
     NOTIFY-->>SFD: Return status update
-    SFD-->>SNS: Re-build and publish message
-    SNS-->>FDM: Pass updated message to FDM SQS subscriber
-    SFD-->>MONGO: Store status update
+    SFD->>SNS: Re-build and publish message
+    SNS->>FDM: Pass updated message to FDM SQS subscriber
+    SFD->>MONGO: Store status update
 
     SFD->>SFD: Handle retries for failed deliveries
     SFD->>SNS: Re-build and publish message on retry
     SFD->>MONGO: Store retried message
     SNS->>FDM: Subscriber consumes updated request
+    SNS->>NOTIFY: Send retry request to Notify
+    NOTIFY->>RECIPIENT: Deliver message on retry
 ```
 
 ## Prerequisites
