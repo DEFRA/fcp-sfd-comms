@@ -64,10 +64,9 @@ graph
     subgraph "Single Front Door (SFD) comms"
         CRON[Cron job runs every 30 seconds to prevent overlapping execution]
         CHECK_DB[Check messages with 'pending' status in MongoDB]
-        CALL_NOTIFY[Get updated status from GOV.UK Notify API<br>e.g. delivered, failed]
         UPDATE_DB[Update message entry in MongoDB<br>with latest status]
-        PUBLISH_SNS[Publish message with updated status<br>to SNS topic: fcp_sfd_comm_events]
         RETRY[Handle retries for retryable failures e.g. technical-failure]
+        PUBLISH_SNS[SNS topic: fcp_sfd_comm_events]
     end
 
     subgraph "GOV.UK Notify API"
@@ -83,14 +82,13 @@ graph
     end
 
     CRON --> CHECK_DB
-    CHECK_DB --> CALL_NOTIFY
-    CALL_NOTIFY --> NOTIFY_STATUS
+    CHECK_DB -->|Retrieve status| NOTIFY_STATUS
     NOTIFY_STATUS --> UPDATE_DB
-    UPDATE_DB --> MONGO
-    UPDATE_DB --> PUBLISH_SNS
-    PUBLISH_SNS --> SQS
+    UPDATE_DB -->|Store status update| MONGO
+    UPDATE_DB -->|Publish| PUBLISH_SNS
+    PUBLISH_SNS -->|Subscriber consumes request| SQS
     UPDATE_DB --> RETRY
-    RETRY --> PUBLISH_SNS
+    RETRY -->|Publish| PUBLISH_SNS
 ```
 
 ## Prerequisites
