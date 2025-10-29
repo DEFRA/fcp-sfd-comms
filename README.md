@@ -58,7 +58,10 @@ graph TB
     UPDATE -->|Store status update| MONGO
     SNS -->|Subscriber consumes updated request| SQS
 
-    linkStyle 9 stroke:#eff5d3
+    linkStyle 9 stroke:#fcdedc
+    linkStyle 10 stroke:#fcdedc
+    linkStyle 11 stroke:#fcdedc
+    linkStyle 12 stroke:#fcdedc
 
     style MONGO fill:#e8f5e8,color:#0E0E0E
     style SNS fill:#e1f5fe,color:#0E0E0E
