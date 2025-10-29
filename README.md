@@ -12,7 +12,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ### Receiving and processing messages
 ```mermaid
-graph
+graph TB
     subgraph "Consumers"
         IAHW[Improving Animal Health and Welfare]
         FUTURE[Future consumers]
@@ -24,6 +24,7 @@ graph
         IDEMPOTENCY_CHECK[Check message is idempotent to avoid duplicate requests]
         SNS[SNS topic: fcp_sfd_comm_events]
         UPDATE[Retrieve status update from Notify API]
+        RETRY[Handle retries for failed deliveries]
     end
 
     subgraph "Farming Data Model (FDM)"
@@ -45,32 +46,38 @@ graph
     
     IAHW -->|Send message| PARSE
     FUTURE -->|Send message| PARSE
-    PARSE --> |Validate| VALIDATION
+    PARSE -->|Validate| VALIDATION
     VALIDATION -->|Idempotency check| IDEMPOTENCY_CHECK
     IDEMPOTENCY_CHECK -->|Build and publish message| SNS
     IDEMPOTENCY_CHECK -->|Store request| MONGO
-    SNS -->|Subscriber consumes request|SQS
+    SNS -->|Subscriber consumes request| SQS
     SNS -->|Send via Notify| NOTIFY
     NOTIFY -->|Deliver message| DELIVERY
     STATUS -->|Retrieve status| UPDATE
     UPDATE -->|Re-build and publish message| SNS
     UPDATE -->|Store status update| MONGO
-    SNS -->|Subscriber consumes updated request|SQS
+    SNS -->|Subscriber consumes updated request| SQS
+
+    linkStyle 9 stroke:#eff5d3
+
+    style MONGO fill:#e8f5e8,color:#0E0E0E
+    style SNS fill:#e1f5fe,color:#0E0E0E
+    style SQS fill:#e1f5fe,color:#0E0E0E
 ```
 
 ### Cron jobs
 ```mermaid
-graph
+graph TB
     subgraph "Single Front Door (SFD) comms"
         CRON[Cron job runs every 30 seconds to prevent overlapping execution]
         CHECK_DB[Check messages with 'pending' status in MongoDB]
-        UPDATE_DB[Update message entry in MongoDB<br>with latest status]
-        RETRY[Handle retries for retryable failures e.g. technical-failure]
-        PUBLISH_SNS[SNS topic: fcp_sfd_comm_events]
+        UPDATE_DB[Retrieve status update from Notify API]
+        RETRY[Handle retries for failed deliveries]
+        SNS[SNS topic: fcp_sfd_comm_events]
     end
 
     subgraph "GOV.UK Notify API"
-        NOTIFY_STATUS[Retrieve latest message status]
+        NOTIFY_STATUS[Check latest status update]
     end
 
     subgraph "Data Storage"
@@ -82,13 +89,17 @@ graph
     end
 
     CRON --> CHECK_DB
-    CHECK_DB -->|Retrieve status| NOTIFY_STATUS
+    CHECK_DB --> NOTIFY_STATUS
     NOTIFY_STATUS --> UPDATE_DB
     UPDATE_DB -->|Store status update| MONGO
-    UPDATE_DB -->|Publish| PUBLISH_SNS
-    PUBLISH_SNS -->|Subscriber consumes request| SQS
+    UPDATE_DB -->|Re-build and publish message| SNS
+    SNS -->|Subscriber consumes request| SQS
     UPDATE_DB --> RETRY
-    RETRY -->|Publish| PUBLISH_SNS
+    RETRY -->|Re-build and publish message| SNS
+
+    style MONGO fill:#e8f5e8,color:#0E0E0E
+    style SNS fill:#e1f5fe,color:#0E0E0E
+    style SQS fill:#e1f5fe,color:#0E0E0E
 ```
 
 ## Prerequisites
