@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, vi, test } from 'vitest'
 
 import { PublishCommand } from '@aws-sdk/client-sns'
 import { publish } from '../../../../src/messaging/sns/publish.js'
+import { debugLog } from '../../../../src/utils/debug-log.js'
 
 const mockSnsClient = {
   send: vi.fn()
@@ -13,8 +14,14 @@ const mockLoggerError = vi.fn()
 
 vi.mock('../../../../src/logging/logger.js', () => ({
   createLogger: () => ({
-    error: (...args) => mockLoggerError(...args)
+    error: (...args) => mockLoggerError(...args),
+    warn: vi.fn(),
+    debug: vi.fn()
   })
+}))
+
+vi.mock('../../../../src/utils/debug-log.js', () => ({
+  debugLog: vi.fn()
 }))
 
 describe('SNS Publish', () => {
@@ -38,5 +45,6 @@ describe('SNS Publish', () => {
     })
 
     expect(mockSnsClient.send).toHaveBeenCalledTimes(1)
+    expect(debugLog).toHaveBeenCalledTimes(1)
   })
 })
