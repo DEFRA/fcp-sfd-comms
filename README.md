@@ -109,6 +109,42 @@ graph
     style SQS fill:#e1f5fe,color:#0E0E0E
 ```
 
+## Event processing pipeline
+
+### Processing flow
+```mermaid
+sequenceDiagram
+    participant CONSUMER as Consumer
+    participant SFD as Single Front Door
+    participant VALIDATOR as Scheme validation
+    participant IDEMPOTENCY_CHECKER as Idempotency checker
+    participant MONGO as MongoDB
+    participant SNS as SNS topic
+    participant FDM as Farming Data Model (FDM)
+    participant NOTIFY as GOV.UK Notify API
+    participant RECIPIENT as Recipient inbox
+
+    CONSUMER->>SFD: Parse message
+    SFD->>VALIDATOR: Validate against schema
+    VALIDATOR->>IDEMPOTENCY_CHECKER: Ensure idempotency
+    IDEMPOTENCY_CHECKER->>MONGO: Store message
+    IDEMPOTENCY_CHECKER->>SNS: Build and publish message
+    SNS->>FDM: Pass message to FDM SQS subscriber
+    SNS->>NOTIFY: Send request to Notify
+    NOTIFY->>RECIPIENT: Deliver message
+
+    SFD-->>NOTIFY: Retrieve status update
+    NOTIFY-->>SFD: Return status update
+    SFD-->>SNS: Re-build and publish message
+    SNS-->>FDM: Pass updated message to FDM SQS subscriber
+    SFD-->>MONGO: Store status update
+
+    SFD->>SFD: Handle retries for failed deliveries
+    SFD->>SNS: Re-build and publish message on retry
+    SFD->>MONGO: Store retried message
+    SNS->>FDM: Subscriber consumes updated request
+```
+
 ## Prerequisites
 - Docker
 - Docker Compose
