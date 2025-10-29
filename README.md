@@ -10,34 +10,52 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ## Architecture overview
 
+### Receiving and processing messages
 ```mermaid
-graph TB
+graph
     subgraph "Consumers"
         IAHW[Improving Animal Health and Welfare]
         FUTURE[Future consumers]
     end
     
-    subgraph "Schema validation"
-        VALIDATION[Check message from consumer aligns with message contract]
+    subgraph "Single Front Door (SFD) comms"
+        PARSE[Parse request from consumer]
+        VALIDATION[Check message is valid and aligns with message contract]
+        IDEMPOTENCY_CHECK[Check message is idempotent to avoid duplicate requests]
+        SNS[SNS topic: fcp_sfd_comm_events]
+        UPDATE[Retrieve status update from Notify API]
     end
 
-    subgraph "Idempotency check"
-        IDEMPOTENCY_CHECK[Check message is idempotent to avoid duplicate messages being sent]
+    subgraph "Farming Data Model (FDM)"
+        SQS[SQS queue: fcp_fdm_events]
     end
-    
-    subgraph "AWS infrastructure"
-        SNS[SNS topic: fcp_sfd_comm_events]
+
+    subgraph "GOV.UK Notify API"
+        NOTIFY[Send message to recipient using template ID provided in consumer's original request]
+        STATUS[Current status of request e.g. sending, delivered etc.]
     end
-    
+
     subgraph "Data Storage"
         MONGO[(MongoDB)]
     end
+
+    subgraph "RECIPIENT"
+        DELIVERY[Deliver message to recipient's inbox]
+    end
     
-    IAHW -->|Send message| VALIDATION
-    FUTURE -->|Send message| VALIDATION
-    VALIDATION -->|Message validated| IDEMPOTENCY_CHECK
-    IDEMPOTENCY_CHECK -->|Publish event| SNS
-    
+    IAHW -->|Send message| PARSE
+    FUTURE -->|Send message| PARSE
+    PARSE --> |Validate| VALIDATION
+    VALIDATION -->|Idempotency check| IDEMPOTENCY_CHECK
+    IDEMPOTENCY_CHECK -->|Build and publish message| SNS
+    IDEMPOTENCY_CHECK -->|Store request| MONGO
+    SNS -->|Subscriber consumes request|SQS
+    SNS -->|Send via Notify| NOTIFY
+    NOTIFY -->|Deliver message| DELIVERY
+    STATUS -->|Retrieve status| UPDATE
+    UPDATE -->|Re-build and publish message| SNS
+    UPDATE -->|Store status update| MONGO
+    SNS -->|Subscriber consumes updated request|SQS
 ```
 
 ## Prerequisites
