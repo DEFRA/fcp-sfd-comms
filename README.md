@@ -50,18 +50,22 @@ graph TB
     VALIDATION -->|Idempotency check| IDEMPOTENCY_CHECK
     IDEMPOTENCY_CHECK -->|Build and publish message| SNS
     IDEMPOTENCY_CHECK -->|Store request| MONGO
+    IDEMPOTENCY_CHECK --> UPDATE
     SNS -->|Subscriber consumes request| SQS
     SNS -->|Send via Notify| NOTIFY
     NOTIFY -->|Deliver message| DELIVERY
     STATUS -->|Retrieve status| UPDATE
-    UPDATE -->|Re-build and publish message| SNS
     UPDATE -->|Store status update| MONGO
+    UPDATE --> RETRY
+    RETRY -->|Re-build and publish message| SNS
     SNS -->|Subscriber consumes updated request| SQS
 
-    linkStyle 9 stroke:#fcdedc
+    linkStyle 6 stroke:#fcdedc
     linkStyle 10 stroke:#fcdedc
     linkStyle 11 stroke:#fcdedc
     linkStyle 12 stroke:#fcdedc
+    linkStyle 13 stroke:#fcdedc
+    linkStyle 14 stroke:#fcdedc
 
     style MONGO fill:#e8f5e8,color:#0E0E0E
     style SNS fill:#e1f5fe,color:#0E0E0E
