@@ -12,7 +12,7 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ### Receiving and processing messages
 ```mermaid
-graph TB
+graph
     subgraph "Consumers"
         IAHW[Improving Animal Health and Welfare]
         FUTURE[Future consumers]
@@ -74,7 +74,7 @@ graph TB
 
 ### Cron jobs
 ```mermaid
-graph TB
+graph
     subgraph "Single Front Door (SFD) comms"
         CRON[Cron job runs every 30 seconds to prevent overlapping execution]
         CHECK_DB[Check messages with 'pending' status in MongoDB]
