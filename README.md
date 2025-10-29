@@ -96,11 +96,11 @@ graph
     end
 
     subgraph "Single Front Door (SFD) comms"
-        CRON[Cron job runs every 30 seconds to prevent overlapping execution]
-        CHECK_DB[Check messages with 'pending' status in MongoDB]
-        UPDATE_DB[Retrieve status update from Notify API]
+        CRON[Trigger cron job every 30 seconds]
+        CHECK_DB[Check 'pending' messages in storage]
+        UPDATE_DB[Retrieve status update]
         RETRY[Handle retries for failed deliveries]
-        SNS[SNS topic: fcp_sfd_comm_events]
+        SNS[SNS topic]
     end
 
     subgraph "Data Storage"
@@ -108,7 +108,7 @@ graph
     end
 
     subgraph "Farming Data Model (FDM)"
-        SQS[SQS queue: fcp_fdm_events]
+        SQS[SQS queue]
     end
 
     CRON --> CHECK_DB
@@ -116,9 +116,9 @@ graph
     NOTIFY_STATUS --> UPDATE_DB
     UPDATE_DB -->|Store status update| MONGO
     UPDATE_DB -->|Re-build and publish message| SNS
-    SNS -->|Subscriber consumes request| SQS
     UPDATE_DB --> RETRY
     RETRY -->|Re-build and publish message| SNS
+    SNS -->|Subscriber consumes message| SQS
 
     style MONGO fill:#e8f5e8,color:#0E0E0E
     style SNS fill:#e1f5fe,color:#0E0E0E
