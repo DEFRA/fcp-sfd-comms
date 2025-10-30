@@ -52,7 +52,7 @@ graph
     FUTURE -->|Send message| PARSE
     PARSE -->|Validate| VALIDATION
     VALIDATION --> IDEMPOTENCY_CHECK
-    IDEMPOTENCY_CHECK -->|Build and publish message| SNS
+    IDEMPOTENCY_CHECK -->|Build and publish| SNS
     IDEMPOTENCY_CHECK -->|Store message| MONGO
     SNS -->|Subscriber receives message| SQS
     SNS -->|Send request to Notify| NOTIFY
