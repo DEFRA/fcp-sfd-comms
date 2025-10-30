@@ -12,8 +12,8 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ### Receiving and processing messages
 Blue - happy path.  
-Orange - cron job for retrieving status update.  
-Red - handling retries for failed messages.
+Orange - retrieving status update (via cron job).  
+Red - handling retries.
 ```mermaid
 graph
     subgraph "Consumers"
