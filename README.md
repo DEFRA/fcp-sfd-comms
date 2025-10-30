@@ -21,36 +21,42 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 ```mermaid
 sequenceDiagram
     participant CONSUMER as Consumer
-    participant SFD as Single Front Door (SFD)
-    participant VALIDATOR as Scheme validation
+    participant SQS as SFD request queue
+    participant SFD as Single Front Door (fcp-sfd-comms)
+    participant VALIDATOR as Schema validation
     participant IDEMPOTENCY_CHECKER as Idempotency checker
     participant MONGO as MongoDB
-    participant SNS as SNS topic
-    participant FDM as Farming Data Model (FDM)
+    participant SNS as SFD events topic
+    participant FDM as Farming Data Model (fcp-fdm)
     participant NOTIFY as GOV.UK Notify API
     participant RECIPIENT as Recipient inbox
 
-    CONSUMER->>SFD: Parse message
-    SFD->>VALIDATOR: Validate against schema
-    VALIDATOR->>IDEMPOTENCY_CHECKER: Ensure idempotency
-    IDEMPOTENCY_CHECKER->>MONGO: Store message
-    IDEMPOTENCY_CHECKER->>SNS: Build and publish message
-    SNS->>FDM: Pass message to FDM SQS subscriber
-    SNS->>NOTIFY: Send request to Notify
-    NOTIFY->>RECIPIENT: Deliver message
+    rect rgba(230, 230, 250, 0.5)
+        note over VALIDATOR,IDEMPOTENCY_CHECKER: Internal components (fcp-sfd-comms)
+    end
 
-    SFD->>NOTIFY: Retrieve status update
-    NOTIFY-->>SFD: Return status update
-    SFD->>SNS: Re-build and publish message
-    SNS->>FDM: Pass updated message to FDM SQS subscriber
-    SFD->>MONGO: Store status update
+    CONSUMER->>SQS: 1. Send message
+    SQS->>SFD: 2. Parse message
+    SFD->>VALIDATOR: 3. Validate against schema
+    VALIDATOR->>IDEMPOTENCY_CHECKER: 4. Ensure idempotency
+    IDEMPOTENCY_CHECKER->>MONGO: 5. Store message
+    IDEMPOTENCY_CHECKER->>SNS: 6. Build and publish message
+    SNS->>FDM: 7. Topic subscriptions consume message
+    SNS->>NOTIFY: 8. Send request to Notify
+    NOTIFY->>RECIPIENT: 9. Deliver message
 
-    SFD-->>SFD: Handle retries
-    SFD->>SNS: Re-build and publish message on retry
-    SFD->>MONGO: Store retried message
-    SNS->>FDM: Subscriber consumes updated request
-    SNS->>NOTIFY: Send retry request to Notify
-    NOTIFY->>RECIPIENT: Deliver message on retry
+    SFD->>NOTIFY: 10. Retrieve status update
+    NOTIFY-->>SFD: 11. Return status update
+    SFD->>SNS: 12. Re-build and publish message
+    SNS->>FDM: 13. Pass updated message to FDM SQS subscriber
+    SFD->>MONGO: 14. Store status update
+
+    SFD-->>SFD: i. Handle retries
+    SFD->>SNS: ii. Re-build and publish message on retry
+    SFD->>MONGO: iii. Store retried message
+    SNS->>FDM: iv. Subscriber consumes updated request
+    SNS->>NOTIFY: v. Send retry request to Notify
+    NOTIFY->>RECIPIENT: vi. Deliver message on retry
 ```
 
 ### Processing flow for status update retrieval
@@ -63,16 +69,21 @@ sequenceDiagram
     participant SNS as SNS topic
     participant FDM as Farming Data Model (FDM)
 
-    SFD->>NOTIFY: Retrieve status update
-    NOTIFY-->>SFD: Return status update
-    SFD->>SNS: Re-build and publish
-    SFD->>MONGO: Store status update
-    SNS->>FDM: Subscriber consumes updated request
+    loop Cron job every 30 seconds
+        SFD->>NOTIFY: 1. Retrieve status update
+        NOTIFY-->>SFD: 2. Return status update
+        SFD->>SNS: 3. Re-build and publish
+        SFD->>MONGO: 4. Store status update
+        SNS->>FDM: 5. Subscriber consumes updated request
 
-    SFD-->>SFD: Handle retries
-    SFD->>NOTIFY: Send retry request to Notify
-    SFD->>SNS: Re-build and publish on retry
-    SNS->>FDM: Subscriber consumes updated message on retry
+        alt Message status failed, proceed to retry
+            SFD-->>SFD: i. Handle retries
+            SFD->>NOTIFY: ii. Send retry request to Notify
+            SFD->>SNS: iii. Re-build and publish on retry
+            SFD->>MONGO: iv. Store retried messages
+            SNS->>FDM: v. Subscriber consumes updated message on retry
+        end
+    end
 ```
 
 ## Prerequisites
