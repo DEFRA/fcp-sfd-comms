@@ -31,9 +31,14 @@ sequenceDiagram
     participant NOTIFY as GOV.UK Notify API
     participant RECIPIENT as Recipient inbox
 
+    rect
+        note over CONSUMER,SNS: Inbound message
+    end
+
     rect rgba(230, 230, 250, 0.5)
         note over VALIDATOR,IDEMPOTENCY_CHECKER: Internal components (fcp-sfd-comms)
     end
+
 
     CONSUMER->>SQS: 1. Send message
     SQS->>SFD: 2. Parse message
@@ -41,6 +46,11 @@ sequenceDiagram
     VALIDATOR->>IDEMPOTENCY_CHECKER: 4. Ensure idempotency
     IDEMPOTENCY_CHECKER->>MONGO: 5. Store message
     IDEMPOTENCY_CHECKER->>SNS: 6. Build and publish message
+
+    rect
+        note over SNS,RECIPIENT: Outbound message
+    end
+
     SNS->>FDM: 7. Topic subscriptions consume message
     SNS->>NOTIFY: 8. Send request to Notify
     NOTIFY->>RECIPIENT: 9. Deliver message
@@ -51,6 +61,10 @@ sequenceDiagram
     SNS->>FDM: 13. Pass updated message to FDM SQS subscriber
     SFD->>MONGO: 14. Store status update
 
+    rect
+        note over SFD,RECIPIENT: Retry logic
+    end
+
     SFD-->>SFD: i. Handle retries
     SFD->>SNS: ii. Re-build and publish message on retry
     SFD->>MONGO: iii. Store retried message
@@ -58,6 +72,10 @@ sequenceDiagram
     SNS->>NOTIFY: v. Send retry request to Notify
     NOTIFY->>RECIPIENT: vi. Deliver message on retry
 ```
+
+### Code processing layer
+1. **Initial request**
+    - 
 
 ### Processing flow for status update retrieval
 
