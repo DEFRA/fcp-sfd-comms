@@ -10,131 +10,18 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ## Architecture overview
 
-### Receiving and processing messages
-Blue - happy path.  
-Orange - retrieving status update (via cron job).  
-Red - handling retries.
-```mermaid
-graph
-    subgraph "Consumers"
-        IAHW[Improving Animal Health and Welfare]
-        FUTURE[Future consumers]
-    end
-    
-    subgraph "Single Front Door (SFD) comms"
-        PARSE[Parse message]
-        VALIDATION[Validate message against schema]
-        IDEMPOTENCY_CHECK[Check message is idempotent]
-        SNS[SNS topic]
-        UPDATE[Retrieve status update]
-        RETRY[Handle retries for failed message delivery]
-    end
-
-    subgraph "GOV.UK Notify API"
-        NOTIFY[Request delivery]
-        STATUS[Current message status]
-    end
-
-    subgraph "Farming Data Model (FDM)"
-        SQS[SQS queue]
-    end
-
-    subgraph "Data Storage"
-        MONGO[(MongoDB)]
-    end
-
-
-    subgraph "RECIPIENT"
-        DELIVERY[Recipient's inbox]
-    end
-    
-    IAHW -->|Send message| PARSE
-    FUTURE -->|Send message| PARSE
-    PARSE -->|Validate| VALIDATION
-    VALIDATION --> IDEMPOTENCY_CHECK
-    IDEMPOTENCY_CHECK -->|Build and publish| SNS
-    IDEMPOTENCY_CHECK -->|Store message| MONGO
-    SNS -->|Subscriber receives message| SQS
-    SNS -->|Send request to Notify| NOTIFY
-    NOTIFY -->|Deliver message| DELIVERY
-    IDEMPOTENCY_CHECK --> UPDATE
-    UPDATE <-.->|Retrieve and return status update| STATUS
-    UPDATE -->|Store status update| MONGO
-    UPDATE -->|Re-build and publish|SNS
-    SNS --> SQS
-    UPDATE --> RETRY
-    RETRY -->|Re-build and publish retry| SNS
-    SNS --> NOTIFY
-    NOTIFY --> DELIVERY
-
-    linkStyle 0 stroke:#aadee3
-    linkStyle 1 stroke:#aadee3
-    linkStyle 2 stroke:#aadee3
-    linkStyle 3 stroke:#aadee3
-    linkStyle 4 stroke:#aadee3
-    linkStyle 5 stroke:#aadee3
-    linkStyle 6 stroke:#aadee3
-    linkStyle 7 stroke:#aadee3
-    linkStyle 8 stroke:#aadee3
-    linkStyle 9 stroke:#e6c19c
-    linkStyle 10 stroke:#e6c19c
-    linkStyle 11 stroke:#e6c19c
-    linkStyle 12 stroke:#e6c19c
-    linkStyle 13 stroke:#e6c19c
-    linkStyle 14 stroke:#db9393
-    linkStyle 15 stroke:#db9393
-    linkStyle 16 stroke:#db9393
-    linkStyle 17 stroke:#db9393
-
-    style MONGO fill:#e8f5e8,color:#0E0E0E
-    style SNS fill:#e1f5fe,color:#0E0E0E
-    style SQS fill:#e1f5fe,color:#0E0E0E
-```
-
-### Cron jobs
-```mermaid
-graph
-    subgraph "GOV.UK Notify API"
-        NOTIFY_STATUS[Check latest status update]
-    end
-
-    subgraph "Single Front Door (SFD) comms"
-        CRON[Trigger cron job every 30 seconds]
-        CHECK_DB[Check 'pending' messages in storage]
-        UPDATE_DB[Retrieve status update]
-        RETRY[Handle retries for failed deliveries]
-        SNS[SNS topic]
-    end
-
-    subgraph "Data Storage"
-        MONGO[(MongoDB)]
-    end
-
-    subgraph "Farming Data Model (FDM)"
-        SQS[SQS queue]
-    end
-
-    CRON --> CHECK_DB
-    CHECK_DB --> NOTIFY_STATUS
-    NOTIFY_STATUS --> UPDATE_DB
-    UPDATE_DB -->|Store status update| MONGO
-    UPDATE_DB -->|Re-build and publish message| SNS
-    UPDATE_DB --> RETRY
-    RETRY -->|Re-build and publish message| SNS
-    SNS -->|Subscriber consumes message| SQS
-
-    style MONGO fill:#e8f5e8,color:#0E0E0E
-    style SNS fill:#e1f5fe,color:#0E0E0E
-    style SQS fill:#e1f5fe,color:#0E0E0E
-```
-
 ## Event processing pipeline
 
-### Processing flow
+> **API Specification**
+> Complete AsyncAPI specification is available at: [`docs/asyncapi0-v1.0.yaml`](/docs/asyncapi-v1.0.yaml)
+> Defines all supported inbound events and schemas with examples provided.
+
+### Processing flow inbound messages
+
 ```mermaid
 sequenceDiagram
     participant CONSUMER as Consumer
-    participant SFD as Single Front Door
+    participant SFD as Single Front Door (SFD)
     participant VALIDATOR as Scheme validation
     participant IDEMPOTENCY_CHECKER as Idempotency checker
     participant MONGO as MongoDB
@@ -158,12 +45,34 @@ sequenceDiagram
     SNS->>FDM: Pass updated message to FDM SQS subscriber
     SFD->>MONGO: Store status update
 
-    SFD-->>SFD: Handle retries for failed deliveries
+    SFD-->>SFD: Handle retries
     SFD->>SNS: Re-build and publish message on retry
     SFD->>MONGO: Store retried message
     SNS->>FDM: Subscriber consumes updated request
     SNS->>NOTIFY: Send retry request to Notify
     NOTIFY->>RECIPIENT: Deliver message on retry
+```
+
+### Processing flow for status update retrieval
+
+```mermaid
+sequenceDiagram
+    participant SFD as Single Front Door (SFD)
+    participant NOTIFY as GOV.UK Notify API
+    participant MONGO as MongoDB
+    participant SNS as SNS topic
+    participant FDM as Farming Data Model (FDM)
+
+    SFD->>NOTIFY: Retrieve status update
+    NOTIFY-->>SFD: Return status update
+    SFD->>SNS: Re-build and publish
+    SFD->>MONGO: Store status update
+    SNS->>FDM: Subscriber consumes updated request
+
+    SFD-->>SFD: Handle retries
+    SFD->>NOTIFY: Send retry request to Notify
+    SFD->>SNS: Re-build and publish on retry
+    SNS->>FDM: Subscriber consumes updated message on retry
 ```
 
 ## Prerequisites
