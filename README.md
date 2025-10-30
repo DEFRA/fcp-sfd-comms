@@ -23,43 +23,34 @@ sequenceDiagram
     participant CONSUMER as Consumer
     participant SQS as SFD request queue
     participant SFD as Single Front Door (fcp-sfd-comms)
-    participant VALIDATOR as Schema validation
-    participant IDEMPOTENCY_CHECKER as Idempotency checker
     participant MONGO as MongoDB
     participant SNS as SFD events topic
-    participant FDM as Farming Data Model (fcp-fdm)
     participant NOTIFY as GOV.UK Notify API
+    participant FDM as Farming Data Model (fcp-fdm)
     participant RECIPIENT as Recipient inbox
 
     rect
         note over CONSUMER,SNS: Inbound message
     end
 
-    rect rgba(230, 230, 250, 0.5)
-        note over VALIDATOR,IDEMPOTENCY_CHECKER: Internal components (fcp-sfd-comms)
-    end
-
-
     CONSUMER->>SQS: 1. Send message
     SQS->>SFD: 2. Parse message
-    SFD->>VALIDATOR: 3. Validate against schema
-    VALIDATOR->>IDEMPOTENCY_CHECKER: 4. Ensure idempotency
-    IDEMPOTENCY_CHECKER->>MONGO: 5. Store message
-    IDEMPOTENCY_CHECKER->>SNS: 6. Build and publish message
+    SFD->>MONGO: 3. Validate and store message
+    SFD->>SNS: 4. Build and publish message
 
     rect
         note over SNS,RECIPIENT: Outbound message
     end
 
-    SNS->>FDM: 7. Topic subscriptions consume message
-    SNS->>NOTIFY: 8. Send request to Notify
-    NOTIFY->>RECIPIENT: 9. Deliver message
+    SFD->>NOTIFY: 5. Send request to Notify
+    FDM->>SNS: 6. Listens for message
+    NOTIFY->>RECIPIENT: 7. Deliver message
 
-    SFD->>NOTIFY: 10. Retrieve status update
-    NOTIFY-->>SFD: 11. Return status update
-    SFD->>SNS: 12. Re-build and publish message
-    SNS->>FDM: 13. Pass updated message to FDM SQS subscriber
-    SFD->>MONGO: 14. Store status update
+    SFD->>NOTIFY: 8. Retrieve status update
+    NOTIFY-->>SFD: 9. Return status update
+    SFD->>SNS: 10. Build and publish message with status update
+    FDM->>SNS: 11. Listens for message with status update
+    SFD->>MONGO: 12. Store message with status update
 
     rect
         note over SFD,RECIPIENT: Retry logic
@@ -67,30 +58,23 @@ sequenceDiagram
 
     SFD-->>SFD: i. Handle retries
     SFD->>SNS: ii. Re-build and publish message on retry
-    SFD->>MONGO: iii. Store retried message
-    SNS->>FDM: iv. Subscriber consumes updated request
-    SNS->>NOTIFY: v. Send retry request to Notify
+    FDM->>SNS: iii. Listen for message
+    SFD->>MONGO: iv. Store message
+    SFD->>NOTIFY: v. Send retry request to Notify
     NOTIFY->>RECIPIENT: vi. Deliver message on retry
 ```
 
 ### Message processing stages
 
 1. Consumer sends request onto the Single Front Door (SFD) queue: `fcp_sfd_comms_request`.
-2. Message is consumed and parsed by the SFD comms service: `fcp-sfd-comms`.
-3. Comms service validates message against agreed schema specified in message contract.
-4. Comms service checks the message is idempotent to prevent duplicate requests being sent.
-5. On successful validation the message is stored in the SFD's comms database: `fcp_sfd_comms`.
-6. Comms builds the message to then be published onto SFD's topic: `fcp_sfd_comm_events`.
-7. All topic subscriptions will receive the message. The Farming Data Model (FDM) is currently the only subscriber to SFD's topic.  
-8. Comms service sends a request to the GOV.UK Notify API alongside the built message which includes the Notify template ID.  
-9. Message is delivered to the recipient.  
-10. Comms service triggers a cron job every 30 seconds, sending a request to the Notify API for a status update on the message.  
-11. Latest message status is returned to the comms service.  
-12. Comms service will re-build the message with the updated status and publish this onto SFD's topic.  
-13. All topic subscriptions (FDM) will receive the updated message.  
-14. Updated message is stored in the comms database. 
+2. Message is consumed and parsed by the SFD comms service: `fcp-sfd-comms`. 
+3. Comms service will validate the request against the message schema, check the request being made is idempotent to avoid duplicate requests, and then store the valid message in the SFD's comms database: `fcp_sfd_comms`.
+4. Comms builds the message to then be published onto SFD's topic: `fcp_sfd_comm_events`.
+5. All topic subscriptions will receive the message. The Farming Data Model (FDM) is currently the only subscriber to SFD's topic.  
+6. Comms service sends a request to the GOV.UK Notify API alongside the built message which includes the Notify template ID.  
+7. Message is delivered to the recipient.  
 
-Extended details on the cron job and retry logic is provided below.
+Extended details on the cron job for status update retrieval and retry logic is provided below.
 
 ### Processing flow for status update retrieval
 
@@ -105,16 +89,16 @@ sequenceDiagram
     loop Cron job every 30 seconds
         SFD->>NOTIFY: 1. Retrieve status update
         NOTIFY-->>SFD: 2. Return status update
-        SFD->>SNS: 3. Re-build and publish
+        SFD->>SNS: 3. Build and publish message with status update
         SFD->>MONGO: 4. Store status update
-        SNS->>FDM: 5. Subscriber consumes updated request
+        FDM->>SNS: 5. Listen for message with status update
 
         alt Message status failed, proceed to retry
             SFD-->>SFD: i. Handle retries
             SFD->>NOTIFY: ii. Send retry request to Notify
             SFD->>SNS: iii. Re-build and publish on retry
-            SFD->>MONGO: iv. Store retried messages
-            SNS->>FDM: v. Subscriber consumes updated message on retry
+            SFD->>MONGO: iv. Store message
+            FDM->>SNS: v. Listen for message on retry
         end
     end
 ```
@@ -123,9 +107,9 @@ sequenceDiagram
 
 1. Cron job is triggered to run every 30 seconds. First stage is sending a request to the GOV.UK Notify API for a status update.
 2. Notify API returns status update to SFD's comms service.
-3. Comms service will re-build and publish the message with the status update onto the SFD topic.
+3. Comms service will build and publish the message with the status update onto the SFD topic.
 4. Updated message is stored in SFD's comms database. 
-5. All topic subscribers will also consume the updated message.
+5. All topic subscribers will listen and consume the updated message.
 
 The `fcp-sfd-comms` service is also configured to handle retries (i) on any messages that fail to be delivered to the recipient. Requests are sent to the Notify API to retry sending the message (ii). In parallel to this, `fcp-sfd-comms` will re-build the message and publish it onto the SFD topic (iii) and store the message in the Mongo database (iv). All topic subscriptions (in this case FDM) will consume the message published onto SFD's topic (v). 
 
