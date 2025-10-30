@@ -83,7 +83,7 @@ sequenceDiagram
     participant SFD as Single Front Door (SFD)
     participant NOTIFY as GOV.UK Notify API
     participant MONGO as MongoDB
-    participant SNS as SNS topic
+    participant SNS as SFD events topic
     participant FDM as Farming Data Model (FDM)
 
     loop Cron job every 30 seconds
