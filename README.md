@@ -43,13 +43,13 @@ sequenceDiagram
     end
 
     SFD->>NOTIFY: 5. Send request to Notify
-    FDM->>SNS: 6. Listens for message
+    FDM-->>SNS: 6. Listens for message
     NOTIFY->>RECIPIENT: 7. Deliver message
 
     SFD->>NOTIFY: 8. Retrieve status update
     NOTIFY-->>SFD: 9. Return status update
     SFD->>SNS: 10. Build and publish message with status update
-    FDM->>SNS: 11. Listens for message with status update
+    FDM-->>SNS: 11. Listens for message with status update
     SFD->>MONGO: 12. Store message with status update
 
     rect
@@ -58,7 +58,7 @@ sequenceDiagram
 
     SFD-->>SFD: i. Handle retries
     SFD->>SNS: ii. Re-build and publish message on retry
-    FDM->>SNS: iii. Listen for message
+    FDM-->>SNS: iii. Listen for message
     SFD->>MONGO: iv. Store message
     SFD->>NOTIFY: v. Send retry request to Notify
     NOTIFY->>RECIPIENT: vi. Deliver message on retry
@@ -91,14 +91,14 @@ sequenceDiagram
         NOTIFY-->>SFD: 2. Return status update
         SFD->>SNS: 3. Build and publish message with status update
         SFD->>MONGO: 4. Store status update
-        FDM->>SNS: 5. Listen for message with status update
+        FDM-->>SNS: 5. Listen for message with status update
 
         alt Message status failed, proceed to retry
             SFD-->>SFD: i. Handle retries
             SFD->>NOTIFY: ii. Send retry request to Notify
             SFD->>SNS: iii. Re-build and publish on retry
             SFD->>MONGO: iv. Store message
-            FDM->>SNS: v. Listen for message on retry
+            FDM-->>SNS: v. Listen for message on retry
         end
     end
 ```
