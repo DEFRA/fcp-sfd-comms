@@ -158,7 +158,7 @@ sequenceDiagram
     SNS->>FDM: Pass updated message to FDM SQS subscriber
     SFD->>MONGO: Store status update
 
-    SFD->>SFD: Handle retries for failed deliveries
+    SFD-->>SFD: Handle retries for failed deliveries
     SFD->>SNS: Re-build and publish message on retry
     SFD->>MONGO: Store retried message
     SNS->>FDM: Subscriber consumes updated request
