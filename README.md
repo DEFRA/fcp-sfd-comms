@@ -74,7 +74,7 @@ sequenceDiagram
 ```
 
 ### Code processing layer
-1. **Initial request**
+    1. **Initial request**
     - 
 
 ### Processing flow for status update retrieval
