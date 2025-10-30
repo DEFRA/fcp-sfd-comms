@@ -11,6 +11,9 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 ## Architecture overview
 
 ### Receiving and processing messages
+Blue - happy path.  
+Orange - cron job for retrieving status update.  
+Red - handling retries for failed messages.
 ```mermaid
 graph
     subgraph "Consumers"
