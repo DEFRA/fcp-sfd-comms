@@ -12,8 +12,8 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ## Event processing pipeline
 
-> **API Specification**
-> Complete AsyncAPI specification is available at: [`docs/asyncapi0-v1.0.yaml`](/docs/asyncapi-v1.0.yaml)
+> **API Specification**  
+> Complete AsyncAPI specification is available at: [`docs/asyncapi0-v1.0.yaml`](/docs/asyncapi-v1.0.yaml).  
 > Defines all supported inbound events and schemas with examples provided.
 
 ### Processing flow inbound messages
