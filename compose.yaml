@@ -4,9 +4,6 @@ services:
       target: development
     image: fcp-sfd-comms-development
     container_name: fcp-sfd-comms-development
-    ports:
-      - '3001:3001'
-      - '9229:9229'
     links:
       - 'localstack:localstack'
       - 'mongodb:mongodb'
@@ -15,9 +12,6 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
-    volumes:
-      - ./src/:/home/node/src
-      - ./package.json:/home/node/package.json
     env_file:
       - .env
     environment:
@@ -35,14 +29,9 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
       NOTIFY_API_KEY: ${NOTIFY_API_KEY}
-    networks:
-      - cdp-tenant
 
   localstack:
     image: localstack/localstack:3.0.2
-    ports:
-      - '4566:4566' # LocalStack Gateway
-      - '4510-4559:4510-4559' # external services port range
     env_file:
       - .env
     environment:
@@ -56,29 +45,11 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-eu-west-2}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
-    volumes:
-      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
-      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
     healthcheck:
       test: ['CMD', 'curl', 'localhost:4566']
       interval: 5s
       start_period: 5s
       retries: 3
-    networks:
-      - cdp-tenant
 
   mongodb:
     image: mongo:6.0.13
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongodb-data:/data
-    networks:
-      - cdp-tenant
-
-volumes:
-  mongodb-data:
-
-networks:
-  cdp-tenant:
-    driver: bridge

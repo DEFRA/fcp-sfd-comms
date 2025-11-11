@@ -23,13 +23,13 @@ services:
       - ./package.json:/home/node/package.json
       - ./coverage:/home/node/coverage
     networks:
-      - cdp-tenant
+      - fcp-sfd
   localstack:
     env_file:
       - path: .env
         required: false
     networks:
-      - cdp-tenant
+      - fcp-sfd
 
   mongodb:
     volumes:
