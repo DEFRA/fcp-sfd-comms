@@ -42,7 +42,7 @@ jobs:
           mkdir -p coverage
           chmod -R a+rw ./coverage
           docker compose -f compose.yaml -f compose.test.yaml -f compose.override.yaml run --rm "fcp-sfd-comms"
-          
+
       - name: SonarQubeScan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
