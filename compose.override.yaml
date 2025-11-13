@@ -21,8 +21,8 @@ services:
       - '4566:4566'
       - '4510-4559:4510-4559'
     volumes:
-      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
       - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+      - localstack-data:/var/lib/localstack
     networks:
       - fcp-sfd
 

@@ -1,3 +1,4 @@
+name: fcp-sfd-comms-test
 services:
   fcp-sfd-comms:
     build:
@@ -5,6 +6,9 @@ services:
     image: fcp-sfd-comms-development
     container_name: fcp-sfd-comms-test
     command: npm run test
+    depends_on:
+      localstack:
+        condition: service_healthy
     env_file:
       - path: .env
         required: false
@@ -22,22 +26,3 @@ services:
       - ./test/:/home/node/test
       - ./package.json:/home/node/package.json
       - ./coverage:/home/node/coverage
-    networks:
-      - fcp-sfd
-  localstack:
-    env_file:
-      - path: .env
-        required: false
-    networks:
-      - fcp-sfd
-
-  mongodb:
-    volumes:
-      - mongodb-data:/data
-
-volumes:
-  mongodb-data:
-
-networks:
-  cdp-tenant:
-    driver: bridge
