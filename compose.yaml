@@ -12,6 +12,9 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_started
+    env_file:
+      - path: .env
+        required: false
     environment:
       PORT: 3001
       NODE_ENV: development
@@ -31,7 +34,8 @@ services:
   localstack:
     image: localstack/localstack:3.0.2
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       DEBUG: ${DEBUG:-1}
       LS_LOG: WARN # Localstack DEBUG Level
