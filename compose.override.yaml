@@ -19,8 +19,14 @@ services:
     ports:
       - '4566:4566'
       - '4510-4559:4510-4559'
+    volumes:
+      - localstack-data:/var/lib/localstack
     networks:
       - fcp-sfd
+
+volumes:
+  mongodb-data:
+  localstack-data:
 
 networks:
   fcp-sfd:
