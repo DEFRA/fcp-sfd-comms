@@ -47,6 +47,9 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-eu-west-2}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
+    volumes:
+      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+      - localstack-data:/var/lib/localstack
     healthcheck:
       test: ['CMD', 'curl', 'localhost:4566']
       interval: 5s
@@ -55,3 +58,8 @@ services:
 
   mongodb:
     image: mongo:6.0.13
+
+volumes:
+  mongodb-data:
+  localstack-data:
+
