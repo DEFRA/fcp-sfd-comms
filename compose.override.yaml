@@ -1,0 +1,34 @@
+name: fcp-sfd-comms
+services:
+  fcp-sfd-comms:
+    ports:
+      - '3001:3001'
+      - '9229:9229'
+    networks:
+      - fcp-sfd
+
+  mongodb:
+    ports:
+      - '27017:27017'
+    networks:
+      - fcp-sfd
+    volumes:
+      - mongodb-data:/data
+
+  localstack:
+    ports:
+      - '4566:4566'
+      - '4510-4559:4510-4559'
+    volumes:
+      - localstack-data:/var/lib/localstack
+    networks:
+      - fcp-sfd
+
+volumes:
+  mongodb-data:
+  localstack-data:
+
+networks:
+  fcp-sfd:
+    driver: bridge
+    name: fcp-sfd
