@@ -8,6 +8,8 @@ vi.mock('@aws-sdk/client-sqs', () => {
   }
 })
 
+const snsEndpoint = process.env.SQS_ENDPOINT
+
 describe('sqs client', () => {
   let originalEnv
 
@@ -26,7 +28,7 @@ describe('sqs client', () => {
 
     expect(sqsClient).toBeDefined()
     expect(mockSqsClient).toHaveBeenCalledWith({
-      endpoint: 'http://localstack:4566',
+      endpoint: snsEndpoint,
       region: 'eu-west-2',
       credentials: {
         accessKeyId: 'test',
@@ -42,7 +44,7 @@ describe('sqs client', () => {
 
     expect(sqsClient).toBeDefined()
     expect(mockSqsClient).toHaveBeenCalledWith({
-      endpoint: 'http://localstack:4566',
+      endpoint: snsEndpoint,
       region: 'eu-west-2'
     })
   })

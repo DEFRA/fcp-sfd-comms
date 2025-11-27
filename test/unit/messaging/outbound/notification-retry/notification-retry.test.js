@@ -25,6 +25,7 @@ vi.mock('../../../../../src/logging/logger.js', () => ({
 }))
 
 const mockLogger = createLogger()
+const commsRequestQueueUrl = process.env.COMMS_REQUEST_QUEUE_URL
 
 describe('notification retry publish', () => {
   beforeEach(() => {
@@ -47,7 +48,7 @@ describe('notification retry publish', () => {
     await publishRetryRequest(mockCommsRequest, 'test@example.com', 15, 'a22edfc0-5249-486e-a98f-0d9f8f4a9d7a')
 
     expect(SendMessageCommand).toHaveBeenCalledWith(expect.objectContaining({
-      QueueUrl: 'http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request'
+      QueueUrl: commsRequestQueueUrl
     }))
 
     expect(sqsClient.send).toHaveBeenCalledTimes(1)
