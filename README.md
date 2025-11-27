@@ -1,6 +1,6 @@
 # fcp-sfd-comms
 ![Publish](https://github.com/defra/fcp-sfd-comms/actions/workflows/publish.yml/badge.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms) 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=coverage)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_fcp-sfd-comms&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=DEFRA_fcp-sfd-comms)
 
@@ -12,8 +12,8 @@ This service is part of the [Single Front Door (SFD) service](https://github.com
 
 ## Event processing pipeline
 
-> **API Specification**  
-> Complete AsyncAPI specification is available at: [`docs/asyncapi0-v1.0.yaml`](/docs/asyncapi-v1.0.yaml).  
+> **API Specification**
+> Complete AsyncAPI specification is available at: [`docs/asyncapi0-v1.0.yaml`](/docs/asyncapi-v1.0.yaml).
 > Defines all supported inbound events and schemas with examples provided.
 
 ### Processing flow inbound messages
@@ -67,12 +67,12 @@ sequenceDiagram
 ### Message processing stages
 
 1. Consumer sends request onto the Single Front Door (SFD) queue: `fcp_sfd_comms_request`.
-2. Message is consumed and parsed by the SFD comms service: `fcp-sfd-comms`. 
+2. Message is consumed and parsed by the SFD comms service: `fcp-sfd-comms`.
 3. Comms service will validate the request against the message schema, check the request being made is idempotent to avoid duplicate requests, and then store the valid message in the SFD's comms database: `fcp_sfd_comms`.
 4. Comms builds the message to then be published onto SFD's topic: `fcp_sfd_comm_events`.
-5. All topic subscriptions will receive the message. The Farming Data Model (FDM) is currently the only subscriber to SFD's topic.  
-6. Comms service sends a request to the GOV.UK Notify API alongside the built message which includes the Notify template ID.  
-7. Message is delivered to the recipient.  
+5. All topic subscriptions will receive the message. The Farming Data Model (FDM) is currently the only subscriber to SFD's topic.
+6. Comms service sends a request to the GOV.UK Notify API alongside the built message which includes the Notify template ID.
+7. Message is delivered to the recipient.
 
 Extended details on the cron job for status update retrieval and retry logic is provided below.
 
@@ -108,10 +108,10 @@ sequenceDiagram
 1. Cron job is triggered to run every 30 seconds. First stage is sending a request to the GOV.UK Notify API for a status update.
 2. Notify API returns status update to SFD's comms service.
 3. Comms service will build and publish the message with the status update onto the SFD topic.
-4. Updated message is stored in SFD's comms database. 
+4. Updated message is stored in SFD's comms database.
 5. All topic subscribers will listen and consume the updated message.
 
-The `fcp-sfd-comms` service is also configured to handle retries (i) on any messages that fail to be delivered to the recipient. Requests are sent to the Notify API to retry sending the message (ii). In parallel to this, `fcp-sfd-comms` will re-build the message and publish it onto the SFD topic (iii) and store the message in the Mongo database (iv). All topic subscriptions (in this case FDM) will consume the message published onto SFD's topic (v). 
+The `fcp-sfd-comms` service is also configured to handle retries (i) on any messages that fail to be delivered to the recipient. Requests are sent to the Notify API to retry sending the message (ii). In parallel to this, `fcp-sfd-comms` will re-build the message and publish it onto the SFD topic (iii) and store the message in the Mongo database (iv). All topic subscriptions (in this case FDM) will consume the message published onto SFD's topic (v).
 
 ## Prerequisites
 - Docker
@@ -138,16 +138,19 @@ The `fcp-sfd-comms` service is also configured to handle retries (i) on any mess
 
 We recommend using the [fcp-sfd-core](https://github.com/DEFRA/fcp-sfd-core) repository for local development. You can however run this service independently by following the instructions below.
 
+> ℹ️️ The aws resources created locally are meant to be shared with [fcp-sfd-comms-publisher-stub](https://github.com/DEFRA/fcp-sfd-comms-publisher-stub) when running alongside.
+> fcp-sfd-comms can be run independently of fcp-sfd-comms-publisher-stub.
+
 #### Build container image
 
-The service runs inside of a Docker container and the container image can be built using Docker Compose:
+The service runs inside a Docker container and the container image can be built using Docker Compose:
 ```
 docker compose build
 ```
 
 #### Start the container
 
-Once built, the container is also started via Docker Compose: 
+Once built, the container is also started via Docker Compose:
 
 ```
 docker compose up -d

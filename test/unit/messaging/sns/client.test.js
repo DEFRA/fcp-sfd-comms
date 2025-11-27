@@ -8,6 +8,8 @@ vi.mock('@aws-sdk/client-sns', () => {
   }
 })
 
+const snsEndpoint = process.env.SQS_ENDPOINT
+
 describe('SNS Client', () => {
   let originalEnv
 
@@ -26,7 +28,7 @@ describe('SNS Client', () => {
 
     expect(snsClient).toBeDefined()
     expect(SNSClient).toHaveBeenCalledWith({
-      endpoint: 'http://localstack:4566',
+      endpoint: snsEndpoint,
       region: 'eu-west-2',
       credentials: {
         accessKeyId: 'test',
@@ -42,7 +44,7 @@ describe('SNS Client', () => {
 
     expect(snsClient).toBeDefined()
     expect(SNSClient).toHaveBeenCalledWith({
-      endpoint: 'http://localstack:4566',
+      endpoint: snsEndpoint,
       region: 'eu-west-2'
     })
   })
