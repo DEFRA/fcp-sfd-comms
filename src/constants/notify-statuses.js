@@ -6,7 +6,7 @@ export const notifyStatuses = {
   TEMPORARY_FAILURE: 'temporary-failure',
   TECHNICAL_FAILURE: 'technical-failure',
   INTERNAL_FAILURE: 'internal-failure',
-  VALIDATION_FAILURE: 'validation-failure' // when its a duff sqs message, should move into finishedStatuses as well.
+  VALIDATION_FAILURE: 'validation-failure' // when its a invalid sqs message, we should move this into finishedStatuses as well because it means it has failed notify validation eg it doesnt have a valid notify template_id.
 }
 
 // pendingStatuses 
