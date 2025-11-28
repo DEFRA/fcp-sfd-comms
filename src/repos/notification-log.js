@@ -12,10 +12,7 @@ const addNotificationRequest = async (message) => {
     const notification = {
       _id: new UUID(),
       message,
-      createdAt: new Date(),
-      statusDetails: {
-        status: notifyStatuses.CREATED
-      }
+      createdAt: new Date()
     }
 
     await dbClient.collection(collection).insertOne(notification)

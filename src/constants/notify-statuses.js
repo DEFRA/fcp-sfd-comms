@@ -6,8 +6,12 @@ export const notifyStatuses = {
   TEMPORARY_FAILURE: 'temporary-failure',
   TECHNICAL_FAILURE: 'technical-failure',
   INTERNAL_FAILURE: 'internal-failure',
-  VALIDATION_FAILURE: 'validation-failure'
+  VALIDATION_FAILURE: 'validation-failure' // when its a duff sqs message, should move into finishedStatuses as well.
 }
+
+// pendingStatuses 
+// we could consider setting a status of pending when we first create the document in the db instead of leaving status as undefined
+
 
 export const finishedStatus = [
   notifyStatuses.DELIVERED,
