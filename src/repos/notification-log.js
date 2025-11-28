@@ -12,7 +12,12 @@ const addNotificationRequest = async (message) => {
     const notification = {
       _id: new UUID(),
       message,
-      createdAt: new Date()
+      createdAt: new Date(),
+      statusDetails: {
+        status: notifyStatuses.CREATED 
+        // change this to a pending status when its first created?
+        // does this have any impact on the rest of the system?
+      }
     }
 
     await dbClient.collection(collection).insertOne(notification)
