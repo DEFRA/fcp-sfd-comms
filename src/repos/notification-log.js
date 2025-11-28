@@ -14,7 +14,9 @@ const addNotificationRequest = async (message) => {
       message,
       createdAt: new Date(),
       statusDetails: {
-        status: notifyStatuses.CREATED
+        status: notifyStatuses.CREATED 
+        // change this to a pending status when its first created?
+        // does this have any impact on the rest of the system?
       }
     }
 
