@@ -31,7 +31,7 @@ describe('Publish Status', () => {
   })
 
   test.each([
-    ['pending-publish', 'uk.gov.fcp.sfd.notification.request'],
+    ['pending-publish', 'uk.gov.fcp.sfd.notification.received'],
     ['created', 'uk.gov.fcp.sfd.notification.sending'],
     ['sending', 'uk.gov.fcp.sfd.notification.sending'],
     ['permanent-failure', 'uk.gov.fcp.sfd.notification.failure.provider'],
