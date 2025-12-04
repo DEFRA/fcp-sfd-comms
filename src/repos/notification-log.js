@@ -14,7 +14,7 @@ const addNotificationRequest = async (message) => {
       message,
       createdAt: new Date(),
       statusDetails: {
-        status: notifyStatuses.CREATED
+        status: notifyStatuses.PENDING_PUBLISH
       }
     }
 

@@ -46,7 +46,7 @@ describe('mongo notification request repository', () => {
 
       expect(notificationRequests).toHaveLength(1)
       expect(notificationRequests[0].message).toEqual(mockMessage)
-      expect(notificationRequests[0].statusDetails.status).toEqual('created')
+      expect(notificationRequests[0].statusDetails.status).toEqual('pending-publish')
     })
 
     test('should throw error if connection fails', async () => {
@@ -98,7 +98,7 @@ describe('mongo notification request repository', () => {
 
       expect(pendingNotifications).toHaveLength(1)
       expect(pendingNotifications[0].message.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
-      expect(pendingNotifications[0].statusDetails.status).toEqual('created')
+      expect(pendingNotifications[0].statusDetails.status).toEqual('pending-publish')
     })
 
     test('should return empty array if no pending notifications', async () => {

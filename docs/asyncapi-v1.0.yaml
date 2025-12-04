@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: Single Front Door Communications
-  version: 1.0.0
+  version: 1.0.1
   description: Publish communications to users via the Single Front Door
 
 channels:
@@ -433,7 +433,7 @@ components:
           type: string
           description: The status of the message delivery
           example: "delivered"
-          enum: ["created", "sending", "delivered", "permanent-failure", "temporary-failure", "technical-failure", "internal-failure", "validation-failure"]
+          enum: [ "pending-publish", "created", "sending", "delivered", "permanent-failure", "temporary-failure", "technical-failure", "internal-failure", "validation-failure"]
         errorCode:
           type: number
           description: Error code returned from Notify. Only present if status is 'internal-failure'

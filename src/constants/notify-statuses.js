@@ -1,4 +1,5 @@
 export const notifyStatuses = {
+  PENDING_PUBLISH: 'pending-publish',
   CREATED: 'created',
   SENDING: 'sending',
   DELIVERED: 'delivered',
