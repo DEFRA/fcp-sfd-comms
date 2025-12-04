@@ -21,5 +21,5 @@ export const statusToEventMap = {
   [notifyStatuses.DELIVERED]: commsEvents.DELIVERED,
   [notifyStatuses.SENDING]: commsEvents.SENDING,
   [notifyStatuses.CREATED]: commsEvents.SENDING,
-  [notifyStatuses.PENDING_PUBLISH]: commsEvents.REQUEST
+  [notifyStatuses.PENDING_PUBLISH]: commsEvents.RECEIVED
 }
