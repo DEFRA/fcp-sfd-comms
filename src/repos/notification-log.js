@@ -2,7 +2,7 @@ import dbClient from '../db/db-client.js'
 
 import { MongoError, UUID } from 'mongodb'
 
-import { finishedStatus, notifyStatuses } from '../constants/notify-statuses.js'
+import { finishedStatus, notifyStatuses, publishedStatus } from '../constants/notify-statuses.js'
 import { DatabaseError } from '../errors/database-errors.js'
 
 const collection = 'notificationRequests'
@@ -134,7 +134,7 @@ const getPendingNotifications = async () => {
     const result = dbClient.collection(collection)
       .find({
         'statusDetails.status': {
-          $nin: finishedStatus
+          $in: publishedStatus
         }
       })
 

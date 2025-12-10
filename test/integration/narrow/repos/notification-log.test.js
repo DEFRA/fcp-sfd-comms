@@ -88,6 +88,14 @@ describe('mongo notification request repository', () => {
 
       await updateNotificationStatus({
         ...v1,
+        id: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383'
+      }, {
+        notificationId: 'dc1028c8-bdda-48b8-b7c8-49c72b7fd383',
+        status: 'created'
+      })
+
+      await updateNotificationStatus({
+        ...v1,
         id: '94449000-2b17-4f57-847a-66662e074f9f'
       }, {
         notificationId: '94449000-2b17-4f57-847a-66662e074f9f',
@@ -98,7 +106,7 @@ describe('mongo notification request repository', () => {
 
       expect(pendingNotifications).toHaveLength(1)
       expect(pendingNotifications[0].message.id).toEqual('dc1028c8-bdda-48b8-b7c8-49c72b7fd383')
-      expect(pendingNotifications[0].statusDetails.status).toEqual('pending-publish')
+      expect(pendingNotifications[0].statusDetails.status).toEqual('created')
     })
 
     test('should return empty array if no pending notifications', async () => {

@@ -10,6 +10,11 @@ export const notifyStatuses = {
   VALIDATION_FAILURE: 'validation-failure'
 }
 
+export const publishedStatus = [
+  notifyStatuses.CREATED,
+  notifyStatuses.SENDING
+]
+
 export const finishedStatus = [
   notifyStatuses.DELIVERED,
   notifyStatuses.INTERNAL_FAILURE,
