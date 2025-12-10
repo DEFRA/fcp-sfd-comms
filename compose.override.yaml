@@ -4,6 +4,8 @@ services:
     ports:
       - '3001:3001'
       - '9229:9229'
+    volumes:
+      - ./src:/home/node/src
     networks:
       - fcp-sfd
 

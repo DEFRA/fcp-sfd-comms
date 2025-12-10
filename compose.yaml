@@ -30,8 +30,6 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-test}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-test}
       NOTIFY_API_KEY: ${NOTIFY_API_KEY}
-    volumes:
-      - ./src:/home/node/src
 
   localstack-1:
     image: localstack/localstack:3.0.2
