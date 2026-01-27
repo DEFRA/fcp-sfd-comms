@@ -67,6 +67,7 @@ describe('comms request schema v1 validation', () => {
     })
 
     test.each([
+      ['crn'],
       ['sbi'],
       ['notifyTemplateId'],
       ['commsType'],
@@ -87,7 +88,6 @@ describe('comms request schema v1 validation', () => {
     })
 
     test.each([
-      ['crn'],
       ['oneClickUnsubscribeUrl']
     ])('missing optional data %s should return message', async (field) => {
       mockV1Message.data = {

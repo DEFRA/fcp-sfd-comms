@@ -11,7 +11,7 @@ const v1 = Joi.object({
   time: Joi.string().isoDate().required(),
   data: Joi.object({
     correlationId: Joi.string().uuid().optional(),
-    crn: crn.optional(),
+    crn: crn.required(),
     sbi: sbi.required(),
     sourceSystem: Joi.string().regex(/^[a-z0-9-_]+$/).required(),
     notifyTemplateId: Joi.string().uuid().required(),
