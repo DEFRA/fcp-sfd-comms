@@ -44,7 +44,7 @@ jobs:
           npm run docker:test
 
       - name: SonarQubeScan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@v7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
