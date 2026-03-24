@@ -108,22 +108,6 @@ const getOriginalNotificationRequest = async (source, correlationId) => {
       return null
     }
 
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-    console.log('DEBUG: Processing document upload message in buildDocumentUploadMessageBatch function')
-
     return {
       id: notification.message.id,
       createdAt: notification.createdAt
