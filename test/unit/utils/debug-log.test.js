@@ -139,10 +139,11 @@ describe('When using the debug logger util', () => {
   describe('when debug logging is disabled', () => {
     test('it should return immediately without calling logger.debug', () => {
       mockLogger.isLevelEnabled.mockReturnValueOnce(false)
+      const callCountBefore = mockLogger.debug.mock.calls.length
 
       debugLog(mockReceivedMessage)
 
-      expect(mockLogger.debug).not.toHaveBeenCalled()
+      expect(mockLogger.debug).toHaveBeenCalledTimes(callCountBefore)
     })
   })
 })
