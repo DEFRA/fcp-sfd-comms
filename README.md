@@ -222,7 +222,7 @@ npm run docker:test:watch
 As mentioned previously, Docker Compose can be used directly for starting tests:
 
 ```
-docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-object-processor"
+docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
 ```
 
 
