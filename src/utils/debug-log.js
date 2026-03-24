@@ -13,8 +13,8 @@ const redactObjectsProperties = (sensitiveObject) => {
         sensitiveObject[key] = `${val.slice(0, 2)}*****`
       }
 
-      if (typeof sensitiveObject[key] === 'object') {
-        // if the value is another object recursivly call the function to redact the nested properties
+      if (sensitiveObject[key] !== null && typeof sensitiveObject[key] === 'object') {
+        // if the value is another object recursively call the function to redact the nested properties
         // nestedObject flag is needed to account for nested properties not being in the protected keys set.
         nestedObject = true
         redactObjectsProperties(sensitiveObject[key])

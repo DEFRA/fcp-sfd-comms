@@ -99,6 +99,35 @@ describe('When using the debug logger util', () => {
     })
   })
 
+  describe('with null values in protected keys', () => {
+    test('it should not throw when personalisation is null', () => {
+      const message = {
+        ...mockReceivedMessage,
+        data: {
+          ...mockReceivedMessage.data,
+          personalisation: null
+        }
+      }
+
+      expect(() => debugLog(message)).not.toThrow()
+    })
+
+    test('it should not throw when a nested personalisation value is null', () => {
+      const message = {
+        ...mockReceivedMessage,
+        data: {
+          ...mockReceivedMessage.data,
+          personalisation: {
+            name: 'John',
+            optionalField: null
+          }
+        }
+      }
+
+      expect(() => debugLog(message)).not.toThrow()
+    })
+  })
+
   describe('with an invalid message', () => {
     test('it should log a warning message with no message content', () => {
       debugLog({ type: 'not-valid' })
