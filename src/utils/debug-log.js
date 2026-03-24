@@ -36,6 +36,8 @@ const sanitiseMessage = (message) => {
 }
 
 const debugLog = (message) => {
+  if (!logger.isLevelEnabled('debug')) return
+
   const debugMessage = structuredClone(message)
   if (!debugMessage.data) {
     logger.warn('Invalid message format for debug logger. Debug log not executed.')
