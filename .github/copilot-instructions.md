@@ -13,7 +13,7 @@ This is a Node.js communications service for the Single Front Door (SFD) platfor
 - **Watch mode (TDD):** `npm run test:watch`
 - **Run tests in Docker (recommended):** `npm run docker:test`
 - **Watch tests in Docker:** `npm run docker:test:watch`
-- **Linting:** `npm run test:lint` (uses `standard`)
+- **Linting:** `npm run lint` (uses `neostandard`)
 
 ### Running the Application
 - **Local development (with watch/debug):** `npm run start:watch`
@@ -85,8 +85,8 @@ Idempotency is enforced to prevent duplicate message processing.
 - Async/await for promises (no callbacks)
 
 ### Linting
-- Uses **Standard.js** (no semicolons, 2-space indentation)
-- Run with: `npm run test:lint`
+- Uses **neostandard**
+- Run with: `npm run lint`
 - Pre-commit hooks configured (`.pre-commit-config.yaml`) for secret detection
 
 ### Database
