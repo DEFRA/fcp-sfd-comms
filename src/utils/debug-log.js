@@ -36,7 +36,9 @@ const sanitiseMessage = (message) => {
 }
 
 const debugLog = (message) => {
-  if (!logger.isLevelEnabled('debug')) return
+  if (!logger.isLevelEnabled('debug')) {
+    return
+  }
 
   const debugMessage = structuredClone(message)
   if (!debugMessage.data) {
