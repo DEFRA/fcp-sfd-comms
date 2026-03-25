@@ -8,7 +8,8 @@ vi.mock('../../../src/logging/logger.js', () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
-    debug: vi.fn()
+    debug: vi.fn(),
+    isLevelEnabled: vi.fn().mockReturnValue(true)
   })
 }))
 
@@ -132,6 +133,17 @@ describe('When using the debug logger util', () => {
     test('it should log a warning message with no message content', () => {
       debugLog({ type: 'not-valid' })
       expect(mockLogger.warn).toHaveBeenCalledWith('Invalid message format for debug logger. Debug log not executed.')
+    })
+  })
+
+  describe('when debug logging is disabled', () => {
+    test('it should return immediately without calling logger.debug', () => {
+      mockLogger.isLevelEnabled.mockReturnValueOnce(false)
+      const callCountBefore = mockLogger.debug.mock.calls.length
+
+      debugLog(mockReceivedMessage)
+
+      expect(mockLogger.debug).toHaveBeenCalledTimes(callCountBefore)
     })
   })
 })
