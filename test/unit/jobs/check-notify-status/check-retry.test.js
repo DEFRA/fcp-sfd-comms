@@ -9,6 +9,11 @@ import { checkRetry } from '../../../../src/jobs/check-notify-status/check-retry
 
 vi.mock('../../../../src/repos/notification-log.js')
 
+vi.mock('../../../../src/logging/correlation-id-store.js', () => ({
+  runWithCorrelationId: vi.fn((correlationId, fn) => fn()),
+  getCorrelationId: vi.fn()
+}))
+
 vi.mock('../../../../src/messaging/outbound/notification-retry/notification-retry.js')
 vi.mock('../../../../src/messaging/outbound/retry-expired/publish-expired.js')
 
