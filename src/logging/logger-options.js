@@ -36,7 +36,7 @@ export const loggerOptions = {
     }
     const correlationId = getCorrelationId()
     if (correlationId) {
-      mixinValues.correlationId = correlationId
+      mixinValues.transaction = { id: correlationId }
     }
     return mixinValues
   }

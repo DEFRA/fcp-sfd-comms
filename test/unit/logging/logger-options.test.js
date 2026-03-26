@@ -36,24 +36,24 @@ describe('logger-options mixin', () => {
     vi.clearAllMocks()
   })
 
-  test('should include correlationId when async context is active', () => {
+  test('should include transaction.id when async context is active', () => {
     mockGetCorrelationId.mockReturnValue('15df79e7-806e-4c85-9372-a2e256a1d597')
 
     const result = loggerOptions.mixin()
 
     expect(result).toEqual(
       expect.objectContaining({
-        correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
+        transaction: { id: '15df79e7-806e-4c85-9372-a2e256a1d597' }
       })
     )
   })
 
-  test('should omit correlationId when no async context is active', () => {
+  test('should omit transaction when no async context is active', () => {
     mockGetCorrelationId.mockReturnValue(undefined)
 
     const result = loggerOptions.mixin()
 
-    expect(result).not.toHaveProperty('correlationId')
+    expect(result).not.toHaveProperty('transaction')
   })
 
   test('should include trace.id when traceId is present', () => {
@@ -76,7 +76,7 @@ describe('logger-options mixin', () => {
     expect(result).not.toHaveProperty('trace')
   })
 
-  test('should include both traceId and correlationId when both are present', () => {
+  test('should include both traceId and transaction.id when both are present', () => {
     mockGetTraceId.mockReturnValue('abc-123-trace')
     mockGetCorrelationId.mockReturnValue('15df79e7-806e-4c85-9372-a2e256a1d597')
 
@@ -84,7 +84,7 @@ describe('logger-options mixin', () => {
 
     expect(result).toEqual({
       trace: { id: 'abc-123-trace' },
-      correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
+      transaction: { id: '15df79e7-806e-4c85-9372-a2e256a1d597' }
     })
   })
 
