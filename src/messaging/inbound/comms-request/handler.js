@@ -18,7 +18,13 @@ const handleCommRequestMessages = async (messages) => {
 
       const processor = getCommsProcessor(content)
 
-      await runWithCorrelationId(correlationId, () => processor(content))
+      await runWithCorrelationId(correlationId, async () => {
+        try {
+          await processor(content)
+        } catch (error) {
+          logger.error(error, 'Error encountered while processing comms request')
+        }
+      })
     } catch (error) {
       logger.error(error, 'Error encountered while processing comms request')
     }
