@@ -41,7 +41,7 @@
     "@hapi/hapi": "21.3.12",
     "aws-embedded-metrics": "4.2.0",
     "aws4": "1.13.2",
-    "convict": "6.2.4",
+    "convict": "^6.2.5",
     "cron": "4.3.0",
     "date-fns": "4.1.0",
     "global-agent": "3.0.0",
