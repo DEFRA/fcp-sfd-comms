@@ -38,10 +38,6 @@ export const loggerOptions = {
     if (correlationId) {
       mixinValues['transaction.id'] = correlationId
     }
-    const correlationId = getCorrelationId()
-    if (correlationId) {
-      mixinValues.transaction = { id: correlationId }
-    }
     return mixinValues
   }
 }
