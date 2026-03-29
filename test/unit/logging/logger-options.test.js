@@ -36,55 +36,47 @@ describe('logger-options mixin', () => {
     vi.clearAllMocks()
   })
 
-  test('should include transaction.id when async context is active', () => {
+  test('should include transaction.id as a flat key when async context is active', () => {
     mockGetCorrelationId.mockReturnValue('15df79e7-806e-4c85-9372-a2e256a1d597')
 
     const result = loggerOptions.mixin()
 
-    expect(result).toEqual(
-      expect.objectContaining({
-        transaction: { id: '15df79e7-806e-4c85-9372-a2e256a1d597' }
-      })
-    )
+    expect(result['transaction.id']).toBe('15df79e7-806e-4c85-9372-a2e256a1d597')
   })
 
-  test('should omit transaction when no async context is active', () => {
+  test('should omit transaction.id when no async context is active', () => {
     mockGetCorrelationId.mockReturnValue(undefined)
 
     const result = loggerOptions.mixin()
 
-    expect(result).not.toHaveProperty('transaction')
+    expect(result).not.toHaveProperty('transaction.id')
   })
 
-  test('should include trace.id when traceId is present', () => {
+  test('should include trace.id as a flat key when traceId is present', () => {
     mockGetTraceId.mockReturnValue('abc-123-trace')
 
     const result = loggerOptions.mixin()
 
-    expect(result).toEqual(
-      expect.objectContaining({
-        trace: { id: 'abc-123-trace' }
-      })
-    )
+    expect(result['trace.id']).toBe('abc-123-trace')
   })
 
-  test('should omit trace when traceId is not present', () => {
+  test('should omit trace.id when traceId is not present', () => {
     mockGetTraceId.mockReturnValue(undefined)
 
     const result = loggerOptions.mixin()
 
-    expect(result).not.toHaveProperty('trace')
+    expect(result).not.toHaveProperty('trace.id')
   })
 
-  test('should include both traceId and transaction.id when both are present', () => {
+  test('should include both trace.id and transaction.id as flat keys when both are present', () => {
     mockGetTraceId.mockReturnValue('abc-123-trace')
     mockGetCorrelationId.mockReturnValue('15df79e7-806e-4c85-9372-a2e256a1d597')
 
     const result = loggerOptions.mixin()
 
     expect(result).toEqual({
-      trace: { id: 'abc-123-trace' },
-      transaction: { id: '15df79e7-806e-4c85-9372-a2e256a1d597' }
+      'trace.id': 'abc-123-trace',
+      'transaction.id': '15df79e7-806e-4c85-9372-a2e256a1d597'
     })
   })
 
