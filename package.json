@@ -29,7 +29,8 @@
   "contributors": [
     "Fay Toward <fay.toward@defra.gov.uk>",
     "Shaun Fitzsimons <shaun.fitzsimmons@defra.gov.uk>",
-    "Rana Salem <rana.salem@defra.gov.uk>"
+    "Rana Salem <rana.salem@defra.gov.uk>",
+    "Adam Kay <adam.kay@defra.gov.uk>"
   ],
   "license": "OGL-UK-3.0",
   "dependencies": {
@@ -41,7 +42,7 @@
     "@hapi/hapi": "21.3.12",
     "aws-embedded-metrics": "4.2.0",
     "aws4": "1.13.2",
-    "convict": "^6.2.5",
+    "convict": "6.2.5",
     "cron": "4.3.0",
     "date-fns": "4.1.0",
     "global-agent": "3.0.0",
