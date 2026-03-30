@@ -30,6 +30,29 @@ subscribe_queue_to_topic() {
   awslocal --endpoint-url=http://${LOCALSTACK_HOST}:${PORT} sns subscribe --topic-arn arn:aws:sns:${AWS_REGION}:000000000000:${TOPIC} --protocol sqs --notification-endpoint ${QUEUE_ARN} --region ${AWS_REGION}
 }
 
+wait_for_subscription() {
+  local TOPIC=$1
+  local QUEUE=$2
+  local TOPIC_ARN=arn:aws:sns:${AWS_REGION}:000000000000:${TOPIC}
+  local QUEUE_ARN=$(awslocal --endpoint-url=http://${LOCALSTACK_HOST}:${PORT} sqs get-queue-attributes --queue-url http://sqs.${AWS_REGION}.${LOCALSTACK_HOST}.localstack.cloud:${PORT}/000000000000/${QUEUE} --attribute-names QueueArn --query 'Attributes.QueueArn' --output text)
+  local ATTEMPTS=0
+  local MAX_ATTEMPTS=60
+
+  while [ ${ATTEMPTS} -lt ${MAX_ATTEMPTS} ]; do
+    local SUBSCRIPTION_ENDPOINTS=$(awslocal --endpoint-url=http://${LOCALSTACK_HOST}:${PORT} sns list-subscriptions-by-topic --topic-arn ${TOPIC_ARN} --region ${AWS_REGION} --query 'Subscriptions[*].Endpoint' --output text)
+
+    if echo "${SUBSCRIPTION_ENDPOINTS}" | grep -q "${QUEUE_ARN}"; then
+      return 0
+    fi
+
+    ATTEMPTS=$((ATTEMPTS + 1))
+    sleep 1
+  done
+
+  echo "subscription not ready: ${TOPIC} -> ${QUEUE}" >&2
+  return 1
+}
+
 create_queue "fcp_sfd_comms_request"
 create_queue "fcp_fdm_events"
 create_topic "fcp_sfd_comm_events"
@@ -42,3 +65,12 @@ create_queue "fcp_sfd_comms_request-deadletter"
 subscribe_queue_to_topic "fcp_sfd_comm_events" "fcp_fdm_events"
 subscribe_queue_to_topic "fcp_sfd_comms_publisher_request" "fcp_sfd_comms_request"
 subscribe_queue_to_topic "fcp_sfd_comm_events_stub" "fcp_sfd_comms_publisher_event_consumer"
+
+if ! wait_for_subscription "fcp_sfd_comm_events" "fcp_fdm_events" ||
+  ! wait_for_subscription "fcp_sfd_comms_publisher_request" "fcp_sfd_comms_request" ||
+  ! wait_for_subscription "fcp_sfd_comm_events_stub" "fcp_sfd_comms_publisher_event_consumer"; then
+  echo "localstack SNS/SQS subscriptions failed to become ready" >&2
+  exit 1
+fi
+
+echo "localstack SNS/SQS subscriptions ready"

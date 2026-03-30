@@ -10,6 +10,9 @@ import notifyClient from '../../../../src/notify/notify-client.js'
 import { createLogger } from '../../../../src/logging/logger.js'
 import { startMessaging, stopMessaging } from '../../../../src/messaging/inbound/inbound.js'
 import { checkNotifyStatusHandler } from '../../../../src/jobs/check-notify-status/handler.js'
+import { snsClient } from '../../../../src/messaging/sns/client.js'
+import { config } from '../../../../src/config/index.js'
+import { ListSubscriptionsByTopicCommand } from '@aws-sdk/client-sns'
 
 vi.mock('../../../../src/notify/notify-client.js', () => ({
   default: {
@@ -31,8 +34,36 @@ vi.mock('../../../../src/logging/logger.js', () => ({
 const commsRequestQueueUrl = process.env.COMMS_REQUEST_QUEUE_URL
 const commsRequestDlqUrl = process.env.COMMS_REQUEST_DEAD_LETTER_QUEUE_URL
 const fdmQueueUrl = process.env.FDM_QUEUE_URL
+const commEventsTopicArn = config.get('messaging.commEvents.topicArn')
+const fdmQueueArn = `arn:aws:sqs:${process.env.AWS_REGION}:000000000000:fcp_fdm_events`
 
 const mockLogger = createLogger('test')
+
+const wait = async (ms) => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+const waitForSubscription = async ({ topicArn, queueArn, timeoutMs = 60000, intervalMs = 1000 }) => {
+  const start = Date.now()
+
+  while (Date.now() - start < timeoutMs) {
+    const response = await snsClient.send(new ListSubscriptionsByTopicCommand({
+      TopicArn: topicArn
+    }))
+
+    const hasSubscription = response.Subscriptions?.some((subscription) => subscription.Endpoint === queueArn)
+
+    if (hasSubscription) {
+      return
+    }
+
+    await wait(intervalMs)
+  }
+
+  throw new Error(`Timed out waiting for SNS subscription ${topicArn} -> ${queueArn}`)
+}
 
 describe('v1 comms request processing integration', () => {
   beforeEach(async () => {
@@ -44,8 +75,13 @@ describe('v1 comms request processing integration', () => {
     await resetQueue(commsRequestDlqUrl)
     await resetQueue(fdmQueueUrl)
 
+    await waitForSubscription({
+      topicArn: commEventsTopicArn,
+      queueArn: fdmQueueArn
+    })
+
     startMessaging()
-  })
+  }, 70000)
 
   test('should process a valid v1 comms request', async () => {
     notifyClient.sendEmail.mockResolvedValue({
