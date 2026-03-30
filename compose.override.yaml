@@ -2,8 +2,8 @@ name: fcp-sfd-comms
 services:
   fcp-sfd-comms:
     ports:
-      - '3001:3001'
-      - '9229:9229'
+      - "3001:3001"
+      - "9229:9229"
     volumes:
       - ./src:/home/node/src
     networks:
@@ -11,24 +11,23 @@ services:
 
   mongodb:
     ports:
-      - '27017:27017'
+      - "27017:27017"
     networks:
       - fcp-sfd
     volumes:
       - mongodb-data:/data
 
-  localstack-1:
+  floci:
     ports:
-      - '4567:4567'
-      - '4650-4699:4650-4699'
+      - "4567:4567"
     volumes:
-      - localstack-1-data:/var/lib/localstack
+      - floci-data:/app/data
     networks:
       - fcp-sfd
 
 volumes:
   mongodb-data:
-  localstack-1-data:
+  floci-data:
 
 networks:
   fcp-sfd:

@@ -97,7 +97,7 @@ Idempotency is enforced to prevent duplicate message processing.
 ### Messaging
 - SQS for inbound requests
 - SNS for events publication
-- Uses LocalStack for local development (Docker Compose)
+- Uses Floci for local development (Docker Compose)
 - AWS SDK v3 clients for both services
 
 ## Constants and Utilities

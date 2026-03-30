@@ -7,20 +7,21 @@ services:
     container_name: fcp-sfd-comms-test
     command: npm run test
     depends_on:
-      localstack-1:
-        condition: service_healthy
+      floci-init:
+        condition: service_completed_successfully
     env_file:
       - path: .env
         required: false
     environment:
       PORT: 3001
       NODE_ENV: development
-      LOCALSTACK_ENDPOINT: http://localstack:4567
       MONGO_URI: mongodb://mongodb:27017/
       NOTIFY_API_KEY: test
+      SQS_ENDPOINT: http://floci:4567
+      SNS_ENDPOINT: http://floci:4567
       COMMS_REQUEST_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_comms_request
       COMMS_REQUEST_DEAD_LETTER_QUEUE_URL: http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_comms_request-deadletter
-      DAL_INGEST_QUEUE_URL: 'http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_data_ingest'
+      DAL_INGEST_QUEUE_URL: "http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_data_ingest"
     volumes:
       - ./src/:/home/node/src
       - ./test/:/home/node/test

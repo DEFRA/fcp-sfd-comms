@@ -127,12 +127,12 @@ The `fcp-sfd-comms` service is also configured to handle retries (i) on any mess
 | AWS_SECRET_ACCESS_KEY | test | No | AWS Secret Access Key. |
 | NOTIFY_API_KEY | n/a - sensitive | Yes | Notify API key to perform API requests to GOV.UK Notify. Generate a test API key for local development and testing on the [GOV.UK Notify portal](https://www.notifications.service.gov.uk/). |
 | MONGO_URI | mongodb://mongo:27017/ | No | MongoDB connection string. |
-| SQS_ENDPOINT | http://localstack:4566 | No | SQS endpoint. |
-| SNS_ENDPOINT | http://localstack:4566 | No | SNS endpoint. |
-| COMMS_REQUEST_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request | No | SQS queue URL to send comms requests. |
-| COMMS_REQUEST_DEAD_LETTER_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_sfd_comms_request-deadletter | No | Comms Request SQS dead letter queue. |
+| SQS_ENDPOINT | http://floci:4567 | No | SQS endpoint. |
+| SNS_ENDPOINT | http://floci:4567 | No | SNS endpoint. |
+| COMMS_REQUEST_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_comms_request | No | SQS queue URL to send comms requests. |
+| COMMS_REQUEST_DEAD_LETTER_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_sfd_comms_request-deadletter | No | Comms Request SQS dead letter queue. |
 | COMM_EVENTS_TOPIC_ARN | arn:aws:sns:eu-west-2:000000000000:fcp_sfd_comm_events | No | SNS topic ARN to publish comm events to. |
-| FDM_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4566/000000000000/fcp_fdm_events | No | SQS queue that is subscribed to the events SNS topic. |
+| FDM_QUEUE_URL | http://sqs.eu-west-2.127.0.0.1:4567/000000000000/fcp_fdm_events | No | SQS queue that is subscribed to the events SNS topic. |
 
 ## Running the application
 
