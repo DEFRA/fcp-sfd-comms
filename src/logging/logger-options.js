@@ -32,11 +32,11 @@ export const loggerOptions = {
     const mixinValues = {}
     const traceId = getTraceId()
     if (traceId) {
-      mixinValues.trace = { id: traceId }
+      mixinValues['trace.id'] = traceId
     }
     const correlationId = getCorrelationId()
     if (correlationId) {
-      mixinValues.transaction = { id: correlationId }
+      mixinValues['transaction.id'] = correlationId
     }
     return mixinValues
   }
