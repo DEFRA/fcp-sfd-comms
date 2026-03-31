@@ -81,7 +81,6 @@
     "vitest": "3.1.2"
   },
   "overrides": {
-    "axios": "1.13.5",
     "form-data": "4.0.4"
   }
 }
