@@ -10,9 +10,9 @@ const snsTopic = config.get('messaging.commEvents.topicArn')
 const logger = createLogger()
 
 const publishReceivedMessage = async (message) => {
-  const type = message.type !== commsEvents.RETRY
-    ? commsEvents.RECEIVED
-    : commsEvents.RETRY
+  const type = message.type === commsEvents.RETRY
+    ? commsEvents.RETRY
+    : commsEvents.RECEIVED
 
   const receivedMessage = buildReceivedMessage(message, type)
 
