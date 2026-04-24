@@ -1,4 +1,4 @@
-name: fcp-sfd-comms
+name: fcp-sfd
 services:
   fcp-sfd-comms:
     ports:
