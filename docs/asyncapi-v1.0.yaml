@@ -1,7 +1,7 @@
 asyncapi: 3.0.0
 info:
   title: Single Front Door Communications
-  version: 1.0.1
+  version: 1.0.2
   description: Publish communications to users via the Single Front Door
 
 channels:
@@ -9,9 +9,9 @@ channels:
     address: fcp_sfd_comms_request
     messages:
       commsRequest:
-        $ref: '#/components/messages/commsRequest'
+        $ref: "#/components/messages/commsRequest"
       commsRetry:
-        $ref: '#/components/messages/commsRetryRequest'
+        $ref: "#/components/messages/commsRetryRequest"
     bindings:
       sqs:
         queue:
@@ -28,56 +28,56 @@ channels:
     address: fcp_sfd_comm_events
     messages:
       receivedCommsEvent:
-        $ref: '#/components/messages/receivedCommsEvent'
+        $ref: "#/components/messages/receivedCommsEvent"
       commsStatusUpdateEvent:
-        $ref: '#/components/messages/commsStatusUpdateEvent'
+        $ref: "#/components/messages/commsStatusUpdateEvent"
       commsRetryExpiredEvent:
-        $ref: '#/components/messages/commsRetryExpiredEvent'
+        $ref: "#/components/messages/commsRetryExpiredEvent"
     bindings:
       sns:
         name: fcp_sfd_comm_events
-      
+
 operations:
   processCommsRequest:
     action: receive
     description: |
       Process communication request from the SQS queue.
     channel:
-      $ref: '#/channels/commsRequestQueue'
+      $ref: "#/channels/commsRequestQueue"
     messages:
-      - $ref: '#/channels/commsRequestQueue/messages/commsRequest'
+      - $ref: "#/channels/commsRequestQueue/messages/commsRequest"
   triggerCommsRetry:
     action: send
     description: |
       Trigger retry for a failed communication request to the SQS queue.
     channel:
-      $ref: '#/channels/commsRequestQueue'
+      $ref: "#/channels/commsRequestQueue"
     messages:
-      - $ref: '#/channels/commsRequestQueue/messages/commsRetry'
+      - $ref: "#/channels/commsRequestQueue/messages/commsRetry"
   publishReceivedComms:
     action: send
     description: |
       Publish an event when a communication request is received or retried to the SNS topic.
     channel:
-      $ref: '#/channels/commEventsTopic'
+      $ref: "#/channels/commEventsTopic"
     messages:
-      - $ref: '#/channels/commEventsTopic/messages/receivedCommsEvent'
+      - $ref: "#/channels/commEventsTopic/messages/receivedCommsEvent"
   publishCommsStatusUpdate:
     action: send
     description: |
       Publish an event when the status of a communication request changes to the SNS topic.
     channel:
-      $ref: '#/channels/commEventsTopic'
+      $ref: "#/channels/commEventsTopic"
     messages:
-      - $ref: '#/channels/commEventsTopic/messages/commsStatusUpdateEvent'
+      - $ref: "#/channels/commEventsTopic/messages/commsStatusUpdateEvent"
   publishCommsRetryExpired:
     action: send
     description: |
       Publish an event when a communication request has exhausted all retry attempts to the SNS topic.
     channel:
-      $ref: '#/channels/commEventsTopic'
+      $ref: "#/channels/commEventsTopic"
     messages:
-      - $ref: '#/channels/commEventsTopic/messages/commsRetryExpiredEvent'
+      - $ref: "#/channels/commEventsTopic/messages/commsRetryExpiredEvent"
 
 components:
   messages:
@@ -96,25 +96,26 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
               - uk.gov.fcp.sfd.notification.request
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
               - crn
               - sourceSystem
               - notifyTemplateId
+              - commsType
               - recipient
               - personalisation
               - sbi
@@ -122,28 +123,28 @@ components:
               - emailReplyToId
             properties:
               crn:
-                $ref: '#/components/schemas/crn'
+                $ref: "#/components/schemas/crn"
               sbi:
-                $ref: '#/components/schemas/sbi'
+                $ref: "#/components/schemas/sbi"
               sourceSystem:
-                $ref: '#/components/schemas/sourceSystem'
+                $ref: "#/components/schemas/sourceSystem"
               notifyTemplateId:
-                $ref: '#/components/schemas/notifyTemplateId'
+                $ref: "#/components/schemas/notifyTemplateId"
               commsType:
-                $ref: '#/components/schemas/commsType'
+                $ref: "#/components/schemas/commsType"
               recipient:
-                $ref: '#/components/schemas/recipient'
+                $ref: "#/components/schemas/recipient"
               personalisation:
-                $ref: '#/components/schemas/personalisation'
+                $ref: "#/components/schemas/personalisation"
               reference:
-                $ref: '#/components/schemas/reference'
+                $ref: "#/components/schemas/reference"
               oneClickUnsubscribeUrl:
-                $ref: '#/components/schemas/oneClickUnsubscribeUrl'
+                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
               emailReplyToId:
-                $ref: '#/components/schemas/emailReplyToId'
-    
+                $ref: "#/components/schemas/emailReplyToId"
+
     commsRetryRequest:
-      name: SFD Comms Request Message
+      name: SFD Comms Retry Request Message
       contentType: application/json
       payload:
         type: object
@@ -157,19 +158,19 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
               - uk.gov.fcp.sfd.notification.retry
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
@@ -184,27 +185,27 @@ components:
               - emailReplyToId
             properties:
               correlationId:
-                $ref: '#/components/schemas/correlationId'
+                $ref: "#/components/schemas/correlationId"
               crn:
-                $ref: '#/components/schemas/crn'
+                $ref: "#/components/schemas/crn"
               sbi:
-                $ref: '#/components/schemas/sbi'
+                $ref: "#/components/schemas/sbi"
               sourceSystem:
-                $ref: '#/components/schemas/sourceSystem'
+                $ref: "#/components/schemas/sourceSystem"
               notifyTemplateId:
-                $ref: '#/components/schemas/notifyTemplateId'
+                $ref: "#/components/schemas/notifyTemplateId"
               commsType:
-                $ref: '#/components/schemas/commsType'
+                $ref: "#/components/schemas/commsType"
               recipient:
-                $ref: '#/components/schemas/recipient'
+                $ref: "#/components/schemas/recipient"
               personalisation:
-                $ref: '#/components/schemas/personalisation'
+                $ref: "#/components/schemas/personalisation"
               reference:
-                $ref: '#/components/schemas/reference'
+                $ref: "#/components/schemas/reference"
               oneClickUnsubscribeUrl:
-                $ref: '#/components/schemas/oneClickUnsubscribeUrl'
+                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
               emailReplyToId:
-                $ref: '#/components/schemas/emailReplyToId'
+                $ref: "#/components/schemas/emailReplyToId"
 
     receivedCommsEvent:
       contentType: application/json
@@ -220,20 +221,20 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
               - uk.gov.fcp.sfd.notification.received
               - uk.gov.fcp.sfd.notification.retry
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
@@ -241,33 +242,34 @@ components:
               - crn
               - sourceSystem
               - notifyTemplateId
+              - recipient
               - personalisation
               - sbi
               - reference
               - emailReplyToId
             properties:
               correlationId:
-                $ref: '#/components/schemas/correlationId'
+                $ref: "#/components/schemas/correlationId"
               crn:
-                $ref: '#/components/schemas/crn'
+                $ref: "#/components/schemas/crn"
               sbi:
-                $ref: '#/components/schemas/sbi'
+                $ref: "#/components/schemas/sbi"
               sourceSystem:
-                $ref: '#/components/schemas/sourceSystem'
+                $ref: "#/components/schemas/sourceSystem"
               notifyTemplateId:
-                $ref: '#/components/schemas/notifyTemplateId'
+                $ref: "#/components/schemas/notifyTemplateId"
               commsType:
-                $ref: '#/components/schemas/commsType'
+                $ref: "#/components/schemas/commsType"
               recipient:
-                $ref: '#/components/schemas/recipient'
+                $ref: "#/components/schemas/recipient"
               personalisation:
-                $ref: '#/components/schemas/personalisation'
+                $ref: "#/components/schemas/personalisation"
               reference:
-                $ref: '#/components/schemas/reference'
+                $ref: "#/components/schemas/reference"
               oneClickUnsubscribeUrl:
-                $ref: '#/components/schemas/oneClickUnsubscribeUrl'
+                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
               emailReplyToId:
-                $ref: '#/components/schemas/emailReplyToId'
+                $ref: "#/components/schemas/emailReplyToId"
 
     commsStatusUpdateEvent:
       contentType: application/json
@@ -283,39 +285,37 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
-              - uk.gov.fcp.sfd.notfication.sending
-              - uk.gov.fcp.sfd.notfication.delivered
-              - uk.gov.fcp.sfd.notfication.failure.validation
-              - uk.gov.fcp.sfd.notfication.failure.internal
-              - uk.gov.fcp.sfd.notfication.failure.provider
+              - uk.gov.fcp.sfd.notification.sending
+              - uk.gov.fcp.sfd.notification.delivered
+              - uk.gov.fcp.sfd.notification.failure.validation
+              - uk.gov.fcp.sfd.notification.failure.internal
+              - uk.gov.fcp.sfd.notification.failure.provider
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
               - correlationId
-              - recipient
               - statusDetails
-              - content
-            properties: 
+            properties:
               correlationId:
-                $ref: '#/components/schemas/correlationId'
+                $ref: "#/components/schemas/correlationId"
               recipient:
-                $ref: '#/components/schemas/recipient'
+                $ref: "#/components/schemas/recipient"
               statusDetails:
-                $ref: '#/components/schemas/statusDetails'
+                $ref: "#/components/schemas/statusDetails"
               content:
-                $ref: '#/components/schemas/content'
+                $ref: "#/components/schemas/content"
 
     commsRetryExpiredEvent:
       contentType: application/json
@@ -331,29 +331,29 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
               - uk.gov.fcp.sfd.notification.retry.expired
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
               - correlationId
               - recipient
-            properties: 
+            properties:
               correlationId:
-                $ref: '#/components/schemas/correlationId'
+                $ref: "#/components/schemas/correlationId"
               recipient:
-                $ref: '#/components/schemas/recipient'
+                $ref: "#/components/schemas/recipient"
 
   schemas:
     crn:
@@ -374,8 +374,8 @@ components:
       type: string
       description: Name of the source system that originated the message
       example: "ahwp"
-      minlength: 3
-      maxlength: 100
+      minLength: 3
+      maxLength: 100
       pattern: "^[a-z0-9-_]+$"
 
     notifyTemplateId:
@@ -389,7 +389,7 @@ components:
       description: Type of communication (e.g. email, SMS)
       default: "email"
       example: "email"
-      enum: ["email"]
+      enum: [ "email" ]
 
     recipient:
       type: string
@@ -409,16 +409,17 @@ components:
 
     reference:
       type: string
-      description: Unique identifier for further operations like status query, must be prefixed with the source system
+      description: Unique identifier for further operations like status query, must be
+        prefixed with the source system
       example: "ffc-ahwr-reference"
-      minlength: 1
-      maxlength: 100
+      minLength: 1
+      maxLength: 100
 
     oneClickUnsubscribeUrl:
       type: string
       description: URL for one-click unsubscribe option
       example: "https://unsubscribe.example.com"
-      minlength: 1
+      minLength: 1
 
     emailReplyToId:
       type: string
@@ -436,14 +437,27 @@ components:
           type: string
           description: The status of the message delivery
           example: "delivered"
-          enum: [ "pending-publish", "created", "sending", "delivered", "permanent-failure", "temporary-failure", "technical-failure", "internal-failure", "validation-failure"]
+          enum:
+            [
+              "pending-publish",
+              "created",
+              "sending",
+              "delivered",
+              "permanent-failure",
+              "temporary-failure",
+              "technical-failure",
+              "internal-failure",
+              "validation-failure",
+            ]
         errorCode:
           type: number
-          description: Error code returned from Notify. Only present if status is 'internal-failure'
+          description: Error code returned from Notify. Only present if status is
+            'internal-failure'
           example: 400
         errors:
           type: array
-          description: A list of error messages returned either from Notify or sfd-comms. Only present if status is 'internal-failure' or 'validation-failure'
+          description: A list of error messages returned either from Notify or sfd-comms.
+            Only present if status is 'internal-failure' or 'validation-failure'
           required:
             - error
             - message
@@ -457,7 +471,7 @@ components:
                 type: string
                 description: "Missing personalisation key: 'caseNumber'"
 
-    content: 
+    content:
       type: object
       description: Details of the notification content sent to the recipient
       properties:
@@ -480,28 +494,28 @@ components:
       type: string
       description: Version of the CloudEvents specification used by the event
       example: "1.0"
-      minlength: 3
-      maxlength: 10
+      minLength: 3
+      maxLength: 10
 
     type:
       type: string
       description: Type of event in reverse DNS notation
       example: uk.gov.fcp.sfd.notification.request
-      minlength: 3
-      maxlength: 250
+      minLength: 3
+      maxLength: 250
 
     source:
       type: string
       description: Service publishing the event
       example: ffc-ahwr-claim
-      minlength: 1
-      maxlength: 100
+      minLength: 1
+      maxLength: 100
 
     id:
       type: string
       description: Unique identifier of the event
       example: 123e4567-e89b-12d3-a456-426655440000
-      minlength: 1
+      minLength: 1
       uniqueItems: true
       format: uuid
 
