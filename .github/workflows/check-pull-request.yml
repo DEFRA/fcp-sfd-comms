@@ -44,7 +44,8 @@ jobs:
           npm run docker:test
 
       - name: SonarQubeScan
-        uses: SonarSource/sonarqube-scan-action@v7
+        if: github.actor != 'dependabot[bot]'
+        uses: SonarSource/sonarqube-scan-action@v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
