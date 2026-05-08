@@ -37,7 +37,7 @@ const processV1CommsRequest = async (message) => {
 
   const params = {
     personalisation: data.personalisation,
-    reference: data.correlationId ?? message.id,
+    reference: data.correlationId || message.id,
     emailReplyToId: data.emailReplyToId
   }
 

@@ -1,5 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+vi.mock('../../../../src/config/index.js', () => ({
+  config: {
+    get: (key) => {
+      if (key === 'notify.allowSimulatorEmails') {
+        const envVal = process.env.ALLOW_SIMULATOR_EMAILS
+        if (envVal === 'true' || envVal === true) return true
+        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') return true
+        return false
+      }
+
+      return undefined
+    }
+  }
+}))
+
 import mockV1CommsRequest from '../../../mocks/comms-request/v1.js'
 import environments from '../../../../src/constants/environments.js'
 
@@ -304,6 +319,33 @@ describe('comms request schema v1 validation', () => {
 
         expect(value).toBeTruthy()
         expect(error).toBeNull()
+      })
+
+      test('strips empty string correlationId', async () => {
+        const message = { ...mockV1CommsRequest, data: { ...mockV1CommsRequest.data, correlationId: '' } }
+
+        const [value, error] = await validate(v1, message)
+
+        expect(error).toBeNull()
+        expect(value.data.correlationId).toBeUndefined()
+      })
+
+      test('strips null correlationId', async () => {
+        const message = { ...mockV1CommsRequest, data: { ...mockV1CommsRequest.data, correlationId: null } }
+
+        const [value, error] = await validate(v1, message)
+
+        expect(error).toBeNull()
+        expect(value.data.correlationId).toBeUndefined()
+      })
+
+      test('keeps provided correlationId when present', async () => {
+        const message = { ...mockV1CommsRequest, data: { ...mockV1CommsRequest.data, correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597' } }
+
+        const [value, error] = await validate(v1, message)
+
+        expect(error).toBeNull()
+        expect(value.data.correlationId).toBe('15df79e7-806e-4c85-9372-a2e256a1d597')
       })
 
       test.each([

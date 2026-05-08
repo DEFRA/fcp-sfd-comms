@@ -9,7 +9,7 @@ export const buildReceivedMessage = (message, type) => ({
   time: new Date(),
   data: {
     ...message.data,
-    correlationId: message.data?.correlationId ?? message.id
+    correlationId: message.data?.correlationId || message.id
   },
   datacontenttype: 'application/json',
   specversion: '1.0'

@@ -9,7 +9,7 @@ export const buildExpiredMessage = (message, recipient) => ({
   type: commsEvents.RETRY_EXPIRED,
   time: new Date(),
   data: {
-    correlationId: message.data?.correlationId ?? message.id,
+    correlationId: message.data?.correlationId || message.id,
     recipient
   },
   datacontenttype: 'application/json',
