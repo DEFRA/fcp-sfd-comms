@@ -110,40 +110,19 @@ components:
           time:
             $ref: "#/components/schemas/time"
           data:
-            type: object
-            required:
-              - crn
-              - sourceSystem
-              - notifyTemplateId
-              - recipient
-              - personalisation
-              - sbi
-              - reference
-              - emailReplyToId
-              - correlationId
-            properties:
-              correlationId:
-                $ref: "#/components/schemas/correlationId"
-              crn:
-                $ref: "#/components/schemas/crn"
-              sbi:
-                $ref: "#/components/schemas/sbi"
-              sourceSystem:
-                $ref: "#/components/schemas/sourceSystem"
-              notifyTemplateId:
-                $ref: "#/components/schemas/notifyTemplateId"
-              commsType:
-                $ref: "#/components/schemas/commsType"
-              recipient:
-                $ref: "#/components/schemas/recipient"
-              personalisation:
-                $ref: "#/components/schemas/personalisation"
-              reference:
-                $ref: "#/components/schemas/reference"
-              oneClickUnsubscribeUrl:
-                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
-              emailReplyToId:
-                $ref: "#/components/schemas/emailReplyToId"
+            allOf:
+              - $ref: "#/components/schemas/messageDataBase"
+              - type: object
+                required:
+                  - crn
+                  - sourceSystem
+                  - notifyTemplateId
+                  - recipient
+                  - personalisation
+                  - sbi
+                  - reference
+                  - emailReplyToId
+                  - correlationId
 
     commsRetryRequest:
       name: SFD Comms Request Message
@@ -425,6 +404,32 @@ components:
       description: Identifier for the reply-to email address
       example: "8e222534-7f05-4972-86e3-17c5d9f894e2"
       format: uuid
+
+    messageDataBase:
+      type: object
+      properties:
+        correlationId:
+          $ref: "#/components/schemas/correlationId"
+        crn:
+          $ref: "#/components/schemas/crn"
+        sbi:
+          $ref: "#/components/schemas/sbi"
+        sourceSystem:
+          $ref: "#/components/schemas/sourceSystem"
+        notifyTemplateId:
+          $ref: "#/components/schemas/notifyTemplateId"
+        commsType:
+          $ref: "#/components/schemas/commsType"
+        recipient:
+          $ref: "#/components/schemas/recipient"
+        personalisation:
+          $ref: "#/components/schemas/personalisation"
+        reference:
+          $ref: "#/components/schemas/reference"
+        oneClickUnsubscribeUrl:
+          $ref: "#/components/schemas/oneClickUnsubscribeUrl"
+        emailReplyToId:
+          $ref: "#/components/schemas/emailReplyToId"
 
     statusDetails:
       type: object
