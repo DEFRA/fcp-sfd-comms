@@ -105,8 +105,8 @@ components:
             type: string
             enum:
               - uk.gov.fcp.sfd.notification.request
-            datacontenttype:
-              $ref: "#/components/schemas/datacontenttype"
+          datacontenttype:
+            $ref: "#/components/schemas/datacontenttype"
           time:
             $ref: "#/components/schemas/time"
           data:
@@ -120,6 +120,7 @@ components:
               - sbi
               - reference
               - emailReplyToId
+              - correlationId
             properties:
               crn:
                 $ref: "#/components/schemas/crn"
