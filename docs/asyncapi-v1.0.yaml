@@ -96,11 +96,11 @@ components:
           - data
         properties:
           id:
-            $ref: '#/components/schemas/id'
+            $ref: "#/components/schemas/id"
           source:
-            $ref: '#/components/schemas/source'
+            $ref: "#/components/schemas/source"
           specversion:
-            $ref: '#/components/schemas/specversion'
+            $ref: "#/components/schemas/specversion"
           type:
             type: string
             enum:
@@ -167,9 +167,9 @@ components:
             enum:
               - uk.gov.fcp.sfd.notification.retry
           datacontenttype:
-            $ref: '#/components/schemas/datacontenttype'
+            $ref: "#/components/schemas/datacontenttype"
           time:
-            $ref: '#/components/schemas/time'
+            $ref: "#/components/schemas/time"
           data:
             type: object
             required:
