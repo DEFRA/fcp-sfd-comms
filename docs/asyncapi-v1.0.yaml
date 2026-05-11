@@ -122,6 +122,8 @@ components:
               - emailReplyToId
               - correlationId
             properties:
+              correlationId:
+                $ref: "#/components/schemas/correlationId"
               crn:
                 $ref: "#/components/schemas/crn"
               sbi:
@@ -187,11 +189,6 @@ components:
               correlationId:
                 allOf:
                   - $ref: "#/components/schemas/correlationId"
-                description: |
-                  Optional. Links this request to a broader workflow or trace.
-                  When absent, empty, or null, the service falls back to the message id.
-              crn:
-                $ref: "#/components/schemas/crn"
               sbi:
                 $ref: "#/components/schemas/sbi"
               sourceSystem:
@@ -254,11 +251,6 @@ components:
               correlationId:
                 allOf:
                   - $ref: "#/components/schemas/correlationId"
-                description: |
-                  Optional. Links this request to a broader workflow or trace.
-                  When absent, empty, or null, the service falls back to the message id.
-              crn:
-                $ref: "#/components/schemas/crn"
               sbi:
                 $ref: "#/components/schemas/sbi"
               sourceSystem:
@@ -320,11 +312,6 @@ components:
               correlationId:
                 allOf:
                   - $ref: "#/components/schemas/correlationId"
-                description: |
-                  Optional. Links this request to a broader workflow or trace.
-                  When absent, empty, or null, the service falls back to the message id.
-              recipient:
-                $ref: "#/components/schemas/recipient"
               statusDetails:
                 $ref: "#/components/schemas/statusDetails"
               content:
@@ -366,11 +353,6 @@ components:
               correlationId:
                 allOf:
                   - $ref: "#/components/schemas/correlationId"
-                description: |
-                  Optional. Links this request to a broader workflow or trace.
-                  When absent, empty, or null, the service falls back to the message id.
-              recipient:
-                $ref: "#/components/schemas/recipient"
 
   schemas:
     crn:
@@ -500,7 +482,9 @@ components:
     correlationId:
       type: string
       format: uuid
-      description: The unique correlation ID linking updates to the original request
+      description: |
+        Optional. Links this request to a broader workflow or trace.
+        When absent, empty, or null, the service falls back to the message id.
       example: 123e4567-e89b-12d3-a456-426655440000
 
     specversion:
