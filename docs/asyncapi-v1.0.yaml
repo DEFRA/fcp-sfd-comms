@@ -153,39 +153,19 @@ components:
           time:
             $ref: "#/components/schemas/time"
           data:
-            type: object
-            required:
-              - correlationId
-              - crn
-              - sourceSystem
-              - notifyTemplateId
-              - recipient
-              - personalisation
-              - sbi
-              - reference
-              - emailReplyToId
-            properties:
-              correlationId:
-                allOf:
-                  - $ref: "#/components/schemas/correlationId"
-              sbi:
-                $ref: "#/components/schemas/sbi"
-              sourceSystem:
-                $ref: "#/components/schemas/sourceSystem"
-              notifyTemplateId:
-                $ref: "#/components/schemas/notifyTemplateId"
-              commsType:
-                $ref: "#/components/schemas/commsType"
-              recipient:
-                $ref: "#/components/schemas/recipient"
-              personalisation:
-                $ref: "#/components/schemas/personalisation"
-              reference:
-                $ref: "#/components/schemas/reference"
-              oneClickUnsubscribeUrl:
-                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
-              emailReplyToId:
-                $ref: "#/components/schemas/emailReplyToId"
+            allOf:
+              - $ref: "#/components/schemas/messageDataBase"
+              - type: object
+                required:
+                  - correlationId
+                  - crn
+                  - sourceSystem
+                  - notifyTemplateId
+                  - recipient
+                  - personalisation
+                  - sbi
+                  - reference
+                  - emailReplyToId
 
     receivedCommsEvent:
       contentType: application/json
@@ -216,38 +196,18 @@ components:
           time:
             $ref: "#/components/schemas/time"
           data:
-            type: object
-            required:
-              - correlationId
-              - crn
-              - sourceSystem
-              - notifyTemplateId
-              - personalisation
-              - sbi
-              - reference
-              - emailReplyToId
-            properties:
-              correlationId:
-                allOf:
-                  - $ref: "#/components/schemas/correlationId"
-              sbi:
-                $ref: "#/components/schemas/sbi"
-              sourceSystem:
-                $ref: "#/components/schemas/sourceSystem"
-              notifyTemplateId:
-                $ref: "#/components/schemas/notifyTemplateId"
-              commsType:
-                $ref: "#/components/schemas/commsType"
-              recipient:
-                $ref: "#/components/schemas/recipient"
-              personalisation:
-                $ref: "#/components/schemas/personalisation"
-              reference:
-                $ref: "#/components/schemas/reference"
-              oneClickUnsubscribeUrl:
-                $ref: "#/components/schemas/oneClickUnsubscribeUrl"
-              emailReplyToId:
-                $ref: "#/components/schemas/emailReplyToId"
+            allOf:
+              - $ref: "#/components/schemas/messageDataBase"
+              - type: object
+                required:
+                  - correlationId
+                  - crn
+                  - sourceSystem
+                  - notifyTemplateId
+                  - personalisation
+                  - sbi
+                  - reference
+                  - emailReplyToId
 
     commsStatusUpdateEvent:
       contentType: application/json
