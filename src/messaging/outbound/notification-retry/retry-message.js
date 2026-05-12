@@ -7,7 +7,7 @@ export const buildRetryMessage = (message, recipient, retryId) => ({
   time: new Date(),
   data: {
     ...message.data,
-    correlationId: message.data.correlationId ?? message.id,
+    correlationId: message.data.correlationId || message.id,
     recipient
   }
 })

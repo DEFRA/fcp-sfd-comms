@@ -186,6 +186,107 @@ describe('v1 comms request processing integration', () => {
     expect(mockLogger.info).toHaveBeenCalledWith('Comms V1 request processed successfully, eventId: 15df79e7-806e-4c85-9372-a2e256a1d597')
   })
 
+  test('should process v1 comms request with empty correlationId and fallback to message id', async () => {
+    notifyClient.sendEmail.mockResolvedValue({
+      data: {
+        id: 'resp-id-empty',
+        content: {
+          subject: 'An update about your application',
+          body: '# The email body in markdown'
+        }
+      }
+    })
+
+    notifyClient.getNotificationById.mockResolvedValue({
+      data: { status: 'delivered' }
+    })
+
+    const mockMessage = {
+      ...v1,
+      id: '3b9e1f6e-0000-4000-8000-000000000001',
+      data: {
+        ...v1.data,
+        recipient: 'test@example.com',
+        correlationId: ''
+      }
+    }
+
+    await sendMessage(
+      commsRequestQueueUrl,
+      JSON.stringify(mockMessage)
+    )
+
+    await new Promise((resolve) => { setTimeout(resolve, 5000) })
+
+    await checkNotifyStatusHandler()
+
+    const requests = await getAllEntities('notificationRequests', { 'message.id': mockMessage.id })
+
+    expect(requests).toHaveLength(1)
+    expect(requests[0].statusDetails.status).toBe('delivered')
+    expect(requests[0].message.id).toBe(mockMessage.id)
+
+    const events = await getMessages(fdmQueueUrl)
+    const parsedEvents = events.map((event) => parseSqsMessage(event))
+
+    // All outbound events should carry correlationId equal to message.id
+    for (const evt of parsedEvents) {
+      expect(evt.data.correlationId).toBe(mockMessage.id)
+    }
+
+    expect(mockLogger.info).toHaveBeenCalledWith(`Comms V1 request processed successfully, eventId: ${mockMessage.id}`)
+  })
+
+  test('should process v1 comms request with null correlationId and fallback to message id', async () => {
+    notifyClient.sendEmail.mockResolvedValue({
+      data: {
+        id: 'resp-id-null',
+        content: {
+          subject: 'An update about your application',
+          body: '# The email body in markdown'
+        }
+      }
+    })
+
+    notifyClient.getNotificationById.mockResolvedValue({
+      data: { status: 'delivered' }
+    })
+
+    const mockMessage = {
+      ...v1,
+      id: '3b9e1f6e-0000-4000-8000-000000000002',
+      data: {
+        ...v1.data,
+        recipient: 'test@example.com',
+        correlationId: null
+      }
+    }
+
+    await sendMessage(
+      commsRequestQueueUrl,
+      JSON.stringify(mockMessage)
+    )
+
+    await new Promise((resolve) => { setTimeout(resolve, 5000) })
+
+    await checkNotifyStatusHandler()
+
+    const requests = await getAllEntities('notificationRequests', { 'message.id': mockMessage.id })
+
+    expect(requests).toHaveLength(1)
+    expect(requests[0].statusDetails.status).toBe('delivered')
+    expect(requests[0].message.id).toBe(mockMessage.id)
+
+    const events = await getMessages(fdmQueueUrl)
+    const parsedEvents = events.map((event) => parseSqsMessage(event))
+
+    for (const evt of parsedEvents) {
+      expect(evt.data.correlationId).toBe(mockMessage.id)
+    }
+
+    expect(mockLogger.info).toHaveBeenCalledWith(`Comms V1 request processed successfully, eventId: ${mockMessage.id}`)
+  })
+
   afterEach(async () => {
     stopMessaging()
   })

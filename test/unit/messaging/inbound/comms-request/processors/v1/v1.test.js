@@ -1,5 +1,22 @@
 import { vi, describe, test, expect, beforeEach } from 'vitest'
 
+// Mock config early to avoid convict running during module imports
+vi.mock('../../../../../../../src/config/index.js', () => ({
+  config: {
+    get: () => undefined
+  }
+}))
+// Mock db client to avoid connecting to Mongo during imports
+vi.mock('../../../../../../../src/db/db-client.js', () => ({
+  default: {}
+}))
+// Mock notify client to avoid instantiating real Notify client during imports
+vi.mock('../../../../../../../src/notify/notify-client.js', () => ({
+  createNotifyClient: () => ({
+    sendEmail: () => ({})
+  })
+}))
+
 import v1CommsRequest from '../../../../../../mocks/comms-request/v1.js'
 
 import { createLogger } from '../../../../../../../src/logging/logger.js'
@@ -89,6 +106,75 @@ describe('comms request v1 processor', () => {
       await processV1CommsRequest(testMessage)
 
       expect(trySendViaNotify).toHaveBeenCalledTimes(1)
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
+        personalisation: testMessage.data.personalisation,
+        reference: testMessage.id,
+        emailReplyToId: testMessage.data.emailReplyToId
+      })
+    })
+
+    test('should use data.correlationId when present as reference', async () => {
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
+
+      const testMessage = {
+        ...v1CommsRequest,
+        data: {
+          ...v1CommsRequest.data,
+          recipient: 'single@example.com',
+          correlationId: '15df79e7-806e-4c85-9372-a2e256a1d597'
+        }
+      }
+
+      await processV1CommsRequest(testMessage)
+
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
+        personalisation: testMessage.data.personalisation,
+        reference: '15df79e7-806e-4c85-9372-a2e256a1d597',
+        emailReplyToId: testMessage.data.emailReplyToId
+      })
+    })
+
+    test('should fall back to message.id when data.correlationId is empty string', async () => {
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
+
+      const testMessage = {
+        ...v1CommsRequest,
+        data: {
+          ...v1CommsRequest.data,
+          recipient: 'single@example.com',
+          correlationId: ''
+        }
+      }
+
+      await processV1CommsRequest(testMessage)
+
+      expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
+        personalisation: testMessage.data.personalisation,
+        reference: testMessage.id,
+        emailReplyToId: testMessage.data.emailReplyToId
+      })
+    })
+
+    test('should fall back to message.id when data.correlationId is null', async () => {
+      trySendViaNotify.mockResolvedValue([{}, null])
+
+      checkNotificationIdempotency.mockResolvedValue(false)
+
+      const testMessage = {
+        ...v1CommsRequest,
+        data: {
+          ...v1CommsRequest.data,
+          recipient: 'single@example.com',
+          correlationId: null
+        }
+      }
+
+      await processV1CommsRequest(testMessage)
+
       expect(trySendViaNotify).toHaveBeenCalledWith(testMessage.data.notifyTemplateId, 'single@example.com', {
         personalisation: testMessage.data.personalisation,
         reference: testMessage.id,

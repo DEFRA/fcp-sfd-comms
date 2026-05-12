@@ -14,7 +14,7 @@ const handleCommRequestMessages = async (messages) => {
     try {
       const content = parseSqsMessage(message)
 
-      const correlationId = content.data?.correlationId ?? content.id
+      const correlationId = content.data?.correlationId || content.id
 
       const processor = getCommsProcessor(content)
 
