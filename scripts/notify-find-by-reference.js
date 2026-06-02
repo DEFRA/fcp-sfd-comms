@@ -5,8 +5,8 @@
  * Used to identify affected records when error logs lack identifying information.
  *
  * Usage:
- *   NOTIFY_API_KEY=<key> node scripts/check-notify-messages.js --references ref1 ref2 ref3
- *   NOTIFY_API_KEY=<key> node scripts/check-notify-messages.js --references ref1 --status delivered
+ *   NOTIFY_API_KEY=<key> node scripts/notify-find-by-reference.js --references ref1 ref2 ref3
+ *   NOTIFY_API_KEY=<key> node scripts/notify-find-by-reference.js --references ref1 --status delivered
  */
 
 import { NotifyClient } from 'notifications-node-client'
