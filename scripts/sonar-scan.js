@@ -3,6 +3,27 @@ import { execFileSync, spawn } from 'node:child_process'
 import { resolve } from 'node:path'
 import dotenv from 'dotenv'
 
+const HELP_TEXT = `
+Runs a SonarCloud scan using the sonar-scanner-cli Docker image and displays results.
+
+Usage:
+  SONAR_TOKEN=<token> node scripts/sonar-scan.js
+
+Options:
+  --help  Show this help message
+
+Environment:
+  SONAR_TOKEN  SonarCloud authentication token (required, can be set in .env)
+
+The scanner reads project configuration from sonar-project.properties and
+detects the current git branch automatically.
+`.trim()
+
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(HELP_TEXT)
+  process.exit(0)
+}
+
 const SONARCLOUD_BASE_URL = 'https://sonarcloud.io'
 const BORDER = '═'.repeat(51)
 const THIN_BORDER = '─'.repeat(51)

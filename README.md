@@ -226,6 +226,47 @@ docker compose -f compose.yaml -f compose.test.yaml run --rm "fcp-sfd-comms"
 ```
 
 
+## Scripts
+
+Utility scripts for querying GOV.UK Notify directly. Useful for operational support and debugging delivery issues.
+
+All scripts require the `NOTIFY_API_KEY` environment variable to be set.
+
+### `notify-find-by-reference`
+
+Looks up notifications by one or more references. Use when error logs lack identifying information and you need to trace specific messages.
+
+```bash
+NOTIFY_API_KEY=<key> node scripts/notify-find-by-reference.js --references ref1 ref2 ref3
+NOTIFY_API_KEY=<key> node scripts/notify-find-by-reference.js --references ref1 --status delivered
+```
+
+| Argument | Required | Description |
+|---|---|---|
+| `--references` | Yes | One or more reference IDs to look up |
+| `--status` | No | Filter by notification status (e.g. `delivered`, `failed`) |
+
+### `notify-find-by-date`
+
+Fetches notifications within a date range. Supports additional filters for status, message type, reference, and template ID.
+
+> **Note:** The Notify API does not support server-side filtering by date or template ID. This script paginates through results and applies these filters client-side.
+
+```bash
+NOTIFY_API_KEY=<key> node scripts/notify-find-by-date.js --from 2026-05-01 --to 2026-05-31
+NOTIFY_API_KEY=<key> node scripts/notify-find-by-date.js --from 2026-05-01 --status delivered --type email
+NOTIFY_API_KEY=<key> node scripts/notify-find-by-date.js --from 2026-05-01 --template-id <uuid>
+```
+
+| Argument | Required | Description |
+|---|---|---|
+| `--from` | Yes | Start date (YYYY-MM-DD) |
+| `--to` | No | End date (YYYY-MM-DD). If omitted, includes all messages from `--from` onwards |
+| `--status` | No | Filter by notification status |
+| `--type` | No | Filter by message type: `email`, `sms`, or `letter` |
+| `--reference` | No | Filter by reference |
+| `--template-id` | No | Filter by Notify template UUID (client-side) |
+
 ## Licence
 
 THIS INFORMATION IS LICENSED UNDER THE CONDITIONS OF THE OPEN GOVERNMENT LICENCE found at:

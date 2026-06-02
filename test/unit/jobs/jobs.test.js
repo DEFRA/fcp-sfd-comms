@@ -4,9 +4,19 @@ import { CronJob } from 'cron'
 
 import { checkNotifyStatusHandler } from '../../../src/jobs/check-notify-status/handler.js'
 
-const availableMock = vi.fn()
-const takeMock = vi.fn((fn) => fn())
-const leaveMock = vi.fn()
+const {
+  availableMock,
+  takeMock,
+  leaveMock,
+  mockStartJob,
+  mockStopJob
+} = vi.hoisted(() => ({
+  availableMock: vi.fn(),
+  takeMock: vi.fn((fn) => fn()),
+  leaveMock: vi.fn(),
+  mockStartJob: vi.fn(),
+  mockStopJob: vi.fn()
+}))
 
 vi.mock('semaphore', () => ({
   default: vi.fn(() => ({
@@ -16,17 +26,35 @@ vi.mock('semaphore', () => ({
   }))
 }))
 
-const mockStartJob = vi.fn()
-const mockStopJob = vi.fn()
-
 vi.mock('cron', () => ({
-  CronJob: vi.fn(() => ({
-    start: mockStartJob,
-    stop: mockStopJob
-  }))
+  CronJob: vi.fn(function () {
+    this.start = mockStartJob
+    this.stop = mockStopJob
+  })
 }))
 
-vi.mock('../../../src/jobs/check-notify-status/handler.js')
+vi.mock('../../../src/config/index.js', () => ({
+  config: {
+    get: (key) => {
+      const values = {
+        'jobs.checkNotifyStatus.cronPattern': '*/30 * * * * *'
+      }
+      return values[key]
+    }
+  }
+}))
+
+vi.mock('../../../src/logging/logger.js', () => ({
+  createLogger: () => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
+  })
+}))
+
+vi.mock('../../../src/jobs/check-notify-status/handler.js', () => ({
+  checkNotifyStatusHandler: vi.fn()
+}))
 
 describe('cron job setup', () => {
   beforeEach(() => {

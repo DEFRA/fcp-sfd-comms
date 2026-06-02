@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, vi, test } from 'vitest'
 
-import { parseArgs, fetchByReference, formatRow, run, printResults } from '../../../scripts/check-notify-messages.js'
+import { parseArgs, fetchByReference, formatRow, run, printResults } from '../../../scripts/notify-find-by-reference.js'
 
 const mockNotification = (overrides = {}) => ({
   id: 'notify-id-1',
