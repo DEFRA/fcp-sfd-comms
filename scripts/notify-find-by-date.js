@@ -17,8 +17,29 @@
 
 import { NotifyClient } from 'notifications-node-client'
 
+const HELP_TEXT = `
+Fetches notifications from GOV.UK Notify filtered by date range.
+
+Usage:
+  NOTIFY_API_KEY=<key> node scripts/notify-find-by-date.js --from <date> [options]
+
+Options:
+  --from <date>         Start date in YYYY-MM-DD format (required)
+  --to <date>           End date in YYYY-MM-DD format
+  --status <status>     Filter by notification status
+  --type <type>         Filter by template type (email, sms, letter)
+  --reference <ref>     Filter by reference
+  --template-id <uuid>  Filter by template ID
+  --help                Show this help message
+`.trim()
+
 const parseArgs = (argv) => {
   const args = argv.slice(2)
+
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(HELP_TEXT)
+    process.exit(0)
+  }
 
   const getArgValue = (flag) => {
     const idx = args.indexOf(flag)

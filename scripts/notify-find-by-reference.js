@@ -11,8 +11,25 @@
 
 import { NotifyClient } from 'notifications-node-client'
 
+const HELP_TEXT = `
+Queries GOV.UK Notify for notifications by one or more references.
+
+Usage:
+  NOTIFY_API_KEY=<key> node scripts/notify-find-by-reference.js --references <ref...> [options]
+
+Options:
+  --references <ref...>  One or more references to search for (required)
+  --status <status>      Filter by notification status
+  --help                 Show this help message
+`.trim()
+
 const parseArgs = (argv) => {
   const args = argv.slice(2)
+
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(HELP_TEXT)
+    process.exit(0)
+  }
 
   const statusIdx = args.indexOf('--status')
   const status = statusIdx !== -1 ? args[statusIdx + 1] : null
