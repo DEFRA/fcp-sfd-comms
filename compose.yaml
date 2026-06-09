@@ -31,7 +31,7 @@ services:
       NOTIFY_API_KEY: ${NOTIFY_API_KEY}
 
   floci:
-    image: hectorvent/floci:1.5.5
+    image: floci/floci:1.5.5
     environment:
       FLOCI_HOSTNAME: floci
       FLOCI_DEFAULT_REGION: ${AWS_REGION:-eu-west-2}
