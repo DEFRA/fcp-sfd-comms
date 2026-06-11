@@ -118,15 +118,6 @@ The `fcp-sfd-comms` service is also configured to handle retries (i) on any mess
 - Docker Compose
 - Node.js (v22 LTS)
 
-### SonarQube Cloud token
-
-One of the npm scripts configured for this service enables code scanning by SonarQube Cloud. This will look for any issues and can be ran optionally before committing if the developer wishes to resolve issues during local development. This script helps ensure fewer issues are pushed to GitHub leading to earlier resolution of existing vulnerabilities. In order for this script to run successfully during local development you will need to generate your own personal `SONAR_TOKEN` and add it to your `.env`:
-
-- Log into [SonarQube Cloud](https://sonarcloud.io/login).
-- Navigate to your `My Account` settings.
-- On the left-hand sidebar navigate to the `Security` tab.
-- Under `Generate Tokens` enter a name for your token and click `Generate Token`.
-- Copy the token and add it to your `.env`, referring to it as [`SONAR_TOKEN`](.env.example).
 
 ## Pre-commit Hooks
 
@@ -266,6 +257,34 @@ NOTIFY_API_KEY=<key> node scripts/notify-find-by-date.js --from 2026-05-01 --tem
 | `--type` | No | Filter by message type: `email`, `sms`, or `letter` |
 | `--reference` | No | Filter by reference |
 | `--template-id` | No | Filter by Notify template UUID (client-side) |
+
+## SonarQube Cloud scan
+
+Run a local scan against [SonarCloud](https://sonarcloud.io/project/overview?id=DEFRA_fcp-sfd-comms) for the current git branch. See the [DEFRA SonarCloud guide](https://github.com/DEFRA/cdp-documentation/blob/main/how-to/sonarcloud.md) for organisation access and CI setup.
+
+### Setup
+
+1. Log in to [SonarQube Cloud](https://sonarcloud.io) with your DEFRA GitHub account
+2. Go to **My Account → Security → Generate Tokens** and create a personal token
+3. Add `SONAR_TOKEN=<your-token>` to your `.env` file
+4. Ensure Docker is running
+
+### Run
+
+Generate test coverage first, then scan:
+
+```bash
+npm run docker:test
+npm run sonar
+```
+
+The script uploads results for the current branch and prints:
+
+- Quality gate pass/fail and failed conditions
+- Open issues on new code (when the gate fails)
+- **Accepted / false-positive issues without comment** — DEFRA quality gates require a justification comment on each suppressed issue; add comments in SonarCloud under the issue **Activity** tab
+
+Exit code is `0` when the gate passes and all suppressed issues are commented, `1` otherwise.
 
 ## Licence
 
