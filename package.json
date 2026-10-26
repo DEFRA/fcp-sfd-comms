@@ -81,6 +81,6 @@
     "axios": "1.20.0",
     "follow-redirects": "1.16.1",
     "fast-xml-builder": "1.1.7",
-    "@hapi/content": "6.0.2"
+    "@hapi/content": "6.0.3"
   }
 }
