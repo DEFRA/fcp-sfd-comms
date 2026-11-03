@@ -87,7 +87,7 @@ Idempotency is enforced to prevent duplicate message processing.
 ### Linting
 - Uses **neostandard**
 - Run with: `npm run lint`
-- Pre-commit hooks configured (`.pre-commit-config.yaml`) for secret detection
+- Husky pre-commit hook (`.husky/pre-commit`) for synthetic CRN/SBI checks, secret detection and linting
 
 ### Database
 - MongoDB for message storage

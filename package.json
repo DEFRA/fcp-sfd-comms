@@ -23,7 +23,9 @@
     "start": "node --experimental-vm-modules src/index.js",
     "start:watch": "nodemon --watch src --exec 'node --experimental-vm-modules --inspect=0.0.0.0 src/index.js'",
     "start:debug": "nodemon --watch src --exec 'node --experimental-vm-modules --inspect-brk=0.0.0.0 src/index.js'",
-    "sonar": "node scripts/sonar-scan.js"
+    "sonar": "node scripts/sonar-scan.js",
+    "check:synthetic-ids": "sfd-id-check --staged",
+    "setup:husky": "node -e \"try { (await import('husky')).default() } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e }\" --input-type module"
   },
   "author": "Defra DDTS",
   "contributors": [
@@ -71,6 +73,8 @@
     "autoprefixer": "10.4.20",
     "dotenv": "17.3.1",
     "eslint": "9.39.4",
+    "fcp-sfd-core": "github:DEFRA/fcp-sfd-core#95f58ade56b2d0dd0f15bdcba6a5f37a54bcc939",
+    "husky": "9.1.7",
     "neostandard": "0.13.0",
     "nodemon": "3.1.7",
     "npm-run-all": "4.1.5",
@@ -79,7 +83,7 @@
   "overrides": {
     "form-data": "4.0.6",
     "axios": "1.20.0",
-    "follow-redirects": "1.16.1",
+    "follow-redirects": "1.16.2",
     "fast-xml-builder": "1.1.7",
     "@hapi/content": "6.0.3"
   }

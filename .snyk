@@ -1,4 +1,19 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
 version: v1.19.0
-ignore: {}
+ignore:
+  SNYK-JS-JOI-22114209:
+    - '*':
+        reason: >-
+          ReDoS in joi's email rule when its multiple option is enabled. The
+          fixed releases (joi 18.3.1 and 17.13.9, published 2026-10-28) fall
+          inside the 7-day supply-chain cooldown enforced by min-release-age=7
+          in .npmrc, so npm rejects them until 2026-11-04T10:05Z.
+
+          Exposure here is nil: the vulnerable path is reached only through
+          Joi.string().email({ multiple: true }), which this service never
+          uses.
+
+          Remove this ignore and upgrade joi once the cooldown window clears.
+        expires: 2026-11-11T00:00:00.000Z
+        created: 2026-11-03T00:00:00.000Z
 patch: {}
