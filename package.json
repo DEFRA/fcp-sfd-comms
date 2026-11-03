@@ -83,7 +83,7 @@
   "overrides": {
     "form-data": "4.0.6",
     "axios": "1.20.0",
-    "follow-redirects": "1.16.1",
+    "follow-redirects": "1.16.2",
     "fast-xml-builder": "1.1.7",
     "@hapi/content": "6.0.3"
   }
