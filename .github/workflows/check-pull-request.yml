@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
           fetch-depth: 0
 
@@ -27,7 +27,7 @@ jobs:
         uses: DEFRA/fcp-sfd-core/.github/actions/check-synthetic-ids@95f58ade56b2d0dd0f15bdcba6a5f37a54bcc939 # main
 
       - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v6
         with:
           node-version: 22
           cache: npm
@@ -48,14 +48,14 @@ jobs:
 
       - name: SonarQubeScan
         if: github.actor != 'dependabot[bot]'
-        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8
+        uses: SonarSource/sonarqube-scan-action@e805d875275f728fac1885b413934be6d7c63f65 # v8
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_SCANNER_OPTS: "-Dsonar.verbose=true"
 
       - name: Snyk Scan
-        uses: snyk/actions/node@8e119fbb6c251787721d34ba683ed48eba792766 # master
+        uses: snyk/actions/node@11b673cfb4b0dc0d860a1323caa199d54950dcce # master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
