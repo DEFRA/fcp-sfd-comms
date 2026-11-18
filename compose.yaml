@@ -31,7 +31,7 @@ services:
       NOTIFY_API_KEY: ${NOTIFY_API_KEY}
 
   floci:
-    image: floci/floci:1.5.5
+    image: floci/floci:2.5.0
     environment:
       FLOCI_HOSTNAME: floci
       FLOCI_DEFAULT_REGION: ${AWS_REGION:-eu-west-2}
@@ -56,7 +56,7 @@ services:
       - ./floci/init.sh:/setup/init.sh
 
   mongodb:
-    image: mongo:6.0.13
+    image: mongo:9.0.4
 
 volumes:
   floci-data:
