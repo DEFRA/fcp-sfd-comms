@@ -70,7 +70,7 @@
     "@types/node": "22.13.4",
     "@types/webpack-assets-manifest": "5.1.4",
     "@vitest/coverage-v8": "4.1.7",
-    "autoprefixer": "10.4.20",
+    "autoprefixer": "10.6.2",
     "dotenv": "17.3.1",
     "eslint": "9.39.4",
     "fcp-sfd-core": "github:DEFRA/fcp-sfd-core#95f58ade56b2d0dd0f15bdcba6a5f37a54bcc939",
